@@ -1,6 +1,6 @@
-package com.nnk.springboot.repositories;
+package com.poseidoninc.poseidon.repositories;
 
-import com.nnk.springboot.domain.RuleName;
+import com.poseidoninc.poseidon.domain.RuleName;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 
