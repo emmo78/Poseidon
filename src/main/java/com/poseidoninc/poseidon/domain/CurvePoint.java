@@ -4,6 +4,9 @@ import java.time.LocalDateTime;
 
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,6 +40,8 @@ public class CurvePoint {
 	Integer curveId ;
 
 	@Column(name = "asOfDate")
+	@DateTimeFormat
+	@JsonFormat(shape = JsonFormat.Shape.STRING)
 	LocalDateTime asOfDate ;
 
 	@Column(name = "term")
@@ -50,5 +55,7 @@ public class CurvePoint {
 	Double value ;
 
 	@Column(name = "creationDate")
+	@DateTimeFormat
+	@JsonFormat(shape = JsonFormat.Shape.STRING)
 	LocalDateTime creationDate ;
 }
