@@ -1,60 +1,48 @@
 package com.poseidoninc.poseidon.domain;
 
-import jakarta.persistence.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
+@DynamicInsert
+@DynamicUpdate
+@Getter
+@Setter
 @Table(name = "users")
 public class User {
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+	@Column(name = "Id")
     private Integer id;
+    
+	@Column(name = "username")
     @NotBlank(message = "Username is mandatory")
+	@Size(max = 125, message = "Username must be maximum of 125 characters")
     private String username;
-    @NotBlank(message = "Password is mandatory")
+	
+    @Column(name = "password")
+    @Pattern(regexp = "^(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$", message ="Password must have at least 8 characters in length, containing at least 1 uppercase letter, 1 digit, and 1 symbol.")
     private String password;
-    @NotBlank(message = "FullName is mandatory")
+
+	@Column(name = "fullname")
+    @NotBlank(message = "Fullname is mandatory")
+	@Size(max = 125, message = "Fullname must be maximum of 125 characters")
     private String fullname;
+ 
+	@Column(name = "role")
     @NotBlank(message = "Role is mandatory")
+	@Size(max = 125, message = "Role must be maximum of 125 characters")
     private String role;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getFullname() {
-        return fullname;
-    }
-
-    public void setFullname(String fullname) {
-        this.fullname = fullname;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
 }
