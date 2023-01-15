@@ -21,7 +21,6 @@ import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.Setter;
 
-
 @Entity
 @DynamicInsert
 @DynamicUpdate
@@ -32,30 +31,30 @@ public class CurvePoint {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "Id")
-	Integer id ;
-	
+	Integer id;
+
 	@Column(name = "CurveId")
 	@Min(value = 0, message = "CurveId must be positive")
-	@Max(value = 127, message = "CurveId is a tinyint so max is 127")	
-	Integer curveId ;
+	@Max(value = 127, message = "CurveId is a tinyint so max is 127")
+	Integer curveId;
 
 	@Column(name = "asOfDate")
 	@DateTimeFormat
 	@JsonFormat(shape = JsonFormat.Shape.STRING)
-	LocalDateTime asOfDate ;
+	LocalDateTime asOfDate;
 
 	@Column(name = "term")
 	@DecimalMin(value = "-1.7976931348623157E308", inclusive = true, message = "Term must be a decimal number")
 	@DecimalMax(value = "1.7976931348623157E308", inclusive = true, message = "Term must be a decimal number")
-	Double term ;
+	Double term;
 
 	@Column(name = "value")
 	@DecimalMin(value = "-1.7976931348623157E308", inclusive = true, message = "Value must be a decimal number")
 	@DecimalMax(value = "1.7976931348623157E308", inclusive = true, message = "Value must be a decimal number")
-	Double value ;
+	Double value;
 
 	@Column(name = "creationDate")
 	@DateTimeFormat
 	@JsonFormat(shape = JsonFormat.Shape.STRING)
-	LocalDateTime creationDate ;
+	LocalDateTime creationDate;
 }

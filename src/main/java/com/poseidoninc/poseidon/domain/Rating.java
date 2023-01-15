@@ -22,26 +22,26 @@ import org.hibernate.annotations.DynamicUpdate;
 @Setter
 @Table(name = "rating")
 public class Rating {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "Id")
-	Integer id ;
-	
+	Integer id;
+
 	@Column(name = "moodysRating")
 	@Size(max = 125, message = "MoodysRating must be maximum of 125 characters")
-	String moodysRating ;
+	String moodysRating;
 
 	@Column(name = "sandPRating")
 	@Size(max = 125, message = "SandPRating must be maximum of 125 characters")
-	String sandPRating ;
+	String sandPRating;
 
 	@Column(name = "fitchRating")
 	@Size(max = 125, message = "FitchRating must be maximum of 125 characters")
-	String fitchRating ;
+	String fitchRating;
 
 	@Column(name = "orderNumber")
 	@Min(value = 0, message = "OrderNumber must be positive")
-	@Max(value = 127, message = "OrderNumber is a tinyint so max is 127")	
-	Integer orderNumber ;
+	@Max(value = 127, message = "OrderNumber is a tinyint so max is 127")
+	Integer orderNumber;
 }

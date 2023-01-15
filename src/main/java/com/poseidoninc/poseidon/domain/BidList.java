@@ -31,97 +31,97 @@ public class BidList {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "BidListId")
-	Integer bidListId ;
-	
+	Integer bidListId;
+
 	@Column(name = "account")
-	@NotBlank(message ="Account must be not null and not blank")
+	@NotBlank(message = "Account must be not null and not blank")
 	@Size(max = 30, message = "Account must be maximum of 30 characters")
-	String account ;
+	String account;
 
 	@Column(name = "type")
-	@NotBlank(message ="Type must be not null and not blank")
+	@NotBlank(message = "Type must be not null and not blank")
 	@Size(max = 30, message = "Type must be maximum of 30 characters")
-	String type ;
+	String type;
 
 	@Column(name = "bidQuantity")
 	@DecimalMin(value = "-1.7976931348623157E308", inclusive = true, message = "Bidqantity must be a decimal number")
 	@DecimalMax(value = "1.7976931348623157E308", inclusive = true, message = "Bidqantity must be a decimal number")
-	Double bidQuantity ;
+	Double bidQuantity;
 
 	@Column(name = "askQuantity")
 	@DecimalMin(value = "-1.7976931348623157E308", inclusive = true, message = "AskQuantity must be a decimal number")
 	@DecimalMax(value = "1.7976931348623157E308", inclusive = true, message = "AskQuantity must be a decimal number")
-	Double askQuantity ;
+	Double askQuantity;
 
 	@Column(name = "bid")
 	@DecimalMin(value = "-1.7976931348623157E308", inclusive = true, message = "Bid must be a decimal number")
 	@DecimalMax(value = "1.7976931348623157E308", inclusive = true, message = "Bid must be a decimal number")
-	Double bid ;
+	Double bid;
 
 	@Column(name = "ask")
 	@DecimalMin(value = "-1.7976931348623157E308", inclusive = true, message = "Ask must be a decimal number")
 	@DecimalMax(value = "1.7976931348623157E308", inclusive = true, message = "Ask must be a decimal number")
-	Double ask ;
+	Double ask;
 
 	@Column(name = "benchmark")
 	@Size(max = 125, message = "Benchmark must be maximum of 125 characters")
-	String benchmark ;
+	String benchmark;
 
 	@Column(name = "bidListDate")
 	@DateTimeFormat
 	@JsonFormat(shape = JsonFormat.Shape.STRING)
-	LocalDateTime bidListDate ;
+	LocalDateTime bidListDate;
 
 	@Column(name = "commentary")
 	@Size(max = 125, message = "Commentary must be maximum of 125 characters")
-	String commentary ;
+	String commentary;
 
 	@Column(name = "security")
 	@Size(max = 125, message = "Security must be maximum of 125 characters")
-	String security ;
+	String security;
 
 	@Column(name = "status")
 	@Size(max = 10, message = "Status must be maximum of 10 characters")
-	String status ;
+	String status;
 
 	@Column(name = "trader")
 	@Size(max = 125, message = "Trader must be maximum of 125 characters")
-	String trader ;
+	String trader;
 
 	@Column(name = "book")
 	@Size(max = 125, message = "Book must be maximum of 125 characters")
-	String book ;
+	String book;
 
 	@Column(name = "creationName")
-	String creationName ;
+	String creationName;
 
 	@Column(name = "creationDate")
 	@DateTimeFormat
 	@JsonFormat(shape = JsonFormat.Shape.STRING)
-	LocalDateTime creationDate ;
+	LocalDateTime creationDate;
 
 	@Column(name = "revisionName")
 	@Size(max = 125, message = "RevisionName must be maximum of 125 characters")
-	String revisionName ;
-	
+	String revisionName;
+
 	@Column(name = "revisionDate")
 	@DateTimeFormat
 	@JsonFormat(shape = JsonFormat.Shape.STRING)
-	LocalDateTime revisionDate ;
-	
+	LocalDateTime revisionDate;
+
 	@Column(name = "dealName")
 	@Size(max = 125, message = "dealName must be maximum of 125 characters")
-	String dealName ;
-	
+	String dealName;
+
 	@Column(name = "dealType")
 	@Size(max = 125, message = "DealType must be maximum of 125 characters")
-	String dealType ;
-	
+	String dealType;
+
 	@Column(name = "sourceListId")
 	@Size(max = 125, message = "SourceListId must be maximum of 125 characters")
-	String sourceListId ;
-	
+	String sourceListId;
+
 	@Column(name = "side")
 	@Size(max = 125, message = "Side must be maximum of 125 characters")
-	String side ;
+	String side;
 }
