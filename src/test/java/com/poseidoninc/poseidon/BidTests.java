@@ -3,6 +3,7 @@ package com.poseidoninc.poseidon;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,7 +40,7 @@ public class BidTests {
 
 		// Find
 		List<BidList> listResult = bidListRepository.findAll();
-		assertThat(listResult.size()).isGreaterThan(0);
+		assertTrue(listResult.size() > 0);
 
 		// Delete
 		Integer id = bid.getBidListId();

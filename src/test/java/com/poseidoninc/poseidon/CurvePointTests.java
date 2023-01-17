@@ -1,8 +1,8 @@
 package com.poseidoninc.poseidon;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,16 +30,16 @@ public class CurvePointTests {
 		// Save
 		curvePoint = curvePointRepository.save(curvePoint);
 		assertNotNull(curvePoint.getId());
-		assertEquals(10, curvePoint.getCurveId());
+		assertTrue(curvePoint.getCurveId() == 10);
 
 		// Update
 		curvePoint.setCurveId(20);
 		curvePoint = curvePointRepository.save(curvePoint);
-		assertEquals(20, curvePoint.getCurveId());
+		assertTrue(curvePoint.getCurveId() == 20);
 
 		// Find
 		List<CurvePoint> listResult = curvePointRepository.findAll();
-		assertThat(listResult.size()).isGreaterThan(0);
+		assertTrue(listResult.size() > 0);
 
 		// Delete
 		Integer id = curvePoint.getId();
