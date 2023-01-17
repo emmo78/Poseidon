@@ -99,7 +99,7 @@ public class Trade {
 	@Size(max = 125, message = "RevisionName must be maximum of 125 characters")
 	String revisionName;
 
-	@Column(name = "bidListDate")
+	@Column(name = "revisionDate")
 	@DateTimeFormat
 	@JsonFormat(shape = JsonFormat.Shape.STRING)
 	LocalDateTime revisionDate;
