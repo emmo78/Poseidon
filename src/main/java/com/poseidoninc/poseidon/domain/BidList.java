@@ -44,22 +44,22 @@ public class BidList {
 	String type;
 
 	@Column(name = "bidQuantity")
-	@DecimalMin(value = "-1.7976931348623157E308", inclusive = true, message = "Bidqantity must be a decimal number")
+	@DecimalMin(value = "0.0", message = "Bidqantity must be a decimal number")
 	@DecimalMax(value = "1.7976931348623157E308", inclusive = true, message = "Bidqantity must be a decimal number")
 	Double bidQuantity;
 
 	@Column(name = "askQuantity")
-	@DecimalMin(value = "-1.7976931348623157E308", inclusive = true, message = "AskQuantity must be a decimal number")
+	@DecimalMin(value = "0.0", message = "AskQuantity must be a decimal number")
 	@DecimalMax(value = "1.7976931348623157E308", inclusive = true, message = "AskQuantity must be a decimal number")
 	Double askQuantity;
 
 	@Column(name = "bid")
-	@DecimalMin(value = "-1.7976931348623157E308", inclusive = true, message = "Bid must be a decimal number")
+	@DecimalMin(value = "0.0", message = "Bid must be a decimal number")
 	@DecimalMax(value = "1.7976931348623157E308", inclusive = true, message = "Bid must be a decimal number")
 	Double bid;
 
 	@Column(name = "ask")
-	@DecimalMin(value = "-1.7976931348623157E308", inclusive = true, message = "Ask must be a decimal number")
+	@DecimalMin(value = "0.0", message = "Ask must be a decimal number")
 	@DecimalMax(value = "1.7976931348623157E308", inclusive = true, message = "Ask must be a decimal number")
 	Double ask;
 
@@ -93,6 +93,7 @@ public class BidList {
 	String book;
 
 	@Column(name = "creationName")
+	@Size(max = 125, message = "CreationName must be maximum of 125 characters")
 	String creationName;
 
 	@Column(name = "creationDate")

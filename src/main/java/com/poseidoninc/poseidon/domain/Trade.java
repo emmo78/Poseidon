@@ -42,22 +42,22 @@ public class Trade {
 	String type;
 	
 	@Column(name = "buyQuantity")
-	@DecimalMin(value = "-1.7976931348623157E308", inclusive = true, message = "BuyQuantity must be a decimal number")
+	@DecimalMin(value = "0.0", message = "BuyQuantity must be a decimal number")
 	@DecimalMax(value = "1.7976931348623157E308", inclusive = true, message = "BuyQuantity must be a decimal number")
 	Double buyQuantity;
 	
 	@Column(name = "sellQuantity")
-	@DecimalMin(value = "-1.7976931348623157E308", inclusive = true, message = "SellQuantity must be a decimal number")
+	@DecimalMin(value = "0.0", message = "SellQuantity must be a decimal number")
 	@DecimalMax(value = "1.7976931348623157E308", inclusive = true, message = "SellQuantity must be a decimal number")
 	Double sellQuantity;
 	
 	@Column(name = "buyPrice")
-	@DecimalMin(value = "-1.7976931348623157E308", inclusive = true, message = "BuyPrice must be a decimal number")
+	@DecimalMin(value = "0.0", message = "BuyPrice must be a decimal number")
 	@DecimalMax(value = "1.7976931348623157E308", inclusive = true, message = "BuyPrice must be a decimal number")
 	Double buyPrice;
 
 	@Column(name = "sellPrice")
-	@DecimalMin(value = "-1.7976931348623157E308", inclusive = true, message = "SellPrice must be a decimal number")
+	@DecimalMin(value = "0.0", message = "SellPrice must be a decimal number")
 	@DecimalMax(value = "1.7976931348623157E308", inclusive = true, message = "SellPrice must be a decimal number")
 	Double sellPrice;
 
@@ -99,7 +99,7 @@ public class Trade {
 	@Size(max = 125, message = "RevisionName must be maximum of 125 characters")
 	String revisionName;
 
-	@Column(name = "bidListDate")
+	@Column(name = "revisionDate")
 	@DateTimeFormat
 	@JsonFormat(shape = JsonFormat.Shape.STRING)
 	LocalDateTime revisionDate;
