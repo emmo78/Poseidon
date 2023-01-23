@@ -1,7 +1,5 @@
 package com.poseidoninc.poseidon.controllers;
 
-import com.poseidoninc.poseidon.domain.User;
-import com.poseidoninc.poseidon.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -10,7 +8,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.request.WebRequest;
+
+import com.poseidoninc.poseidon.domain.User;
+import com.poseidoninc.poseidon.repositories.UserRepository;
 
 import jakarta.validation.Valid;
 
@@ -19,8 +20,8 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
-    @RequestMapping("/user/list")
-    public String home(Model model)
+    @GetMapping("/user/list")
+    public String home(Model model, WebRequest request)
     {
         model.addAttribute("users", userRepository.findAll());
         return "user/list";
