@@ -48,7 +48,7 @@ public class CurvePoint {
 	@DecimalMax(value = "1.7976931348623157E308", inclusive = true, message = "Term must be a decimal number")
 	Double term;
 
-	@Column(name = "cvalue")
+	@Column(name = "`value`")
 	@DecimalMin(value = "0.0", message = "Value must be a decimal number")
 	@DecimalMax(value = "1.7976931348623157E308", inclusive = true, message = "Value must be a decimal number")
 	Double value;
