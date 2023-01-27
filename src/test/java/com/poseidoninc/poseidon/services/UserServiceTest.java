@@ -2,10 +2,14 @@ package com.poseidoninc.poseidon.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.AfterAll;
@@ -22,6 +26,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -158,7 +165,7 @@ public class UserServiceTest {
 		public void setUpForAllTests() {
 			requestMock = new MockHttpServletRequest();
 			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/user/getByName/Aaa");
+			requestMock.setRequestURI("/user/getById/1");
 			request = new ServletWebRequest(requestMock);
 		}
 
@@ -211,7 +218,7 @@ public class UserServiceTest {
 		@DisplayName("test getUserById should throw UnexpectedRollbackException on ResourceNotFoundException")
 		public void getUserByIdTestShouldThrowsResourceNotFoundException() {
 			//GIVEN
-			when(userRepository.findById(anyInt())).thenReturn(null);
+			when(userRepository.findById(anyInt())).thenReturn(Optional.ofNullable(null));
 			
 			//WHEN
 			//THEN
@@ -247,7 +254,93 @@ public class UserServiceTest {
 				() -> userService.getUserById(1, request))
 				.getMessage()).isEqualTo("Error while getting user profile");
 		}
-	}	
+	}
+	
+	@Nested
+	@Tag("getUsersTests")
+	@DisplayName("Tests for getting users")
+	@TestInstance(Lifecycle.PER_CLASS)
+	class getUsersTests {
+		
+		private Pageable pageRequest;
+		
+		@BeforeAll
+		public void setUpForAllTests() {
+			pageRequest = Pageable.unpaged();
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/user/getUsers");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			pageRequest = null;
+			requestMock = null;
+			request = null;
+		}
+		
+		@AfterEach
+		public void unSetForEachTests() {
+			userService = null;
+			user = null;
+		}
+
+		@Test
+		@Tag("UserServiceTest")
+		@DisplayName("test getUsers should return users")
+		public void getUserByIdShouldRetrunExcpectedUser() {
+			
+			//GIVEN
+			List<User> expectedUsers = new ArrayList<>();
+			user = new User();
+			user.setId(1);
+			user.setUsername("Aaa");
+			user.setPassword("aaa1=Passwd");
+			user.setFullname("AAA");
+			user.setRole("USER");
+			expectedUsers.add(user);
+			user.setId(2);
+			user.setUsername("Bbb");
+			user.setPassword("bbb2=Passwd");
+			user.setFullname("BBB");
+			expectedUsers.add(user);
+			when(userRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<User>(expectedUsers, pageRequest, 2));
+			
+			//WHEN
+			Page<User> resultedUsers = userService.getUsers(pageRequest, request);
+			
+			//THEN
+			assertThat(resultedUsers).containsExactlyElementsOf(expectedUsers);
+		}
+		
+		@Test
+		@Tag("UserServiceTest")
+		@DisplayName("test getUsers should throw UnexpectedRollbackException on NullPointerException")
+		public void getUserssTestShouldThrowsUnexpectedRollbackExceptionOnNullPointerException() {
+			//GIVEN
+			when(userRepository.findAll(any(Pageable.class))).thenThrow(new NullPointerException());
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> userService.getUsers(pageRequest, request))
+					.getMessage()).isEqualTo("Error while getting Users");
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test getUsers should throw UnexpectedRollbackException on any RuntimeException")
+		public void getRegistrantsTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
+			//GIVEN
+			when(userRepository.findAll(any(Pageable.class))).thenThrow(new RuntimeException());
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> userService.getUsers(pageRequest, request))
+					.getMessage()).isEqualTo("Error while getting Users");
+		}
+		
+	}
 }	
 
 

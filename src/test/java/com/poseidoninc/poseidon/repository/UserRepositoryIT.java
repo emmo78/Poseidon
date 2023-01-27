@@ -87,7 +87,7 @@ public class UserRepositoryIT {
 			//GIVEN
 			user.setId(null);
 			user.setUsername("Aaa");
-			user.setPassword(passwd); //missing 1 symbol and one number 
+			user.setPassword(passwd);
 			user.setFullname("AAA");
 			user.setRole("USER");
 	

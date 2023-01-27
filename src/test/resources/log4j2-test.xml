@@ -22,15 +22,15 @@
     </Appenders>
 
     <Loggers>
-        <!-- LOG everything at ERROR level -->
-        <Root level="error">
+        <!-- LOG everything at INFO level -->
+        <Root level="info">
             <AppenderRef ref="Console" />
             <AppenderRef ref="RollingFile" />
         </Root>
 
-        <!-- LOG at ERROR level -->
-        <Logger name="org.springframework.boot.autoconfigure" level="error"></Logger>
-        <Logger name="org.springframework.boot.web.embedded.tomcat" level="error"></Logger>
+        <!-- LOG at INFO level -->
+        <Logger name="org.springframework.boot.autoconfigure" level="info"></Logger>
+        <Logger name="org.springframework.boot.web.embedded.tomcat" level="info"></Logger>
  
         <!-- LOG at DEBUG level -->
 		<Logger name="com.paymybuddy.paymybuddy.service" level="debug"></Logger>

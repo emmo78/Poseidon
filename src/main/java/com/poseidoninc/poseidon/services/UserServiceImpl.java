@@ -41,6 +41,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
 	public User getUserById(Integer userId, WebRequest request) throws UnexpectedRollbackException {
 		User user = null;
 		try {
@@ -59,8 +60,22 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public Page<User> getUsers(Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException {
-		// TODO Auto-generated method stub
-		return null;
+		Page<User> pageUsers = null;
+		try {
+			//throws NullPointerException if pageRequest is null
+			pageUsers = userRepository.findAll(pageRequest);
+		} catch(NullPointerException npe) {
+			log.error("{} : {} ", requestService.requestToString(request), npe.toString());
+			throw new UnexpectedRollbackException("Error while getting Users");
+		} catch(Exception e) {
+			log.error("{} : {} ", requestService.requestToString(request), e.toString());
+			throw new UnexpectedRollbackException("Error while getting Users");
+		}
+		log.info("{} : users page number : {} of {}",
+			requestService.requestToString(request),
+			pageUsers.getNumber()+1,
+			pageUsers.getTotalPages());
+		return pageUsers;
 	}
 
 	@Override
