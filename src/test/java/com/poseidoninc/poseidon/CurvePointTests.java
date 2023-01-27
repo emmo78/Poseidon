@@ -16,7 +16,7 @@ import com.poseidoninc.poseidon.domain.CurvePoint;
 import com.poseidoninc.poseidon.repositories.CurvePointRepository;
 
 @SpringBootTest
-@ActiveProfiles("mytest")
+//@ActiveProfiles("mytest")
 public class CurvePointTests {
 
 	@Autowired

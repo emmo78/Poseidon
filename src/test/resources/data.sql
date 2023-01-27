@@ -87,7 +87,3 @@ CREATE TABLE `users` (
   `role` varchar(125) DEFAULT NULL,
   PRIMARY KEY (`Id`)
 );
-
-insert into `users`(`fullname`, `username`, `password`, `role`) values('Administrator', 'admin', '$2a$10$pBV8ILO/s/nao4wVnGLrh.sa/rnr5pDpbeC4E.KNzQWoy8obFZdaa', 'ADMIN');
-insert into `users`(`fullname`, `username`, `password`, `role`) values('User', 'user', '$2a$10$pBV8ILO/s/nao4wVnGLrh.sa/rnr5pDpbeC4E.KNzQWoy8obFZdaa', 'USER');
-insert into `curvepoint` (`CurveId`, `asOfDate`, `term`, `value`, `creationDate`) values(0, NULL, 0.0, 0.0, NULL); 

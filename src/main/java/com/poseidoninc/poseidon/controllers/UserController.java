@@ -1,6 +1,5 @@
 package com.poseidoninc.poseidon.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,11 +13,13 @@ import com.poseidoninc.poseidon.domain.User;
 import com.poseidoninc.poseidon.repositories.UserRepository;
 
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 
 @Controller
+@AllArgsConstructor
 public class UserController {
-    @Autowired
-    private UserRepository userRepository;
+ 
+    private final UserRepository userRepository;
 
     @GetMapping("/user/list")
     public String home(Model model, WebRequest request)
