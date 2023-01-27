@@ -42,8 +42,19 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public User getUserById(Integer userId, WebRequest request) throws UnexpectedRollbackException {
-		// TODO Auto-generated method stub
-		return null;
+		User user = null;
+		try {
+			//Throws ResourceNotFoundException | IllegalArgumentException
+			user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+		} catch(ResourceNotFoundException | IllegalArgumentException re) {
+			log.error("{} : {} ", requestService.requestToString(request), re.toString());
+			throw new UnexpectedRollbackException("Error while getting user profile");
+		} catch (Exception e) {
+			log.error("{} : {} ", requestService.requestToString(request), e.toString());
+			throw new UnexpectedRollbackException("Error while getting user profile");
+		}
+		log.info("{} : user={} gotten",  requestService.requestToString(request), user.getId());
+		return user;
 	}
 
 	@Override
