@@ -99,32 +99,107 @@ public class UserRepositoryIT {
 		}
 	}
 	
-	@Test
+	@Nested
 	@Tag("findByUsernameTests")
-	@DisplayName("find by Username will return the user by Username")
-	public void findByUsernameTestShouldReturnUserByUsername() {
+	@DisplayName("Tests finding user by username")
+	@TestInstance(Lifecycle.PER_CLASS)
+	class FindByUserNameTests {
 
-		//GIVEN
-		user.setId(null);
-		user.setUsername("Aaa");
-		user.setPassword("aaa1=Passwd");
-		user.setFullname("AAA");
-		user.setRole("USER");
-		userRepository.saveAndFlush(user);
-
-		//WHEN
-		User userResult = userRepository.findByUsername("Aaa");
+		@Test
+		@Tag("UserRepositoryIT")
+		@DisplayName("find by Username should return the user by Username")
+		public void findByUsernameTestShouldReturnUserByUsername() {
+	
+			//GIVEN
+			user.setId(null);
+			user.setUsername("Aaa");
+			user.setPassword("aaa1=Passwd");
+			user.setFullname("AAA");
+			user.setRole("USER");
+			userRepository.saveAndFlush(user);
+	
+			//WHEN
+			User userResult = userRepository.findByUsername("Aaa");
+			
+			//THEN
+			assertThat(userResult).extracting(
+					User::getUsername,
+					User::getPassword,
+					User::getFullname,
+					User::getRole)
+				.containsExactly(
+					"Aaa",
+					"aaa1=Passwd",
+					"AAA",
+					"USER");	
+		}
 		
-		//THEN
-		assertThat(userResult).extracting(
-				User::getUsername,
-				User::getPassword,
-				User::getFullname,
-				User::getRole)
-			.containsExactly(
-				"Aaa",
-				"aaa1=Passwd",
-				"AAA",
-				"USER");	
-	}	
+		@Test
+		@Tag("UserRepositoryIT")
+		@DisplayName("find by incorrect username should return null")
+		public void findByIncorrectUsernameTestShouldReturnNull() {
+	
+			//GIVEN
+			user.setId(null);
+			user.setUsername("Aaa");
+			user.setPassword("aaa1=Passwd");
+			user.setFullname("AAA");
+			user.setRole("USER");
+			userRepository.saveAndFlush(user);
+	
+			//WHEN
+			User userResult = userRepository.findByUsername("Bbb");
+			
+			//THEN
+			assertThat(userRepository.findById(null)).isEmpty();
+			assertThat(userResult).isNull();	
+		}	
+	}
+	
+	@Nested
+	@Tag("existsByUsernameTests")
+	@DisplayName("Tests exists by userName")
+	@TestInstance(Lifecycle.PER_CLASS)
+	class ExistsByUserNameTests {
+
+		@Test
+		@Tag("UserRepositoryIT")
+		@DisplayName("exists by Username should return true")
+		public void findByUsernameTestShouldReturnTrue() {
+	
+			//GIVEN
+			user.setId(null);
+			user.setUsername("Aaa");
+			user.setPassword("aaa1=Passwd");
+			user.setFullname("AAA");
+			user.setRole("USER");
+			userRepository.saveAndFlush(user);
+	
+			//WHEN
+			boolean result = userRepository.existsByUsername("Aaa");
+			
+			//THEN
+			assertThat(result).isTrue();	
+		}
+		
+		@Test
+		@Tag("UserRepositoryIT")
+		@DisplayName("exists by Username should return false")
+		public void findByUsernameTestShouldReturnFalse() {
+	
+			//GIVEN
+			user.setId(null);
+			user.setUsername("Aaa");
+			user.setPassword("aaa1=Passwd");
+			user.setFullname("AAA");
+			user.setRole("USER");
+			userRepository.saveAndFlush(user);
+	
+			//WHEN
+			boolean result = userRepository.existsByUsername("Bbb");
+			
+			//THEN
+			assertThat(result).isFalse();	
+		}
+	}
 }

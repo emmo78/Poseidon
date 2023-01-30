@@ -1,14 +1,15 @@
 package com.poseidoninc.poseidon.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +23,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -30,11 +34,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 import com.poseidoninc.poseidon.domain.User;
+import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
 import com.poseidoninc.poseidon.repositories.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,6 +55,9 @@ public class UserServiceTest {
 	
 	@Spy
 	private RequestService requestService = new RequestServiceImpl();
+	
+	@Mock
+	private PasswordEncoder passwordEncoder;
 	
 	private MockHttpServletRequest requestMock;
 	private WebRequest request;
@@ -215,32 +225,32 @@ public class UserServiceTest {
 		
 		@Test
 		@Tag("UserServiceTest")
-		@DisplayName("test getUserById should throw UnexpectedRollbackException on ResourceNotFoundException")
-		public void getUserByIdTestShouldThrowsResourceNotFoundException() {
-			//GIVEN
-			when(userRepository.findById(anyInt())).thenReturn(Optional.ofNullable(null));
-			
-			//WHEN
-			//THEN
-			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> userService.getUserById(1, request))
-				.getMessage()).isEqualTo("Error while getting user profile");
-		}
-		
-		@Test
-		@Tag("UserServiceTest")
-		@DisplayName("test getUserById should throw UnexpectedRollbackException on IllegalArgumentException")
+		@DisplayName("test getUserById should throw IllegalArgumentException")
 		public void getUserByIdTestShouldThrowsUnexpectedRollbackExceptionOnIllegalArgumentException() {
 			//GIVEN
 			when(userRepository.findById(anyInt())).thenThrow(new IllegalArgumentException());
 			
 			//WHEN
 			//THEN
-			assertThat(assertThrows(UnexpectedRollbackException.class,
+			assertThat(assertThrows(IllegalArgumentException.class,
 				() -> userService.getUserById(1, request))
-				.getMessage()).isEqualTo("Error while getting user profile");
+				.getMessage()).isEqualTo("Id must not be null");
 		}
 
+		@Test
+		@Tag("UserServiceTest")
+		@DisplayName("test getUserById should throw ResourceNotFoundException")
+		public void getUserByIdTestShouldThrowsResourceNotFoundException() {
+			//GIVEN
+			when(userRepository.findById(anyInt())).thenReturn(Optional.ofNullable(null));
+			
+			//WHEN
+			//THEN
+			assertThat(assertThrows(ResourceNotFoundException.class,
+				() -> userService.getUserById(1, request))
+				.getMessage()).isEqualTo("User profil not found");
+		}
+		
 		@Test
 		@Tag("UserServiceTest")
 		@DisplayName("test getUserById should throw UnexpectedRollbackException on any RuntimeException")
@@ -339,7 +349,94 @@ public class UserServiceTest {
 					() -> userService.getUsers(pageRequest, request))
 					.getMessage()).isEqualTo("Error while getting Users");
 		}
+	}
+	
+	@Nested
+	@Tag("saveUserTests")
+	@DisplayName("Tests for saving users")
+	@TestInstance(Lifecycle.PER_CLASS)
+	class SaveUserTests {
 		
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/user/saveUser");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
+		
+		@AfterEach
+		public void unSetForEachTests() {
+			userService = null;
+			user = null;
+		}
+
+		@ParameterizedTest(name = "id = {0}, userName = {1}, existsByUserName return {2} saveUser should return user")
+		@CsvSource(value = {"null, Aaa, false"//,
+							//"1, Aaa, true",
+							//"1, Bbb, false"
+		}, nullValues = {"null"}  
+				)
+		@Tag("UserServiceTest")
+		@DisplayName("test saveUser should return users")
+		public void saveUserShouldReturnUser(int id, String userName, boolean existsByUserName) {
+			
+			//GIVEN
+			user = new User();
+			user.setUsername("Aaa");
+			user.setPassword("aaa1=Passwd");
+			user.setFullname("AAA");
+			user.setRole("USER");
+			when(userRepository.findById(nullable(Integer.class))).thenReturn(Optional.of(user));
+			when(userRepository.existsByUsername(anyString())).thenReturn(existsByUserName);
+			
+			//WHEN
+			User resultedUser = userService.saveUser(id, user, request);
+			
+			//THEN
+			assertThat(resultedUser).extracting(
+					User::getUsername,
+					User::getPassword,
+					User::getFullname,
+					User::getRole)
+				.containsExactly(
+					userName,
+					"$2y$10$t1l6VPEz5lU69UM1T9HXBOwUwRgGZI6K3Vju/Tfcw1BG./fQbGgJu",
+					"AAA",
+					"USER");	
+		}
+		
+/*		@Test
+		@Tag("UserServiceTest")
+		@DisplayName("test saveUser should throw UnexpectedRollbackException on NullPointerException")
+		public void saveUsersTestShouldThrowsUnexpectedRollbackExceptionOnNullPointerException() {
+			//GIVEN
+			when(userRepository.findAll(any(Pageable.class))).thenThrow(new NullPointerException());
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> userService.saveUser(pageRequest, request))
+					.getMessage()).isEqualTo("Error while saving Users");
+		}
+		
+		@Test
+		@Tag("RegisteredServiceTest")
+		@DisplayName("test saveUser should throw UnexpectedRollbackException on any RuntimeException")
+		public void getRegistrantsTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
+			//GIVEN
+			when(userRepository.findAll(any(Pageable.class))).thenThrow(new RuntimeException());
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> userService.saveUser(pageRequest, request))
+					.getMessage()).isEqualTo("Error while saving Users");
+		}	*/
 	}
 }	
 

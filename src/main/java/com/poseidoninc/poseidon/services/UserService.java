@@ -6,12 +6,14 @@ import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.web.context.request.WebRequest;
 
 import com.poseidoninc.poseidon.domain.User;
+import com.poseidoninc.poseidon.exception.ResourceConflictException;
+import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
 
 public interface UserService {
 	User getUserByUserName(String userName, WebRequest request) throws UnexpectedRollbackException;
-	User getUserById(Integer userId, WebRequest request) throws UnexpectedRollbackException;
-	
+	User getUserById(Integer userId, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException;
 	Page<User> getUsers(Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException;
-	User saveUser(Integer Id, User user, WebRequest request) throws UnexpectedRollbackException;
-	void deleteUser(Integer Id, WebRequest request) throws UnexpectedRollbackException;	
+
+	User saveUser(Integer id, User user, WebRequest request) throws ResourceConflictException, ResourceNotFoundException, UnexpectedRollbackException;
+	void deleteUser(Integer id, WebRequest request) throws UnexpectedRollbackException;	
 }
