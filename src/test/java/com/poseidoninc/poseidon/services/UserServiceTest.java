@@ -1,12 +1,14 @@
 package com.poseidoninc.poseidon.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -16,6 +18,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
@@ -25,7 +28,7 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -54,10 +57,10 @@ public class UserServiceTest {
 	private UserRepository userRepository;
 	
 	@Spy
-	private RequestService requestService = new RequestServiceImpl();
+	private final RequestService requestService = new RequestServiceImpl();
 	
-	@Mock
-	private PasswordEncoder passwordEncoder;
+	@Spy
+	private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 	
 	private MockHttpServletRequest requestMock;
 	private WebRequest request;
@@ -248,7 +251,7 @@ public class UserServiceTest {
 			//THEN
 			assertThat(assertThrows(ResourceNotFoundException.class,
 				() -> userService.getUserById(1, request))
-				.getMessage()).isEqualTo("User profil not found");
+				.getMessage()).isEqualTo("User not found");
 		}
 		
 		@Test
@@ -377,37 +380,47 @@ public class UserServiceTest {
 			user = null;
 		}
 
-		@ParameterizedTest(name = "id = {0}, userName = {1}, existsByUserName return {2} saveUser should return user")
-		@CsvSource(value = {"null, Aaa, false"//,
-							//"1, Aaa, true",
-							//"1, Bbb, false"
-		}, nullValues = {"null"}  
-				)
+		@ParameterizedTest(name = "id = {0}, userToSaveName = {1}, existsByUserName return {2}, saveUser should return user")
+		@CsvSource(value = {"null, Aaa, false",
+							"1, Aaa, true",
+							"1, Bbb, false"}
+							,nullValues = {"null"})
 		@Tag("UserServiceTest")
-		@DisplayName("test saveUser should return users")
-		public void saveUserShouldReturnUser(int id, String userName, boolean existsByUserName) {
+		@DisplayName("test saveUser should return user")
+		public void saveUserShouldReturnUser(Integer id, String userToSaveName, boolean existsByUserName) {
 			
 			//GIVEN
+			User userToSave = new User();
+			userToSave.setId(id);
+			userToSave.setUsername(userToSaveName);
+			userToSave.setPassword("aaa1=Passwd");
+			userToSave.setFullname("AAA");
+			userToSave.setRole("USER");
+			
 			user = new User();
+			user.setId(1);
 			user.setUsername("Aaa");
 			user.setPassword("aaa1=Passwd");
 			user.setFullname("AAA");
 			user.setRole("USER");
+			
 			when(userRepository.findById(nullable(Integer.class))).thenReturn(Optional.of(user));
-			when(userRepository.existsByUsername(anyString())).thenReturn(existsByUserName);
+			lenient().when(userRepository.existsByUsername(anyString())).thenReturn(existsByUserName);
+			ArgumentCaptor<User> userBeingSaved = ArgumentCaptor.forClass(User.class);
+			when(userRepository.save(any(User.class))).thenReturn(userToSave);
 			
 			//WHEN
-			User resultedUser = userService.saveUser(id, user, request);
+			User resultedUser = userService.saveUser(userToSave, request);
 			
 			//THEN
+			verify(userRepository, times(1)).save(userBeingSaved.capture());
+			passwordEncoder.matches("aaa1=Passwd", userBeingSaved.getValue().getPassword());
 			assertThat(resultedUser).extracting(
 					User::getUsername,
-					User::getPassword,
 					User::getFullname,
 					User::getRole)
 				.containsExactly(
-					userName,
-					"$2y$10$t1l6VPEz5lU69UM1T9HXBOwUwRgGZI6K3Vju/Tfcw1BG./fQbGgJu",
+					userToSaveName,
 					"AAA",
 					"USER");	
 		}

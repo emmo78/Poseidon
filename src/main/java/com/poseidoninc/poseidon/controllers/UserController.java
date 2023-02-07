@@ -1,12 +1,10 @@
 package com.poseidoninc.poseidon.controllers;
 
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.context.request.WebRequest;
 
@@ -22,6 +20,7 @@ import lombok.AllArgsConstructor;
 public class UserController {
 
 	private final UserService userService;
+	private final UserRepository userRepository;
 
 	@GetMapping("/user/list")
 	public String home(Model model, WebRequest request) {
@@ -35,18 +34,18 @@ public class UserController {
 		return "user/add";
 	}
 
-/*	@PostMapping("/user/validate")
+	@PostMapping("/user/validate")
 	public String validate(@Valid User user, BindingResult result, Model model) {
 		if (result.hasErrors()) {
 			return "user/add";
 		}
 
-		userService.save(user);
+		userRepository.save(user);
 		return "redirect:/user/list";
 
 	}
 
-	@GetMapping("/user/update/{id}")
+/*	@GetMapping("/user/update/{id}")
 	public String showUpdateForm(@PathVariable("id") int id, Model model) {
 		User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
 		user.setPassword("");

@@ -151,9 +151,29 @@ public class UserRepositoryIT {
 			User userResult = userRepository.findByUsername("Bbb");
 			
 			//THEN
-			assertThat(userRepository.findById(null)).isEmpty();
+			assertThat(userResult).isNull();
+			
+		}
+		
+		@Test
+		@Tag("UserRepositoryIT")
+		@DisplayName("find by null username should return null")
+		public void findByNullUserNameTestShouldReturnNull() {
+	
+			//GIVEN
+			user.setId(null);
+			user.setUsername("Aaa");
+			user.setPassword("aaa1=Passwd");
+			user.setFullname("AAA");
+			user.setRole("USER");
+			userRepository.saveAndFlush(user);
+	
+			//WHEN
+			User userResult = userRepository.findByUsername(null);
+			
+			//THEN
 			assertThat(userResult).isNull();	
-		}	
+		}
 	}
 	
 	@Nested

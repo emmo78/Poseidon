@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
 			throw new IllegalArgumentException ("Id must not be null");
 		} catch(ResourceNotFoundException  rnfe) {
 			log.error("{} : {} ", requestService.requestToString(request), rnfe.toString());
-			throw new ResourceNotFoundException("User profil not found");
+			throw new ResourceNotFoundException(rnfe.getMessage());
 		} catch (Exception e) {
 			log.error("{} : {} ", requestService.requestToString(request), e.toString());
 			throw new UnexpectedRollbackException("Error while getting user profile");
@@ -90,11 +90,12 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional(rollbackFor = {ResourceNotFoundException.class, ResourceConflictException.class, UnexpectedRollbackException.class})
-	public User saveUser(Integer id, User user, WebRequest request) throws ResourceConflictException, ResourceNotFoundException, UnexpectedRollbackException {
+	public User saveUser(User user, WebRequest request) throws ResourceConflictException, ResourceNotFoundException, UnexpectedRollbackException {
+		Integer id = user.getId();
 		String username = user.getUsername();
 		String oldUsername = null;
 		try {
-			oldUsername = getUserById(id, request).getUsername();
+			oldUsername = getUserById(id, request).getUsername(); //throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException
 		} catch (IllegalArgumentException iae) {
 			
 		} finally {
@@ -104,10 +105,10 @@ public class UserServiceImpl implements UserService {
 				throw rce;
 			}
 		}
-		user.setId(id);
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
+		User savedUser = null;
 		try {
-			user = userRepository.save(user);
+			savedUser = userRepository.save(user);
 		}  catch(IllegalArgumentException | OptimisticLockingFailureException re) {
 			log.error("{} : user={} : {} ", requestService.requestToString(request), user.getUsername(), re.toString());
 			throw new UnexpectedRollbackException("Error while saving your profile");
@@ -115,8 +116,8 @@ public class UserServiceImpl implements UserService {
 			log.error("{} : user={} : {} ", requestService.requestToString(request), user.getUsername(), e.toString());
 			throw new UnexpectedRollbackException("Error while saving your profile");
 		}
-		log.info("{} : user={} persisted", requestService.requestToString(request), user.getUsername());
-		return user;
+		log.info("{} : user={} persisted", requestService.requestToString(request), savedUser.getUsername());
+		return savedUser;
 	}
 
 	@Override
