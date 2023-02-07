@@ -18,6 +18,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -44,6 +45,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 import com.poseidoninc.poseidon.domain.User;
+import com.poseidoninc.poseidon.exception.ResourceConflictException;
 import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
 import com.poseidoninc.poseidon.repositories.UserRepository;
 
@@ -374,6 +376,16 @@ public class UserServiceTest {
 			request = null;
 		}
 		
+		@BeforeEach
+		public void setUpForEachTest() {
+			user = new User();
+			user.setId(1);
+			user.setUsername("Aaa");
+			user.setPassword("aaa1=Passwd");
+			user.setFullname("AAA");
+			user.setRole("USER");
+		}
+		
 		@AfterEach
 		public void unSetForEachTests() {
 			userService = null;
@@ -397,13 +409,6 @@ public class UserServiceTest {
 			userToSave.setFullname("AAA");
 			userToSave.setRole("USER");
 			
-			user = new User();
-			user.setId(1);
-			user.setUsername("Aaa");
-			user.setPassword("aaa1=Passwd");
-			user.setFullname("AAA");
-			user.setRole("USER");
-			
 			when(userRepository.findById(nullable(Integer.class))).thenReturn(Optional.of(user));
 			lenient().when(userRepository.existsByUsername(anyString())).thenReturn(existsByUserName);
 			ArgumentCaptor<User> userBeingSaved = ArgumentCaptor.forClass(User.class);
@@ -425,31 +430,54 @@ public class UserServiceTest {
 					"USER");	
 		}
 		
-/*		@Test
+		@ParameterizedTest(name = "id = {0}, userToSaveName = {1}, existsByUserName return {2}, saveUser should throw ResourceConflictException")
+		@CsvSource(value = {"null, Aaa, true",
+							"1, Bbb, true"}
+							,nullValues = {"null"})
 		@Tag("UserServiceTest")
-		@DisplayName("test saveUser should throw UnexpectedRollbackException on NullPointerException")
-		public void saveUsersTestShouldThrowsUnexpectedRollbackExceptionOnNullPointerException() {
+		@DisplayName("test saveUser should throw ResourceConflictException")
+		public void saveUsersTestShouldThrowsResourceConflictException(Integer id, String userToSaveName, boolean existsByUserName) {
+
 			//GIVEN
-			when(userRepository.findAll(any(Pageable.class))).thenThrow(new NullPointerException());
+			User userToSave = new User();
+			userToSave.setId(id);
+			userToSave.setUsername(userToSaveName);
+			userToSave.setPassword("aaa1=Passwd");
+			userToSave.setFullname("AAA");
+			userToSave.setRole("USER");
+
+			when(userRepository.findById(nullable(Integer.class))).thenReturn(Optional.of(user));
+			lenient().when(userRepository.existsByUsername(anyString())).thenReturn(existsByUserName);
+
 			//WHEN
 			//THEN
-			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> userService.saveUser(pageRequest, request))
-					.getMessage()).isEqualTo("Error while saving Users");
+			assertThat(assertThrows(ResourceConflictException.class,
+					() -> userService.saveUser(userToSave, request))
+					.getMessage()).isEqualTo("UserName already exists");
 		}
 		
 		@Test
-		@Tag("RegisteredServiceTest")
-		@DisplayName("test saveUser should throw UnexpectedRollbackException on any RuntimeException")
+		@Tag("UserServiceTest")
+		@DisplayName("test saveUser should throw UnexpectedRollbackException")
 		public void getRegistrantsTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
 			//GIVEN
-			when(userRepository.findAll(any(Pageable.class))).thenThrow(new RuntimeException());
+			//GIVEN
+			User userToSave = new User();
+			userToSave.setId(1);
+			userToSave.setUsername("Aaa");
+			userToSave.setPassword("aaa1=Passwd");
+			userToSave.setFullname("AAA");
+			userToSave.setRole("USER");
+
+			when(userRepository.findById(nullable(Integer.class))).thenReturn(Optional.of(user));
+			lenient().when(userRepository.existsByUsername(anyString())).thenReturn(true);
+			when(userRepository.save(any(User.class))).thenThrow(new RuntimeException());
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> userService.saveUser(pageRequest, request))
-					.getMessage()).isEqualTo("Error while saving Users");
-		}	*/
+					() -> userService.saveUser(userToSave, request))
+					.getMessage()).isEqualTo("Error while saving your profile");
+		}	
 	}
 }	
 

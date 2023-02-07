@@ -95,12 +95,12 @@ public class UserServiceImpl implements UserService {
 		String username = user.getUsername();
 		String oldUsername = null;
 		try {
-			oldUsername = getUserById(id, request).getUsername(); //throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException
+			oldUsername = getUserById(id, request).getUsername(); //throw ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException
 		} catch (IllegalArgumentException iae) {
 			
 		} finally {
 			if ((id == null || !username.equalsIgnoreCase(oldUsername)) && userRepository.existsByUsername(username)) {
-				ResourceConflictException rce = new ResourceConflictException("userName already exists");
+				ResourceConflictException rce = new ResourceConflictException("UserName already exists");
 				log.error("{} : user={} : {} ", requestService.requestToString(request), username, rce.toString());				
 				throw rce;
 			}
@@ -123,7 +123,5 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void deleteUser(Integer id, WebRequest request) throws UnexpectedRollbackException {
 		// TODO Auto-generated method stub
-
 	}
-
 }
