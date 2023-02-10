@@ -6,6 +6,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -19,7 +21,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
@@ -30,6 +31,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
+import org.mockito.BDDMockito.Then;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -71,9 +73,9 @@ public class UserServiceTest {
 	
 	@Nested
 	@Tag("getUserByUserNameTests")
-	@DisplayName("Tests for method getUserByUserName")
+	@DisplayName("Tests for getUserByUserName")
 	@TestInstance(Lifecycle.PER_CLASS)
-	class getUserByUserNameTests {
+	class GetUserByUserNameTests {
 		
 		@BeforeAll
 		public void setUpForAllTests() {
@@ -98,7 +100,7 @@ public class UserServiceTest {
 		@Test
 		@Tag("UserServiceTest")
 		@DisplayName("test getUserByUserName should return expected user")
-		public void getUserByUserNameShouldRetrunExcpectedUser() {
+		public void getUserByUserNameTestShouldRetrunExcpectedUser() {
 			
 			//GIVEN
 			user = new User();
@@ -174,7 +176,7 @@ public class UserServiceTest {
 	@Tag("getUserByIdTests")
 	@DisplayName("Tests for getting user by Id")
 	@TestInstance(Lifecycle.PER_CLASS)
-	class getUserByIdTests {
+	class GetUserByIdTests {
 		
 		@BeforeAll
 		public void setUpForAllTests() {
@@ -199,7 +201,7 @@ public class UserServiceTest {
 		@Test
 		@Tag("UserServiceTest")
 		@DisplayName("test getUserById should return expected user")
-		public void getUserByIdShouldRetrunExcpectedUser() {
+		public void getUserByIdTestShouldRetrunExcpectedUser() {
 			
 			//GIVEN
 			user = new User();
@@ -275,7 +277,7 @@ public class UserServiceTest {
 	@Tag("getUsersTests")
 	@DisplayName("Tests for getting users")
 	@TestInstance(Lifecycle.PER_CLASS)
-	class getUsersTests {
+	class GetUsersTests {
 		
 		private Pageable pageRequest;
 		
@@ -304,7 +306,7 @@ public class UserServiceTest {
 		@Test
 		@Tag("UserServiceTest")
 		@DisplayName("test getUsers should return users")
-		public void getUserByIdShouldRetrunExcpectedUser() {
+		public void getUsersTesthouldRetrunExcpectedUsers() {
 			
 			//GIVEN
 			List<User> expectedUsers = new ArrayList<>();
@@ -332,7 +334,7 @@ public class UserServiceTest {
 		@Test
 		@Tag("UserServiceTest")
 		@DisplayName("test getUsers should throw UnexpectedRollbackException on NullPointerException")
-		public void getUserssTestShouldThrowsUnexpectedRollbackExceptionOnNullPointerException() {
+		public void getUsersTestShouldThrowsUnexpectedRollbackExceptionOnNullPointerException() {
 			//GIVEN
 			when(userRepository.findAll(any(Pageable.class))).thenThrow(new NullPointerException());
 			//WHEN
@@ -345,7 +347,7 @@ public class UserServiceTest {
 		@Test
 		@Tag("RegisteredServiceTest")
 		@DisplayName("test getUsers should throw UnexpectedRollbackException on any RuntimeException")
-		public void getRegistrantsTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
+		public void getUsersTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
 			//GIVEN
 			when(userRepository.findAll(any(Pageable.class))).thenThrow(new RuntimeException());
 			//WHEN
@@ -366,7 +368,7 @@ public class UserServiceTest {
 		public void setUpForAllTests() {
 			requestMock = new MockHttpServletRequest();
 			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/user/saveUser");
+			requestMock.setRequestURI("/user/saveUser/");
 			request = new ServletWebRequest(requestMock);
 		}
 
@@ -399,7 +401,7 @@ public class UserServiceTest {
 							,nullValues = {"null"})
 		@Tag("UserServiceTest")
 		@DisplayName("test saveUser should return user")
-		public void saveUserShouldReturnUser(Integer id, String userToSaveName, boolean existsByUserName) {
+		public void saveUserTestShouldReturnUser(Integer id, String userToSaveName, boolean existsByUserName) {
 			
 			//GIVEN
 			User userToSave = new User();
@@ -409,7 +411,14 @@ public class UserServiceTest {
 			userToSave.setFullname("AAA");
 			userToSave.setRole("USER");
 			
-			when(userRepository.findById(nullable(Integer.class))).thenReturn(Optional.of(user));
+			when(userRepository.findById(nullable(Integer.class))).then(invocation -> {
+				Integer index = invocation.getArgument(0);
+				if (index == null) {
+					throw new IllegalArgumentException ("Id must not be null");
+				} else {
+					return Optional.of(user); 
+				}
+			});
 			lenient().when(userRepository.existsByUsername(anyString())).thenReturn(existsByUserName);
 			ArgumentCaptor<User> userBeingSaved = ArgumentCaptor.forClass(User.class);
 			when(userRepository.save(any(User.class))).thenReturn(userToSave);
@@ -436,7 +445,7 @@ public class UserServiceTest {
 							,nullValues = {"null"})
 		@Tag("UserServiceTest")
 		@DisplayName("test saveUser should throw ResourceConflictException")
-		public void saveUsersTestShouldThrowsResourceConflictException(Integer id, String userToSaveName, boolean existsByUserName) {
+		public void saveUserTestShouldThrowsResourceConflictException(Integer id, String userToSaveName, boolean existsByUserName) {
 
 			//GIVEN
 			User userToSave = new User();
@@ -458,9 +467,31 @@ public class UserServiceTest {
 		
 		@Test
 		@Tag("UserServiceTest")
-		@DisplayName("test saveUser should throw UnexpectedRollbackException")
-		public void getRegistrantsTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
+		@DisplayName("test saveUser with unknow id should throw a ResourceNotFoundException")
+		public void saveUserTestWithUnknownIdShouldThrowAResourceNotFoundException() {
+			
 			//GIVEN
+			User userToSave = new User();
+			userToSave.setId(1);
+			userToSave.setUsername("Aaa");
+			userToSave.setPassword("aaa1=Passwd");
+			userToSave.setFullname("AAA");
+			userToSave.setRole("USER");
+
+			when(userRepository.findById(nullable(Integer.class))).thenThrow(new ResourceNotFoundException("User not found"));
+
+			//WHEN
+			//THEN
+			assertThat(assertThrows(ResourceNotFoundException.class,
+					() -> userService.saveUser(userToSave, request))
+					.getMessage()).isEqualTo("User not found");
+		}	
+		
+		@Test
+		@Tag("UserServiceTest")
+		@DisplayName("test saveUser should throw UnexpectedRollbackException on any RuntimeException")
+		public void saveUserTestShouldThrowUnexpectedRollbackExceptionOnAnyRuntimeException() {
+			
 			//GIVEN
 			User userToSave = new User();
 			userToSave.setId(1);
@@ -472,13 +503,111 @@ public class UserServiceTest {
 			when(userRepository.findById(nullable(Integer.class))).thenReturn(Optional.of(user));
 			lenient().when(userRepository.existsByUsername(anyString())).thenReturn(true);
 			when(userRepository.save(any(User.class))).thenThrow(new RuntimeException());
+
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
 					() -> userService.saveUser(userToSave, request))
-					.getMessage()).isEqualTo("Error while saving your profile");
+					.getMessage()).isEqualTo("Error while saving user");
 		}	
 	}
+	
+	@Nested
+	@Tag("deleteUserTests")
+	@DisplayName("Tests for deleting users")
+	@TestInstance(Lifecycle.PER_CLASS)
+	class DeleteUserTests {
+		
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/user/delete/1");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
+		
+		@BeforeEach
+		public void setUpForEachTest() {
+			user = new User();
+			user.setId(1);
+			user.setUsername("Aaa");
+			user.setPassword("aaa1=Passwd");
+			user.setFullname("AAA");
+			user.setRole("USER");
+		}
+		
+		@AfterEach
+		public void unSetForEachTests() {
+			userService = null;
+			user = null;
+		}
+
+		@Test
+		@Tag("UserServiceTest")
+		@DisplayName("test deleteUser should delete it")
+		public void deleteUserTestShouldDeleteIt() {
+			
+			//GIVEN
+			when(userRepository.findById(anyInt())).thenReturn(Optional.of(user));
+			ArgumentCaptor<User> userBeingDeleted = ArgumentCaptor.forClass(User.class);
+			doNothing().when(userRepository).delete(any(User.class));// Needed to Capture user
+			
+			//WHEN
+			userService.deleteUser(1, request);
+			
+			//THEN
+			verify(userRepository, times(1)).delete(userBeingDeleted.capture());
+			assertThat(userBeingDeleted.getValue()).extracting(
+					User::getId,
+					User::getUsername,
+					User::getPassword,
+					User::getFullname,
+					User::getRole)
+				.containsExactly(
+					1,
+					"Aaa",
+					"aaa1=Passwd",
+					"AAA",
+					"USER");	
+		}
+		
+		@Test
+		@Tag("UserServiceTest")
+		@DisplayName("test deleteUser should throw ResourceNotFoundException")
+		public void saveUserTestShouldThrowUnexpectedRollbackExceptionOnResourceNotFoundException() {
+
+			//GIVEN
+			when(userRepository.findById(anyInt())).thenThrow(new ResourceNotFoundException("User not found"));
+
+			//WHEN
+			//THEN
+			assertThat(assertThrows(ResourceNotFoundException.class,
+					() -> userService.deleteUser(2, request))
+					.getMessage()).isEqualTo("User not found");
+		}	
+
+		@Test
+		@Tag("UserServiceTest")
+		@DisplayName("test deleteUser should throw UnexpectedRollbackException On Any RuntimeExpceptioin")
+		public void deleteUserTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
+
+			//GIVEN
+			when(userRepository.findById(anyInt())).thenReturn(Optional.of(user));
+			doThrow(new RuntimeException()).when(userRepository).delete(any(User.class));
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> userService.deleteUser(1, request))
+					.getMessage()).isEqualTo("Error while deleting user");
+		}	
+	}
+	
 }	
 
 

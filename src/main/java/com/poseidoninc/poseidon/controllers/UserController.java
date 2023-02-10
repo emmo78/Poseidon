@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.context.request.WebRequest;
 
@@ -20,7 +21,6 @@ import lombok.AllArgsConstructor;
 public class UserController {
 
 	private final UserService userService;
-	private final UserRepository userRepository;
 
 	@GetMapping("/user/list")
 	public String home(Model model, WebRequest request) {
@@ -35,43 +35,35 @@ public class UserController {
 	}
 
 	@PostMapping("/user/validate")
-	public String validate(@Valid User user, BindingResult result, Model model) {
+	public String validate(@Valid User user, BindingResult result, WebRequest request) {
 		if (result.hasErrors()) {
 			return "user/add";
 		}
-
-		userRepository.save(user);
+		userService.saveUser(user, request);
 		return "redirect:/user/list";
 
 	}
 
-/*	@GetMapping("/user/update/{id}")
-	public String showUpdateForm(@PathVariable("id") int id, Model model) {
-		User user = userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
+	@GetMapping("/user/update/{id}")
+	public String showUpdateForm(@PathVariable("id") Integer id, Model model, WebRequest request) {
+		User user = userService.getUserById(id, request);
 		user.setPassword("");
 		model.addAttribute("user", user);
 		return "user/update";
 	}
 
-	@PostMapping("/user/update/{id}")
-	public String updateUser(@PathVariable("id") int id, @Valid User user, BindingResult result, Model model) {
+	@PostMapping("/user/update")
+	public String updateUser(@Valid User user, BindingResult result, WebRequest request) {
 		if (result.hasErrors()) {
 			return "user/update";
 		}
-
-		user.setPassword(encoder.encode(user.getPassword()));
-		user.setId(id);
-		userRepository.save(user);
+		userService.saveUser(user, request);
 		return "redirect:/user/list";
 	}
 
 	@GetMapping("/user/delete/{id}")
-	public String deleteUser(@PathVariable("id") int id, Model model) {
-		User user = userRepository.findById(id)
-				.orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
-		userRepository.delete(user);
-		model.addAttribute("users", userRepository.findAll());
+	public String deleteUser(@PathVariable("id") Integer id, Model model, WebRequest request) {
+		userService.deleteUser(id, request);
 		return "redirect:/user/list";
 	}
-	*/
 }

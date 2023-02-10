@@ -13,7 +13,6 @@ public interface UserService {
 	User getUserByUserName(String userName, WebRequest request) throws UnexpectedRollbackException;
 	User getUserById(Integer userId, WebRequest request) throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException;
 	Page<User> getUsers(Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException;
-
 	User saveUser(User userToSave, WebRequest request) throws ResourceConflictException, ResourceNotFoundException, UnexpectedRollbackException;
-	void deleteUser(Integer id, WebRequest request) throws UnexpectedRollbackException;	
+	void deleteUser(Integer userId, WebRequest request) throws UnexpectedRollbackException;	
 }
