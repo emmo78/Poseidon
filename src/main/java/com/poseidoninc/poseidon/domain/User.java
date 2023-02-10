@@ -33,7 +33,7 @@ public class User {
     private String username;
 	
     @Column(name = "password")
-    @Pattern(regexp = "^(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$", message ="Password must have at least 8 characters in length, containing at least 1 uppercase letter, 1 digit, and 1 symbol.")
+    @Pattern(regexp = "^(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*#?&=])[A-Za-z\\d@$!%*#?&=]{8,13}$", message ="Password must have at least 8 characters in length, max 13, containing at least 1 uppercase letter, 1 digit, and 1 symbol.")
     private String password;
 
 	@Column(name = "fullname")

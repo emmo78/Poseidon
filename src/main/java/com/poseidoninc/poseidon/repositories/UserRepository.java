@@ -8,4 +8,6 @@ import com.poseidoninc.poseidon.domain.User;
 
 public interface UserRepository extends JpaRepository<User, Integer>, JpaSpecificationExecutor<User> {
 
+	User findByUsername(String userName);
+	boolean existsByUsername(String userName);
 }

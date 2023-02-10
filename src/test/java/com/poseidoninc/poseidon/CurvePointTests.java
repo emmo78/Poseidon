@@ -10,11 +10,13 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.poseidoninc.poseidon.domain.CurvePoint;
 import com.poseidoninc.poseidon.repositories.CurvePointRepository;
 
 @SpringBootTest
+@ActiveProfiles("mytest")
 public class CurvePointTests {
 
 	@Autowired
@@ -36,7 +38,7 @@ public class CurvePointTests {
 		curvePoint.setCurveId(20);
 		curvePoint = curvePointRepository.save(curvePoint);
 		assertTrue(curvePoint.getCurveId() == 20);
-
+		
 		// Find
 		List<CurvePoint> listResult = curvePointRepository.findAll();
 		assertTrue(listResult.size() > 0);
