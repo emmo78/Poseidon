@@ -33,6 +33,9 @@
 							<th>Account</th>
 							<th>Type</th>
 							<th>Bid Quantity</th>
+							<th>Ask Quantity</th>
+							<th>Bid</th>
+							<th>Ask</th>
 							<th>Action</th>
 						</tr>
 					</thead>
@@ -41,7 +44,10 @@
 							<td style="width: 10%" th:text="${bidList.bidListId}"></td>
 							<td th:text="${bidList.account}"></td>
 							<td th:text="${bidList.type}"></td>
-							<td style="width: 25%" th:text="${bidList.bidQuantity}"></td>
+							<td th:text="${bidList.bidQuantity}"></td>
+							<td th:text="${bidList.askQuantity}"></td>
+							<td th:text="${bidList.bid}"></td>
+							<td style="width: 25%"th:text="${bidList.ask}"></td>
 							<td style="width: 15%" class="text-center">
 								<a th:href="@{/bidList/update/{bidListId}(bidListId=${bidList.bidListId})}">Edit</a>&nbsp;|&nbsp;
 								<a th:href="@{/bidList/delete/{bidListId}(bidListId=${bidList.bidListId})}">Delete</a>

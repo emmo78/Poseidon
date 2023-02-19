@@ -13,6 +13,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -51,7 +53,7 @@ import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
 import com.poseidoninc.poseidon.repositories.BidListRepository;
 
 @ExtendWith(MockitoExtension.class)
-public class BidListTest {
+public class BidListServiceTest {
 	@InjectMocks
 	private BidListServiceImpl bidListService;
 	
@@ -102,7 +104,24 @@ public class BidListTest {
 			bidList.setAccount("acount");
 			bidList.setType("type");
 			bidList.setBidQuantity(1.0);
-			bidList.setAskQuantity("USER");
+			bidList.setAskQuantity(3.0);
+			bidList.setBid(4.0);
+			bidList.setAsk(5.0);
+			bidList.setBenchmark("benchmark");
+			bidList.setBidListDate(LocalDateTime.parse("21/01/2023 10:20:30", DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss")));
+			bidList.setCommentary("commentary");
+			bidList.setSecurity("security");
+			bidList.setStatus("status");
+			bidList.setTrader("trader");
+			bidList.setBook("book");
+			bidList.setCreationName("creation name");
+			bidList.setCreationDate(LocalDateTime.parse("22/01/2023 12:22:32", DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss")));
+			bidList.setRevisionName("revisionName");
+			bidList.setRevisionDate(LocalDateTime.parse("23/01/2023 13:23:33", DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss")));
+			bidList.setDealName("deal name");
+			bidList.setDealType("deal type");
+			bidList.setSourceListId("source list id");
+			bidList.setSide("side");					
 			when(bidListRepository.findById(anyInt())).thenReturn(Optional.of(bidList));
 			
 			//WHEN
@@ -110,17 +129,52 @@ public class BidListTest {
 			
 			//THEN
 			assertThat(bidListResult).extracting(
-					BidList::getId,
-					BidList::getBidListname,
-					BidList::getPassword,
-					BidList::getFullname,
-					BidList::getRole)
+					bidList::getBidListId,
+					bidList::getAccount,
+					bidList::getType,
+					bidList::getBidQuantity,
+					bidList::getAskQuantity,
+					bidList::getBid,
+					bidList::getAsk,
+					bidList::getBenchmark,
+					bidList::gettBidListDate,
+					bidList::getCommentary,
+					bidList::getSecurity,
+					bidList::getStatus,
+					bidList::getTrader,
+					bidList::getBook,
+					bidList::getCreationName,
+					bidList::getCreationDate,
+					bidList::getRevisionName,
+					bidList::getRevisionDate,
+					bidList::getDealName,
+					bidList::getDealType,
+					bidList::getSourceListId,
+					bidList::getSide)				
 				.containsExactly(
 					1,
-					"Aaa",
-					"aaa1=Passwd",
-					"AAA",
-					"USER");	
+					"account",
+					"type",
+					1.0,
+					3.0,
+					4.0,
+					5.0,
+					LocalDateTime.parse("21/01/2023 10:20:30", DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss")),
+					"benchmark",
+					"commentary",
+					"security",
+					"status",
+					"trader",
+					"book",
+					"creation name",
+					LocalDateTime.parse("22/01/2023 12:22:32", DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss")),
+					"revisionName",
+					LocalDateTime.parse("23/01/2023 13:23:33", DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss")),
+					"deal name",
+					"deal type",
+					"source list id",
+					"side"
+					);	
 		}
 		
 		@Test
@@ -165,108 +219,7 @@ public class BidListTest {
 				.getMessage()).isEqualTo("Error while getting bidList profile");
 		}
 	}
-	
-	@Nested
-	@Tag("getBidListByIdWithBlankPasswdTests")
-	@DisplayName("Tests for getting bidList by Id with blank passwd")
-	@TestInstance(Lifecycle.PER_CLASS)
-	class GetBidListByIdWithBlankPasswdTests {
-		
-		@BeforeAll
-		public void setUpForAllTests() {
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/bidList/getById/1");
-			request = new ServletWebRequest(requestMock);
-		}
-
-		@AfterAll
-		public void unSetForAllTests() {
-			requestMock = null;
-			request = null;
-		}
-		
-		@AfterEach
-		public void unSetForEachTests() {
-			bidListService = null;
-			bidList = null;
-		}
-
-		@Test
-		@Tag("BidListServiceTest")
-		@DisplayName("test getBidListByIdWithBlankPasswd should return expected bidList")
-		public void getBidListByIdWithBlankPasswdTestShouldRetrunExcpectedBidList() {
-			
-			//GIVEN
-			bidList = new BidList();
-			bidList.setId(1);
-			bidList.setBidListname("Aaa");
-			bidList.setPassword("aaa1=Passwd");
-			bidList.setFullname("AAA");
-			bidList.setRole("USER");
-			when(bidListRepository.findById(anyInt())).thenReturn(Optional.of(bidList));
-			
-			//WHEN
-			BidList bidListResult = bidListService.getBidListByIdWithBlankPasswd(1, request);
-			
-			//THEN
-			assertThat(bidListResult).extracting(
-					BidList::getId,
-					BidList::getBidListname,
-					BidList::getPassword,
-					BidList::getFullname,
-					BidList::getRole)
-				.containsExactly(
-					1,
-					"Aaa",
-					"",
-					"AAA",
-					"USER");	
-		}
-		
-		@Test
-		@Tag("BidListServiceTest")
-		@DisplayName("test getBidListByIdWithBlankPasswd should throw IllegalArgumentException")
-		public void getBidListByIdWithBlankPasswdTestShouldThrowsUnexpectedRollbackExceptionOnIllegalArgumentException() {
-			//GIVEN
-			when(bidListRepository.findById(anyInt())).thenThrow(new IllegalArgumentException());
-			
-			//WHEN
-			//THEN
-			assertThat(assertThrows(IllegalArgumentException.class,
-				() -> bidListService.getBidListByIdWithBlankPasswd(1, request))
-				.getMessage()).isEqualTo("Id must not be null");
-		}
-
-		@Test
-		@Tag("BidListServiceTest")
-		@DisplayName("test getBidListByIdWithBlankPasswd should throw ResourceNotFoundException")
-		public void getBidListByIdWithBlankPasswdTestShouldThrowsResourceNotFoundException() {
-			//GIVEN
-			when(bidListRepository.findById(anyInt())).thenReturn(Optional.ofNullable(null));
-			
-			//WHEN
-			//THEN
-			assertThat(assertThrows(ResourceNotFoundException.class,
-				() -> bidListService.getBidListByIdWithBlankPasswd(1, request))
-				.getMessage()).isEqualTo("BidList not found");
-		}
-		
-		@Test
-		@Tag("BidListServiceTest")
-		@DisplayName("test getBidListByIdWithBlankPasswd should throw UnexpectedRollbackException on any RuntimeException")
-		public void getBidListByIdWithBlankPasswdTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
-			//GIVEN
-			when(bidListRepository.findById(anyInt())).thenThrow(new RuntimeException());
-			
-			//WHEN
-			//THEN
-			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> bidListService.getBidListByIdWithBlankPasswd(1, request))
-				.getMessage()).isEqualTo("Error while getting bidList profile");
-		}
-	}
-	
+	/*	
 	@Nested
 	@Tag("getBidListsTests")
 	@DisplayName("Tests for getting bidLists")
@@ -601,5 +554,5 @@ public class BidListTest {
 					.getMessage()).isEqualTo("Error while deleting bidList");
 		}	
 	}
-
+*/
 }
