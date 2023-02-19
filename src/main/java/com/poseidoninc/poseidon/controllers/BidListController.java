@@ -64,4 +64,5 @@ public class BidListController {
 		bidListService.deleteBidList(id, request);
         return "redirect:/bidList/list";
     }
+    
 }

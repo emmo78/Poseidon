@@ -44,8 +44,7 @@ public class UserController {
 
 	@GetMapping("/user/update/{id}")
 	public String showUpdateForm(@PathVariable("id") Integer id, Model model, WebRequest request) {
-		User user = userService.getUserById(id, request);
-		user.setPassword("");
+		User user = userService.getUserByIdWithBlankPasswd(id, request);
 		model.addAttribute("user", user);
 		return "user/update";
 	}

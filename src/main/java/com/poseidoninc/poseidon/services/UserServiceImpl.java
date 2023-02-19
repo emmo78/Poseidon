@@ -66,6 +66,13 @@ public class UserServiceImpl implements UserService {
 		log.info("{} : user={} gotten",  requestService.requestToString(request), user.getId());
 		return user;
 	}
+	
+	@Override
+	public User getUserByIdWithBlankPasswd(Integer userId, WebRequest request) throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException {
+		User user = getUserById(userId, request);
+		user.setPassword("");
+		return user;
+	}
 
 	@Override
 	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)

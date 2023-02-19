@@ -31,7 +31,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
-import org.mockito.BDDMockito.Then;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -235,12 +234,12 @@ public class UserServiceTest {
 		@DisplayName("test getUserById should throw IllegalArgumentException")
 		public void getUserByIdTestShouldThrowsUnexpectedRollbackExceptionOnIllegalArgumentException() {
 			//GIVEN
-			when(userRepository.findById(anyInt())).thenThrow(new IllegalArgumentException());
+			when(userRepository.findById(nullable(Integer.class))).thenThrow(new IllegalArgumentException());
 			
 			//WHEN
 			//THEN
 			assertThat(assertThrows(IllegalArgumentException.class,
-				() -> userService.getUserById(1, request))
+				() -> userService.getUserById(null, request))
 				.getMessage()).isEqualTo("Id must not be null");
 		}
 
@@ -269,6 +268,107 @@ public class UserServiceTest {
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
 				() -> userService.getUserById(1, request))
+				.getMessage()).isEqualTo("Error while getting user profile");
+		}
+	}
+	
+	@Nested
+	@Tag("getUserByIdWithBlankPasswdTests")
+	@DisplayName("Tests for getting user by Id with blank passwd")
+	@TestInstance(Lifecycle.PER_CLASS)
+	class GetUserByIdWithBlankPasswdTests {
+		
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/user/getById/1");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
+		
+		@AfterEach
+		public void unSetForEachTests() {
+			userService = null;
+			user = null;
+		}
+
+		@Test
+		@Tag("UserServiceTest")
+		@DisplayName("test getUserByIdWithBlankPasswd should return expected user")
+		public void getUserByIdWithBlankPasswdTestShouldRetrunExcpectedUser() {
+			
+			//GIVEN
+			user = new User();
+			user.setId(1);
+			user.setUsername("Aaa");
+			user.setPassword("aaa1=Passwd");
+			user.setFullname("AAA");
+			user.setRole("USER");
+			when(userRepository.findById(anyInt())).thenReturn(Optional.of(user));
+			
+			//WHEN
+			User userResult = userService.getUserByIdWithBlankPasswd(1, request);
+			
+			//THEN
+			assertThat(userResult).extracting(
+					User::getId,
+					User::getUsername,
+					User::getPassword,
+					User::getFullname,
+					User::getRole)
+				.containsExactly(
+					1,
+					"Aaa",
+					"",
+					"AAA",
+					"USER");	
+		}
+		
+		@Test
+		@Tag("UserServiceTest")
+		@DisplayName("test getUserByIdWithBlankPasswd should throw IllegalArgumentException")
+		public void getUserByIdWithBlankPasswdTestShouldThrowsUnexpectedRollbackExceptionOnIllegalArgumentException() {
+			//GIVEN
+			when(userRepository.findById(anyInt())).thenThrow(new IllegalArgumentException());
+			
+			//WHEN
+			//THEN
+			assertThat(assertThrows(IllegalArgumentException.class,
+				() -> userService.getUserByIdWithBlankPasswd(1, request))
+				.getMessage()).isEqualTo("Id must not be null");
+		}
+
+		@Test
+		@Tag("UserServiceTest")
+		@DisplayName("test getUserByIdWithBlankPasswd should throw ResourceNotFoundException")
+		public void getUserByIdWithBlankPasswdTestShouldThrowsResourceNotFoundException() {
+			//GIVEN
+			when(userRepository.findById(anyInt())).thenReturn(Optional.ofNullable(null));
+			
+			//WHEN
+			//THEN
+			assertThat(assertThrows(ResourceNotFoundException.class,
+				() -> userService.getUserByIdWithBlankPasswd(1, request))
+				.getMessage()).isEqualTo("User not found");
+		}
+		
+		@Test
+		@Tag("UserServiceTest")
+		@DisplayName("test getUserByIdWithBlankPasswd should throw UnexpectedRollbackException on any RuntimeException")
+		public void getUserByIdWithBlankPasswdTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
+			//GIVEN
+			when(userRepository.findById(anyInt())).thenThrow(new RuntimeException());
+			
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+				() -> userService.getUserByIdWithBlankPasswd(1, request))
 				.getMessage()).isEqualTo("Error while getting user profile");
 		}
 	}
