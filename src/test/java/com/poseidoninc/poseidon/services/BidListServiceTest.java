@@ -2,27 +2,17 @@ package com.poseidoninc.poseidon.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
@@ -30,25 +20,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 import com.poseidoninc.poseidon.domain.BidList;
-import com.poseidoninc.poseidon.exception.ResourceConflictException;
 import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
 import com.poseidoninc.poseidon.repositories.BidListRepository;
 
@@ -101,23 +82,23 @@ public class BidListServiceTest {
 			//GIVEN
 			bidList = new BidList();
 			bidList.setBidListId(1);
-			bidList.setAccount("acount");
+			bidList.setAccount("account");
 			bidList.setType("type");
 			bidList.setBidQuantity(1.0);
 			bidList.setAskQuantity(3.0);
 			bidList.setBid(4.0);
 			bidList.setAsk(5.0);
 			bidList.setBenchmark("benchmark");
-			bidList.setBidListDate(LocalDateTime.parse("21/01/2023 10:20:30", DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss")));
+			bidList.setBidListDate(LocalDateTime.parse("21/01/2023 10:20:30", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
 			bidList.setCommentary("commentary");
 			bidList.setSecurity("security");
 			bidList.setStatus("status");
 			bidList.setTrader("trader");
 			bidList.setBook("book");
 			bidList.setCreationName("creation name");
-			bidList.setCreationDate(LocalDateTime.parse("22/01/2023 12:22:32", DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss")));
+			bidList.setCreationDate(LocalDateTime.parse("22/01/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
 			bidList.setRevisionName("revisionName");
-			bidList.setRevisionDate(LocalDateTime.parse("23/01/2023 13:23:33", DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss")));
+			bidList.setRevisionDate(LocalDateTime.parse("23/01/2023 13:23:33", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
 			bidList.setDealName("deal name");
 			bidList.setDealType("deal type");
 			bidList.setSourceListId("source list id");
@@ -129,29 +110,29 @@ public class BidListServiceTest {
 			
 			//THEN
 			assertThat(bidListResult).extracting(
-					bidList::getBidListId,
-					bidList::getAccount,
-					bidList::getType,
-					bidList::getBidQuantity,
-					bidList::getAskQuantity,
-					bidList::getBid,
-					bidList::getAsk,
-					bidList::getBenchmark,
-					bidList::gettBidListDate,
-					bidList::getCommentary,
-					bidList::getSecurity,
-					bidList::getStatus,
-					bidList::getTrader,
-					bidList::getBook,
-					bidList::getCreationName,
-					bidList::getCreationDate,
-					bidList::getRevisionName,
-					bidList::getRevisionDate,
-					bidList::getDealName,
-					bidList::getDealType,
-					bidList::getSourceListId,
-					bidList::getSide)				
-				.containsExactly(
+					BidList::getBidListId,
+					BidList::getAccount,
+					BidList::getType,
+					BidList::getBidQuantity,
+					BidList::getAskQuantity,
+					BidList::getBid,
+					BidList::getAsk,
+					BidList::getBenchmark,
+					bid -> bid.getBidListDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")),
+					BidList::getCommentary,
+					BidList::getSecurity,
+					BidList::getStatus,
+					BidList::getTrader,
+					BidList::getBook,
+					BidList::getCreationName,
+					bid -> bid.getCreationDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")),
+					BidList::getRevisionName,
+					bid -> bid.getRevisionDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")),
+					BidList::getDealName,
+					BidList::getDealType,
+					BidList::getSourceListId,
+					BidList::getSide)
+			.containsExactly(
 					1,
 					"account",
 					"type",
@@ -159,24 +140,24 @@ public class BidListServiceTest {
 					3.0,
 					4.0,
 					5.0,
-					LocalDateTime.parse("21/01/2023 10:20:30", DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss")),
 					"benchmark",
+					"21/01/2023 10:20:30",
 					"commentary",
 					"security",
 					"status",
 					"trader",
 					"book",
 					"creation name",
-					LocalDateTime.parse("22/01/2023 12:22:32", DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss")),
+					"22/01/2023 12:22:32",
 					"revisionName",
-					LocalDateTime.parse("23/01/2023 13:23:33", DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss")),
+					"23/01/2023 13:23:33",
 					"deal name",
 					"deal type",
 					"source list id",
 					"side"
-					);	
+					);
 		}
-		
+				
 		@Test
 		@Tag("BidListServiceTest")
 		@DisplayName("test getBidListById should throw IllegalArgumentException")
@@ -216,7 +197,7 @@ public class BidListServiceTest {
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
 				() -> bidListService.getBidListById(1, request))
-				.getMessage()).isEqualTo("Error while getting bidList profile");
+				.getMessage()).isEqualTo("Error while getting bidlist");
 		}
 	}
 	/*	

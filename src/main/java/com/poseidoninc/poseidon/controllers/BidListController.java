@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.context.request.WebRequest;
 
 import com.poseidoninc.poseidon.domain.BidList;
-import com.poseidoninc.poseidon.domain.User;
 import com.poseidoninc.poseidon.services.BidListService;
 
 import jakarta.validation.Valid;

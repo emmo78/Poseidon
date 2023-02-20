@@ -45,7 +45,6 @@ public class UserRepositoryIT {
 	@Nested
 	@Tag("saveUserTests")
 	@DisplayName("Tests for validation and saving user")
-	@TestInstance(Lifecycle.PER_CLASS)
 	class saveUserTests {
 
 		@Test
