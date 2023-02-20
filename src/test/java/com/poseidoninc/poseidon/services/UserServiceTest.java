@@ -417,11 +417,12 @@ public class UserServiceTest {
 			user.setFullname("AAA");
 			user.setRole("USER");
 			expectedUsers.add(user);
-			user.setId(2);
-			user.setUsername("Bbb");
-			user.setPassword("bbb2=Passwd");
-			user.setFullname("BBB");
-			expectedUsers.add(user);
+			User user2 = new User();			
+			user2.setId(2);
+			user2.setUsername("Bbb");
+			user2.setPassword("bbb2=Passwd");
+			user2.setFullname("BBB");
+			expectedUsers.add(user2);
 			when(userRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<User>(expectedUsers, pageRequest, 2));
 			
 			//WHEN

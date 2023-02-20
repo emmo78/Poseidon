@@ -2,12 +2,15 @@ package com.poseidoninc.poseidon.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.AfterAll;
@@ -24,6 +27,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -200,7 +206,7 @@ public class BidListServiceTest {
 				.getMessage()).isEqualTo("Error while getting bidlist");
 		}
 	}
-	/*	
+		
 	@Nested
 	@Tag("getBidListsTests")
 	@DisplayName("Tests for getting bidLists")
@@ -239,17 +245,54 @@ public class BidListServiceTest {
 			//GIVEN
 			List<BidList> expectedBidLists = new ArrayList<>();
 			bidList = new BidList();
-			bidList.setId(1);
-			bidList.setBidListname("Aaa");
-			bidList.setPassword("aaa1=Passwd");
-			bidList.setFullname("AAA");
-			bidList.setRole("USER");
+			bidList.setBidListId(1);
+			bidList.setAccount("account");
+			bidList.setType("type");
+			bidList.setBidQuantity(1.0);
+			bidList.setAskQuantity(3.0);
+			bidList.setBid(4.0);
+			bidList.setAsk(5.0);
+			bidList.setBenchmark("benchmark");
+			bidList.setBidListDate(LocalDateTime.parse("21/01/2023 10:20:30", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			bidList.setCommentary("commentary");
+			bidList.setSecurity("security");
+			bidList.setStatus("status");
+			bidList.setTrader("trader");
+			bidList.setBook("book");
+			bidList.setCreationName("creation name");
+			bidList.setCreationDate(LocalDateTime.parse("22/01/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			bidList.setRevisionName("revisionName");
+			bidList.setRevisionDate(LocalDateTime.parse("23/01/2023 13:23:33", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			bidList.setDealName("deal name");
+			bidList.setDealType("deal type");
+			bidList.setSourceListId("source list id");
+			bidList.setSide("side");					
 			expectedBidLists.add(bidList);
-			bidList.setId(2);
-			bidList.setBidListname("Bbb");
-			bidList.setPassword("bbb2=Passwd");
-			bidList.setFullname("BBB");
-			expectedBidLists.add(bidList);
+			
+			BidList bidList2 = new BidList();
+			bidList2.setBidListId(12);
+			bidList2.setAccount("account2");
+			bidList2.setType("type2");
+			bidList2.setBidQuantity(1.02);
+			bidList2.setAskQuantity(3.02);
+			bidList2.setBid(4.02);
+			bidList2.setAsk(5.02);
+			bidList2.setBenchmark("benchmark2");
+			bidList2.setBidListDate(LocalDateTime.parse("11/01/2023 10:20:30", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			bidList2.setCommentary("commentary2");
+			bidList2.setSecurity("security2");
+			bidList2.setStatus("status2");
+			bidList2.setTrader("trader2");
+			bidList2.setBook("book2");
+			bidList2.setCreationName("creation name2");
+			bidList2.setCreationDate(LocalDateTime.parse("12/01/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			bidList2.setRevisionName("revisionName2");
+			bidList2.setRevisionDate(LocalDateTime.parse("12/01/2023 13:23:33", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			bidList2.setDealName("deal name2");
+			bidList2.setDealType("deal type2");
+			bidList2.setSourceListId("source list id2");
+			bidList2.setSide("side2");					
+			expectedBidLists.add(bidList2);
 			when(bidListRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<BidList>(expectedBidLists, pageRequest, 2));
 			
 			//WHEN
@@ -264,7 +307,7 @@ public class BidListServiceTest {
 		@DisplayName("test getBidLists should throw UnexpectedRollbackException on NullPointerException")
 		public void getBidListsTestShouldThrowsUnexpectedRollbackExceptionOnNullPointerException() {
 			//GIVEN
-			when(bidListRepository.findAll(any(Pageable.class))).thenThrow(new NullPointerException());
+			when(bidListRepository.findAll(nullable(Pageable.class))).thenThrow(new NullPointerException());
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
@@ -285,7 +328,7 @@ public class BidListServiceTest {
 					.getMessage()).isEqualTo("Error while getting BidLists");
 		}
 	}
-	
+	/*
 	@Nested
 	@Tag("saveBidListTests")
 	@DisplayName("Tests for saving bidLists")

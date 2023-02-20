@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.WebRequest;
 
 import com.poseidoninc.poseidon.domain.BidList;
+import com.poseidoninc.poseidon.domain.User;
 import com.poseidoninc.poseidon.exception.ResourceConflictException;
 import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
 import com.poseidoninc.poseidon.repositories.BidListRepository;
@@ -46,9 +47,24 @@ public class BidListServiceImpl implements BidListService {
 	}
 
 	@Override
+	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
 	public Page<BidList> getBidLists(Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException {
-		// TODO Auto-generated method stub
-		return null;
+		Page<BidList> pageBidList = null;
+		try {
+			//throws NullPointerException if pageRequest is null
+			pageBidList = bidListRepository.findAll(pageRequest);
+		} catch(NullPointerException npe) {
+			log.error("{} : {} ", requestService.requestToString(request), npe.toString());
+			throw new UnexpectedRollbackException("Error while getting BidLists");
+		} catch(Exception e) {
+			log.error("{} : {} ", requestService.requestToString(request), e.toString());
+			throw new UnexpectedRollbackException("Error while getting BidLists");
+		}
+		log.info("{} : users page number : {} of {}",
+			requestService.requestToString(request),
+			pageBidList.getNumber()+1,
+			pageBidList.getTotalPages());
+		return pageBidList;
 	}
 
 	@Override
