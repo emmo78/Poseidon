@@ -446,7 +446,7 @@ public class UserServiceTest {
 		}
 		
 		@Test
-		@Tag("RegisteredServiceTest")
+		@Tag("UserServiceTest")
 		@DisplayName("test getUsers should throw UnexpectedRollbackException on any RuntimeException")
 		public void getUsersTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
 			//GIVEN
@@ -481,7 +481,7 @@ public class UserServiceTest {
 		
 		@BeforeEach
 		public void setUpForEachTest() {
-			user = new User();
+			user = new User(); // user already in data base
 			user.setId(1);
 			user.setUsername("Aaa");
 			user.setPassword("aaa1=Passwd");
@@ -496,9 +496,9 @@ public class UserServiceTest {
 		}
 
 		@ParameterizedTest(name = "id = {0}, userToSaveName = {1}, existsByUserName return {2}, saveUser should return user")
-		@CsvSource(value = {"null, Aaa, false",
-							"1, Aaa, true",
-							"1, Bbb, false"}
+		@CsvSource(value = {"null, Aaa, false", // save new user not already in data base
+							"1, Aaa, true", // update user already in data base
+							"1, Bbb, false"} // user update user name not existing yet in data base
 							,nullValues = {"null"})
 		@Tag("UserServiceTest")
 		@DisplayName("test saveUser should return user")
@@ -517,7 +517,7 @@ public class UserServiceTest {
 				if (index == null) {
 					throw new IllegalArgumentException ("Id must not be null");
 				} else {
-					return Optional.of(user); 
+					return Optional.of(user);
 				}
 			});
 			lenient().when(userRepository.existsByUsername(anyString())).thenReturn(existsByUserName);
@@ -529,7 +529,7 @@ public class UserServiceTest {
 			
 			//THEN
 			verify(userRepository, times(1)).save(userBeingSaved.capture());
-			passwordEncoder.matches("aaa1=Passwd", userBeingSaved.getValue().getPassword());
+			assertThat(passwordEncoder.matches("aaa1=Passwd", userBeingSaved.getValue().getPassword())).isTrue();
 			assertThat(resultedUser).extracting(
 					User::getUsername,
 					User::getFullname,
@@ -541,8 +541,8 @@ public class UserServiceTest {
 		}
 		
 		@ParameterizedTest(name = "id = {0}, userToSaveName = {1}, existsByUserName return {2}, saveUser should throw ResourceConflictException")
-		@CsvSource(value = {"null, Aaa, true",
-							"1, Bbb, true"}
+		@CsvSource(value = {"null, Aaa, true", // do not save new user with user name already in data base
+							"1, Bbb, true"} // does not update the user who changed his name to an existing one in the database
 							,nullValues = {"null"})
 		@Tag("UserServiceTest")
 		@DisplayName("test saveUser should throw ResourceConflictException")

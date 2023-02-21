@@ -28,6 +28,7 @@ import lombok.Setter;
 @Setter
 @Table(name = "bidlist")
 public class BidList {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "BidListId")

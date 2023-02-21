@@ -4,7 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
@@ -16,6 +20,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
@@ -23,6 +28,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -36,6 +44,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 import com.poseidoninc.poseidon.domain.BidList;
+import com.poseidoninc.poseidon.domain.User;
 import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
 import com.poseidoninc.poseidon.repositories.BidListRepository;
 
@@ -56,7 +65,7 @@ public class BidListServiceTest {
 
 	@Nested
 	@Tag("getBidListByIdTests")
-	@DisplayName("Tests for getting bidList by Id")
+	@DisplayName("Tests for getting bidList by bidListId")
 	@TestInstance(Lifecycle.PER_CLASS)
 	class GetBidListByIdTests {
 		
@@ -316,7 +325,7 @@ public class BidListServiceTest {
 		}
 		
 		@Test
-		@Tag("RegisteredServiceTest")
+		@Tag("BidListServiceTest")
 		@DisplayName("test getBidLists should throw UnexpectedRollbackException on any RuntimeException")
 		public void getBidListsTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
 			//GIVEN
@@ -328,10 +337,10 @@ public class BidListServiceTest {
 					.getMessage()).isEqualTo("Error while getting BidLists");
 		}
 	}
-	/*
+	
 	@Nested
 	@Tag("saveBidListTests")
-	@DisplayName("Tests for saving bidLists")
+	@DisplayName("Tests for saving bidList")
 	@TestInstance(Lifecycle.PER_CLASS)
 	class SaveBidListTests {
 		
@@ -352,11 +361,27 @@ public class BidListServiceTest {
 		@BeforeEach
 		public void setUpForEachTest() {
 			bidList = new BidList();
-			bidList.setId(1);
-			bidList.setBidListname("Aaa");
-			bidList.setPassword("aaa1=Passwd");
-			bidList.setFullname("AAA");
-			bidList.setRole("USER");
+			bidList.setAccount("account");
+			bidList.setType("type");
+			bidList.setBidQuantity(1.0);
+			bidList.setAskQuantity(3.0);
+			bidList.setBid(4.0);
+			bidList.setAsk(5.0);
+			bidList.setBenchmark("benchmark");
+			bidList.setBidListDate(LocalDateTime.parse("21/01/2023 10:20:30", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			bidList.setCommentary("commentary");
+			bidList.setSecurity("security");
+			bidList.setStatus("status");
+			bidList.setTrader("trader");
+			bidList.setBook("book");
+			bidList.setCreationName("creation name");
+			bidList.setCreationDate(LocalDateTime.parse("22/01/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			bidList.setRevisionName("revisionName");
+			bidList.setRevisionDate(LocalDateTime.parse("23/01/2023 13:23:33", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			bidList.setDealName("deal name");
+			bidList.setDealType("deal type");
+			bidList.setSourceListId("source list id");
+			bidList.setSide("side");					
 		}
 		
 		@AfterEach
@@ -365,99 +390,72 @@ public class BidListServiceTest {
 			bidList = null;
 		}
 
-		@ParameterizedTest(name = "id = {0}, bidListToSaveName = {1}, existsByBidListName return {2}, saveBidList should return bidList")
-		@CsvSource(value = {"null, Aaa, false",
-							"1, Aaa, true",
-							"1, Bbb, false"}
+		@ParameterizedTest(name = "{0} bidList to save, so id = {1}, saveBidList should return bidList with an id")
+		@CsvSource(value = {"new, null", // save new bidList
+							"updated, 1"} // save updated bidList
 							,nullValues = {"null"})
 		@Tag("BidListServiceTest")
 		@DisplayName("test saveBidList should return bidList")
-		public void saveBidListTestShouldReturnBidList(Integer id, String bidListToSaveName, boolean existsByBidListName) {
+		public void saveBidListTestShouldReturnBidList(String state, Integer id) {
 			
 			//GIVEN
-			BidList bidListToSave = new BidList();
-			bidListToSave.setId(id);
-			bidListToSave.setBidListname(bidListToSaveName);
-			bidListToSave.setPassword("aaa1=Passwd");
-			bidListToSave.setFullname("AAA");
-			bidListToSave.setRole("USER");
-			
-			when(bidListRepository.findById(nullable(Integer.class))).then(invocation -> {
-				Integer index = invocation.getArgument(0);
-				if (index == null) {
-					throw new IllegalArgumentException ("Id must not be null");
-				} else {
-					return Optional.of(bidList); 
-				}
-			});
-			lenient().when(bidListRepository.existsByBidListname(anyString())).thenReturn(existsByBidListName);
-			ArgumentCaptor<BidList> bidListBeingSaved = ArgumentCaptor.forClass(BidList.class);
-			when(bidListRepository.save(any(BidList.class))).thenReturn(bidListToSave);
+			bidList.setBidListId(id);
+			when(bidListRepository.save(any(BidList.class))).thenReturn(bidList);
 			
 			//WHEN
-			BidList resultedBidList = bidListService.saveBidList(bidListToSave, request);
+			BidList bidListResult = bidListService.saveBidList(bidList, request);
 			
 			//THEN
-			verify(bidListRepository, times(1)).save(bidListBeingSaved.capture());
-			passwordEncoder.matches("aaa1=Passwd", bidListBeingSaved.getValue().getPassword());
-			assertThat(resultedBidList).extracting(
-					BidList::getBidListname,
-					BidList::getFullname,
-					BidList::getRole)
-				.containsExactly(
-					bidListToSaveName,
-					"AAA",
-					"USER");	
+			verify(bidListRepository).save(bidList); //times(1) is the default and can be omitted
+			assertThat(bidListResult).extracting(
+					bid -> Optional.ofNullable(bid.getBidListId()).orElseGet(() -> 1),
+					BidList::getAccount,
+					BidList::getType,
+					BidList::getBidQuantity,
+					BidList::getAskQuantity,
+					BidList::getBid,
+					BidList::getAsk,
+					BidList::getBenchmark,
+					bid -> bid.getBidListDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")),
+					BidList::getCommentary,
+					BidList::getSecurity,
+					BidList::getStatus,
+					BidList::getTrader,
+					BidList::getBook,
+					BidList::getCreationName,
+					bid -> bid.getCreationDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")),
+					BidList::getRevisionName,
+					bid -> bid.getRevisionDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")),
+					BidList::getDealName,
+					BidList::getDealType,
+					BidList::getSourceListId,
+					BidList::getSide)
+			.containsExactly(
+					1,
+					"account",
+					"type",
+					1.0,
+					3.0,
+					4.0,
+					5.0,
+					"benchmark",
+					"21/01/2023 10:20:30",
+					"commentary",
+					"security",
+					"status",
+					"trader",
+					"book",
+					"creation name",
+					"22/01/2023 12:22:32",
+					"revisionName",
+					"23/01/2023 13:23:33",
+					"deal name",
+					"deal type",
+					"source list id",
+					"side"
+					);
 		}
-		
-		@ParameterizedTest(name = "id = {0}, bidListToSaveName = {1}, existsByBidListName return {2}, saveBidList should throw ResourceConflictException")
-		@CsvSource(value = {"null, Aaa, true",
-							"1, Bbb, true"}
-							,nullValues = {"null"})
-		@Tag("BidListServiceTest")
-		@DisplayName("test saveBidList should throw ResourceConflictException")
-		public void saveBidListTestShouldThrowsResourceConflictException(Integer id, String bidListToSaveName, boolean existsByBidListName) {
-
-			//GIVEN
-			BidList bidListToSave = new BidList();
-			bidListToSave.setId(id);
-			bidListToSave.setBidListname(bidListToSaveName);
-			bidListToSave.setPassword("aaa1=Passwd");
-			bidListToSave.setFullname("AAA");
-			bidListToSave.setRole("USER");
-
-			when(bidListRepository.findById(nullable(Integer.class))).thenReturn(Optional.of(bidList));
-			lenient().when(bidListRepository.existsByBidListname(anyString())).thenReturn(existsByBidListName);
-
-			//WHEN
-			//THEN
-			assertThat(assertThrows(ResourceConflictException.class,
-					() -> bidListService.saveBidList(bidListToSave, request))
-					.getMessage()).isEqualTo("BidListName already exists");
-		}
-		
-		@Test
-		@Tag("BidListServiceTest")
-		@DisplayName("test saveBidList with unknow id should throw a ResourceNotFoundException")
-		public void saveBidListTestWithUnknownIdShouldThrowAResourceNotFoundException() {
-			
-			//GIVEN
-			BidList bidListToSave = new BidList();
-			bidListToSave.setId(1);
-			bidListToSave.setBidListname("Aaa");
-			bidListToSave.setPassword("aaa1=Passwd");
-			bidListToSave.setFullname("AAA");
-			bidListToSave.setRole("USER");
-
-			when(bidListRepository.findById(nullable(Integer.class))).thenThrow(new ResourceNotFoundException("BidList not found"));
-
-			//WHEN
-			//THEN
-			assertThat(assertThrows(ResourceNotFoundException.class,
-					() -> bidListService.saveBidList(bidListToSave, request))
-					.getMessage()).isEqualTo("BidList not found");
-		}	
-		
+				
 		@Test
 		@Tag("BidListServiceTest")
 		@DisplayName("test saveBidList should throw UnexpectedRollbackException on any RuntimeException")
@@ -465,14 +463,6 @@ public class BidListServiceTest {
 			
 			//GIVEN
 			BidList bidListToSave = new BidList();
-			bidListToSave.setId(1);
-			bidListToSave.setBidListname("Aaa");
-			bidListToSave.setPassword("aaa1=Passwd");
-			bidListToSave.setFullname("AAA");
-			bidListToSave.setRole("USER");
-
-			when(bidListRepository.findById(nullable(Integer.class))).thenReturn(Optional.of(bidList));
-			lenient().when(bidListRepository.existsByBidListname(anyString())).thenReturn(true);
 			when(bidListRepository.save(any(BidList.class))).thenThrow(new RuntimeException());
 
 			//WHEN
@@ -482,7 +472,7 @@ public class BidListServiceTest {
 					.getMessage()).isEqualTo("Error while saving bidList");
 		}	
 	}
-	
+	/*
 	@Nested
 	@Tag("deleteBidListTests")
 	@DisplayName("Tests for deleting bidLists")
