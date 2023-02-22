@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.context.request.WebRequest;
 
 import com.poseidoninc.poseidon.domain.User;
-import com.poseidoninc.poseidon.repositories.UserRepository;
 import com.poseidoninc.poseidon.services.UserService;
 
 import jakarta.validation.Valid;
@@ -41,13 +40,11 @@ public class UserController {
 		}
 		userService.saveUser(user, request);
 		return "redirect:/user/list";
-
 	}
 
 	@GetMapping("/user/update/{id}")
 	public String showUpdateForm(@PathVariable("id") Integer id, Model model, WebRequest request) {
-		User user = userService.getUserById(id, request);
-		user.setPassword("");
+		User user = userService.getUserByIdWithBlankPasswd(id, request);
 		model.addAttribute("user", user);
 		return "user/update";
 	}
@@ -62,8 +59,8 @@ public class UserController {
 	}
 
 	@GetMapping("/user/delete/{id}")
-	public String deleteUser(@PathVariable("id") Integer id, Model model, WebRequest request) {
-		userService.deleteUser(id, request);
+	public String deleteUser(@PathVariable("id") Integer id, WebRequest request) {
+		userService.deleteUserById(id, request);
 		return "redirect:/user/list";
 	}
 }

@@ -18,7 +18,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 @AutoConfigureMockMvc
 public class UserControllerIT {
 	
-	@Autowired
+	/*@Autowired
 	MockMvc mockMvc;
 	
 	@Autowired
@@ -41,7 +41,7 @@ public class UserControllerIT {
 
 
 	}
-	
+	*/
 
 
 

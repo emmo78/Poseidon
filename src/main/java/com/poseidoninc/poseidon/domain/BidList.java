@@ -28,6 +28,7 @@ import lombok.Setter;
 @Setter
 @Table(name = "bidlist")
 public class BidList {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "BidListId")
@@ -44,23 +45,23 @@ public class BidList {
 	String type;
 
 	@Column(name = "bidQuantity")
-	@DecimalMin(value = "0.0", message = "Bidqantity must be a decimal number")
-	@DecimalMax(value = "1.7976931348623157E308", inclusive = true, message = "Bidqantity must be a decimal number")
+	@DecimalMin(value = "0.0", message = "Bidqantity must be a positive decimal number")
+	@DecimalMax(value = "1.7976931348623157E308", inclusive = true, message = "Bidqantity must be a positive decimal number")
 	Double bidQuantity;
 
 	@Column(name = "askQuantity")
-	@DecimalMin(value = "0.0", message = "AskQuantity must be a decimal number")
-	@DecimalMax(value = "1.7976931348623157E308", inclusive = true, message = "AskQuantity must be a decimal number")
+	@DecimalMin(value = "0.0", message = "AskQuantity must be a positive decimal number")
+	@DecimalMax(value = "1.7976931348623157E308", inclusive = true, message = "AskQuantity must be a positive decimal number")
 	Double askQuantity;
 
 	@Column(name = "bid")
-	@DecimalMin(value = "0.0", message = "Bid must be a decimal number")
-	@DecimalMax(value = "1.7976931348623157E308", inclusive = true, message = "Bid must be a decimal number")
+	@DecimalMin(value = "0.0", message = "Bid must be a positive decimal number")
+	@DecimalMax(value = "1.7976931348623157E308", inclusive = true, message = "Bid must be a positive decimal number")
 	Double bid;
 
 	@Column(name = "ask")
-	@DecimalMin(value = "0.0", message = "Ask must be a decimal number")
-	@DecimalMax(value = "1.7976931348623157E308", inclusive = true, message = "Ask must be a decimal number")
+	@DecimalMin(value = "0.0", message = "Ask must be a positive decimal number")
+	@DecimalMax(value = "1.7976931348623157E308", inclusive = true, message = "Ask must be a positive decimal number")
 	Double ask;
 
 	@Column(name = "benchmark")
