@@ -693,6 +693,24 @@ public class UserServiceTest {
 					.getMessage()).isEqualTo("User not found");
 		}	
 
+		
+		
+		@Test
+		@Tag("UserServiceTest")
+		@DisplayName("test deleteUser should throw UnexpectedRollbackException On IllegalArgumentException")
+		public void deleteUserTestShouldThrowsUnexpectedRollbackExceptionOnIllegalArgumentException() {
+
+			//GIVEN
+			when(userRepository.findById(anyInt())).thenReturn(Optional.of(user));
+			doThrow(new IllegalArgumentException()).when(userRepository).delete(any(User.class));
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> userService.deleteUser(1, request))
+					.getMessage()).isEqualTo("Error while deleting user");
+		}	
+		
+		
 		@Test
 		@Tag("UserServiceTest")
 		@DisplayName("test deleteUser should throw UnexpectedRollbackException On Any RuntimeExpceptioin")

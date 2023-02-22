@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,7 +44,6 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 import com.poseidoninc.poseidon.domain.BidList;
-import com.poseidoninc.poseidon.domain.User;
 import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
 import com.poseidoninc.poseidon.repositories.BidListRepository;
 
@@ -472,7 +471,7 @@ public class BidListServiceTest {
 					.getMessage()).isEqualTo("Error while saving bidList");
 		}	
 	}
-	/*
+	
 	@Nested
 	@Tag("deleteBidListTests")
 	@DisplayName("Tests for deleting bidLists")
@@ -496,11 +495,28 @@ public class BidListServiceTest {
 		@BeforeEach
 		public void setUpForEachTest() {
 			bidList = new BidList();
-			bidList.setId(1);
-			bidList.setBidListname("Aaa");
-			bidList.setPassword("aaa1=Passwd");
-			bidList.setFullname("AAA");
-			bidList.setRole("USER");
+			bidList.setBidListId(1);
+			bidList.setAccount("account");
+			bidList.setType("type");
+			bidList.setBidQuantity(1.0);
+			bidList.setAskQuantity(3.0);
+			bidList.setBid(4.0);
+			bidList.setAsk(5.0);
+			bidList.setBenchmark("benchmark");
+			bidList.setBidListDate(LocalDateTime.parse("21/01/2023 10:20:30", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			bidList.setCommentary("commentary");
+			bidList.setSecurity("security");
+			bidList.setStatus("status");
+			bidList.setTrader("trader");
+			bidList.setBook("book");
+			bidList.setCreationName("creation name");
+			bidList.setCreationDate(LocalDateTime.parse("22/01/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			bidList.setRevisionName("revisionName");
+			bidList.setRevisionDate(LocalDateTime.parse("23/01/2023 13:23:33", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			bidList.setDealName("deal name");
+			bidList.setDealType("deal type");
+			bidList.setSourceListId("source list id");
+			bidList.setSide("side");					
 		}
 		
 		@AfterEach
@@ -515,7 +531,6 @@ public class BidListServiceTest {
 		public void deleteBidListTestShouldDeleteIt() {
 			
 			//GIVEN
-			when(bidListRepository.findById(anyInt())).thenReturn(Optional.of(bidList));
 			ArgumentCaptor<BidList> bidListBeingDeleted = ArgumentCaptor.forClass(BidList.class);
 			doNothing().when(bidListRepository).delete(any(BidList.class));// Needed to Capture bidList
 			
@@ -525,41 +540,75 @@ public class BidListServiceTest {
 			//THEN
 			verify(bidListRepository, times(1)).delete(bidListBeingDeleted.capture());
 			assertThat(bidListBeingDeleted.getValue()).extracting(
-					BidList::getId,
-					BidList::getBidListname,
-					BidList::getPassword,
-					BidList::getFullname,
-					BidList::getRole)
-				.containsExactly(
+					BidList::getBidListId,
+					BidList::getAccount,
+					BidList::getType,
+					BidList::getBidQuantity,
+					BidList::getAskQuantity,
+					BidList::getBid,
+					BidList::getAsk,
+					BidList::getBenchmark,
+					bid -> bid.getBidListDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")),
+					BidList::getCommentary,
+					BidList::getSecurity,
+					BidList::getStatus,
+					BidList::getTrader,
+					BidList::getBook,
+					BidList::getCreationName,
+					bid -> bid.getCreationDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")),
+					BidList::getRevisionName,
+					bid -> bid.getRevisionDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")),
+					BidList::getDealName,
+					BidList::getDealType,
+					BidList::getSourceListId,
+					BidList::getSide)
+			.containsExactly(
 					1,
-					"Aaa",
-					"aaa1=Passwd",
-					"AAA",
-					"USER");	
+					"account",
+					"type",
+					1.0,
+					3.0,
+					4.0,
+					5.0,
+					"benchmark",
+					"21/01/2023 10:20:30",
+					"commentary",
+					"security",
+					"status",
+					"trader",
+					"book",
+					"creation name",
+					"22/01/2023 12:22:32",
+					"revisionName",
+					"23/01/2023 13:23:33",
+					"deal name",
+					"deal type",
+					"source list id",
+					"side"
+					);
 		}
 		
 		@Test
 		@Tag("BidListServiceTest")
-		@DisplayName("test deleteBidList should throw ResourceNotFoundException")
-		public void saveBidListTestShouldThrowUnexpectedRollbackExceptionOnResourceNotFoundException() {
+		@DisplayName("test deleteBidList should throw UnexpectedRollbackException On Any RuntimeExpceptioin")
+		public void deleteBidListTestShouldThrowsUnexpectedRollbackExceptionOnIllegalArgumentException() {
 
 			//GIVEN
-			when(bidListRepository.findById(anyInt())).thenThrow(new ResourceNotFoundException("BidList not found"));
-
+			doThrow(new IllegalArgumentException()).when(bidListRepository).delete(any(BidList.class));
 			//WHEN
 			//THEN
-			assertThat(assertThrows(ResourceNotFoundException.class,
-					() -> bidListService.deleteBidList(2, request))
-					.getMessage()).isEqualTo("BidList not found");
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> bidListService.deleteBidList(1, request))
+					.getMessage()).isEqualTo("Error while deleting bidList");
 		}	
 
+		
 		@Test
 		@Tag("BidListServiceTest")
 		@DisplayName("test deleteBidList should throw UnexpectedRollbackException On Any RuntimeExpceptioin")
 		public void deleteBidListTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
 
 			//GIVEN
-			when(bidListRepository.findById(anyInt())).thenReturn(Optional.of(bidList));
 			doThrow(new RuntimeException()).when(bidListRepository).delete(any(BidList.class));
 			//WHEN
 			//THEN
@@ -568,5 +617,5 @@ public class BidListServiceTest {
 					.getMessage()).isEqualTo("Error while deleting bidList");
 		}	
 	}
-*/
+
 }
