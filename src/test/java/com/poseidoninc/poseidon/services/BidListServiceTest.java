@@ -21,6 +21,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
@@ -214,7 +215,7 @@ public class BidListServiceTest {
 				.getMessage()).isEqualTo("Error while getting bidlist");
 		}
 	}
-		
+	
 	@Nested
 	@Tag("getBidListsTests")
 	@DisplayName("Tests for getting bidLists")
@@ -399,7 +400,11 @@ public class BidListServiceTest {
 			
 			//GIVEN
 			bidList.setBidListId(id);
-			when(bidListRepository.save(any(BidList.class))).thenReturn(bidList);
+			when(bidListRepository.save(any(BidList.class))).then(invocation -> {
+				BidList bidListSaved = invocation.getArgument(0);
+				bidListSaved.setBidListId(Optional.ofNullable(bidListSaved.getBidListId()).orElseGet(() -> 1));
+				return bidListSaved;
+				});
 			
 			//WHEN
 			BidList bidListResult = bidListService.saveBidList(bidList, request);
@@ -407,7 +412,7 @@ public class BidListServiceTest {
 			//THEN
 			verify(bidListRepository).save(bidList); //times(1) is the default and can be omitted
 			assertThat(bidListResult).extracting(
-					bid -> Optional.ofNullable(bid.getBidListId()).orElseGet(() -> 1),
+					BidList::getBidListId,
 					BidList::getAccount,
 					BidList::getType,
 					BidList::getBidQuantity,
@@ -461,17 +466,17 @@ public class BidListServiceTest {
 		public void saveBidListTestShouldThrowUnexpectedRollbackExceptionOnAnyRuntimeException() {
 			
 			//GIVEN
-			BidList bidListToSave = new BidList();
+			bidList.setBidListId(1);
 			when(bidListRepository.save(any(BidList.class))).thenThrow(new RuntimeException());
 
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> bidListService.saveBidList(bidListToSave, request))
+					() -> bidListService.saveBidList(bidList, request))
 					.getMessage()).isEqualTo("Error while saving bidList");
 		}	
 	}
-	
+
 	@Nested
 	@Tag("deleteBidListTests")
 	@DisplayName("Tests for deleting bidLists")
@@ -527,15 +532,16 @@ public class BidListServiceTest {
 
 		@Test
 		@Tag("BidListServiceTest")
-		@DisplayName("test deleteBidList should delete it")
-		public void deleteBidListTestShouldDeleteIt() {
+		@DisplayName("test deleteBidList by Id should delete it")
+		public void deleteBidListByIdTestShouldDeleteIt() {
 			
 			//GIVEN
+			when(bidListRepository.findById(anyInt())).thenReturn(Optional.of(bidList));
 			ArgumentCaptor<BidList> bidListBeingDeleted = ArgumentCaptor.forClass(BidList.class);
 			doNothing().when(bidListRepository).delete(any(BidList.class));// Needed to Capture bidList
 			
 			//WHEN
-			bidListService.deleteBidList(1, request);
+			bidListService.deleteBidListById(1, request);
 			
 			//THEN
 			verify(bidListRepository, times(1)).delete(bidListBeingDeleted.capture());
@@ -590,30 +596,47 @@ public class BidListServiceTest {
 		
 		@Test
 		@Tag("BidListServiceTest")
-		@DisplayName("test deleteBidList should throw UnexpectedRollbackException On Any RuntimeExpceptioin")
-		public void deleteBidListTestShouldThrowsUnexpectedRollbackExceptionOnIllegalArgumentException() {
+		@DisplayName("test deleteBidList by Id by Id should throw ResourceNotFoundException")
+		public void deleteBidListByIdTestShouldThrowUnexpectedRollbackExceptionOnResourceNotFoundException() {
 
 			//GIVEN
+			when(bidListRepository.findById(anyInt())).thenThrow(new ResourceNotFoundException("BidList not found"));
+
+			//WHEN
+			//THEN
+			assertThat(assertThrows(ResourceNotFoundException.class,
+					() -> bidListService.deleteBidListById(2, request))
+					.getMessage()).isEqualTo("BidList not found");
+		}	
+
+		@Test
+		@Tag("BidListServiceTest")
+		@DisplayName("test deleteBidList by Id should throw UnexpectedRollbackException On IllegalArgumentException()")
+		public void deleteBidListByIdTestShouldThrowsUnexpectedRollbackExceptionOnIllegalArgumentException() {
+
+			//GIVEN
+			when(bidListRepository.findById(anyInt())).thenReturn(Optional.of(bidList));
 			doThrow(new IllegalArgumentException()).when(bidListRepository).delete(any(BidList.class));
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> bidListService.deleteBidList(1, request))
+					() -> bidListService.deleteBidListById(1, request))
 					.getMessage()).isEqualTo("Error while deleting bidList");
 		}	
 
 		
 		@Test
 		@Tag("BidListServiceTest")
-		@DisplayName("test deleteBidList should throw UnexpectedRollbackException On Any RuntimeExpceptioin")
-		public void deleteBidListTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
+		@DisplayName("test deleteBidList by Id should throw UnexpectedRollbackException On Any RuntimeExpceptioin")
+		public void deleteBidListByIdTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
 
 			//GIVEN
+			when(bidListRepository.findById(anyInt())).thenReturn(Optional.of(bidList));
 			doThrow(new RuntimeException()).when(bidListRepository).delete(any(BidList.class));
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> bidListService.deleteBidList(1, request))
+					() -> bidListService.deleteBidListById(1, request))
 					.getMessage()).isEqualTo("Error while deleting bidList");
 		}	
 	}

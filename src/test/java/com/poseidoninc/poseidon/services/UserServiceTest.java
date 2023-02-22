@@ -522,7 +522,11 @@ public class UserServiceTest {
 			});
 			lenient().when(userRepository.existsByUsername(anyString())).thenReturn(existsByUserName);
 			ArgumentCaptor<User> userBeingSaved = ArgumentCaptor.forClass(User.class);
-			when(userRepository.save(any(User.class))).thenReturn(userToSave);
+			when(userRepository.save(any(User.class))).then(invocation -> {
+				User userSaved = invocation.getArgument(0);
+				userSaved.setId(Optional.ofNullable(userSaved.getId()).orElseGet(() -> 1));
+				return userSaved;
+				});
 			
 			//WHEN
 			User resultedUser = userService.saveUser(userToSave, request);
@@ -531,10 +535,12 @@ public class UserServiceTest {
 			verify(userRepository, times(1)).save(userBeingSaved.capture());
 			assertThat(passwordEncoder.matches("aaa1=Passwd", userBeingSaved.getValue().getPassword())).isTrue();
 			assertThat(resultedUser).extracting(
+					User::getId,
 					User::getUsername,
 					User::getFullname,
 					User::getRole)
 				.containsExactly(
+					1,	
 					userToSaveName,
 					"AAA",
 					"USER");	
@@ -572,19 +578,12 @@ public class UserServiceTest {
 		public void saveUserTestWithUnknownIdShouldThrowAResourceNotFoundException() {
 			
 			//GIVEN
-			User userToSave = new User();
-			userToSave.setId(1);
-			userToSave.setUsername("Aaa");
-			userToSave.setPassword("aaa1=Passwd");
-			userToSave.setFullname("AAA");
-			userToSave.setRole("USER");
-
 			when(userRepository.findById(nullable(Integer.class))).thenThrow(new ResourceNotFoundException("User not found"));
 
 			//WHEN
 			//THEN
 			assertThat(assertThrows(ResourceNotFoundException.class,
-					() -> userService.saveUser(userToSave, request))
+					() -> userService.saveUser(user, request))
 					.getMessage()).isEqualTo("User not found");
 		}	
 		
@@ -651,8 +650,8 @@ public class UserServiceTest {
 
 		@Test
 		@Tag("UserServiceTest")
-		@DisplayName("test deleteUser should delete it")
-		public void deleteUserTestShouldDeleteIt() {
+		@DisplayName("test deleteUser by Id should delete it")
+		public void deleteUserByIdTestShouldDeleteIt() {
 			
 			//GIVEN
 			when(userRepository.findById(anyInt())).thenReturn(Optional.of(user));
@@ -660,7 +659,7 @@ public class UserServiceTest {
 			doNothing().when(userRepository).delete(any(User.class));// Needed to Capture user
 			
 			//WHEN
-			userService.deleteUser(1, request);
+			userService.deleteUserById(1, request);
 			
 			//THEN
 			verify(userRepository, times(1)).delete(userBeingDeleted.capture());
@@ -680,8 +679,8 @@ public class UserServiceTest {
 		
 		@Test
 		@Tag("UserServiceTest")
-		@DisplayName("test deleteUser should throw ResourceNotFoundException")
-		public void saveUserTestShouldThrowUnexpectedRollbackExceptionOnResourceNotFoundException() {
+		@DisplayName("test deleteUser by Id by Id should throw ResourceNotFoundException")
+		public void deleteUserByIdTestShouldThrowUnexpectedRollbackExceptionOnResourceNotFoundException() {
 
 			//GIVEN
 			when(userRepository.findById(anyInt())).thenThrow(new ResourceNotFoundException("User not found"));
@@ -689,16 +688,14 @@ public class UserServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(ResourceNotFoundException.class,
-					() -> userService.deleteUser(2, request))
+					() -> userService.deleteUserById(2, request))
 					.getMessage()).isEqualTo("User not found");
 		}	
 
-		
-		
 		@Test
 		@Tag("UserServiceTest")
-		@DisplayName("test deleteUser should throw UnexpectedRollbackException On IllegalArgumentException")
-		public void deleteUserTestShouldThrowsUnexpectedRollbackExceptionOnIllegalArgumentException() {
+		@DisplayName("test deleteUser by Id should throw UnexpectedRollbackException On IllegalArgumentException")
+		public void deleteUserByIdTestShouldThrowsUnexpectedRollbackExceptionOnIllegalArgumentException() {
 
 			//GIVEN
 			when(userRepository.findById(anyInt())).thenReturn(Optional.of(user));
@@ -706,15 +703,15 @@ public class UserServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> userService.deleteUser(1, request))
+					() -> userService.deleteUserById(1, request))
 					.getMessage()).isEqualTo("Error while deleting user");
 		}	
 		
 		
 		@Test
 		@Tag("UserServiceTest")
-		@DisplayName("test deleteUser should throw UnexpectedRollbackException On Any RuntimeExpceptioin")
-		public void deleteUserTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
+		@DisplayName("test deleteUser by Id should throw UnexpectedRollbackException On Any RuntimeExpceptioin")
+		public void deleteUserByIdTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
 
 			//GIVEN
 			when(userRepository.findById(anyInt())).thenReturn(Optional.of(user));
@@ -722,11 +719,10 @@ public class UserServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> userService.deleteUser(1, request))
+					() -> userService.deleteUserById(1, request))
 					.getMessage()).isEqualTo("Error while deleting user");
 		}	
 	}
-	
 }	
 
 

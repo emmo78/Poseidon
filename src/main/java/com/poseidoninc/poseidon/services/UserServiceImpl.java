@@ -127,16 +127,16 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional(rollbackFor = {IllegalArgumentException.class, ResourceNotFoundException.class, UnexpectedRollbackException.class})
-	public void deleteUser(Integer userId, WebRequest request) throws IllegalArgumentException, ResourceNotFoundException, UnexpectedRollbackException {
+	public void deleteUserById(Integer userId, WebRequest request) throws IllegalArgumentException, ResourceNotFoundException, UnexpectedRollbackException {
 		try {
-			userRepository.delete(getUserById(userId, request));
-		}  catch(IllegalArgumentException iae) {
+			userRepository.delete(getUserById(userId, request)); //getUserById throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException
+		} catch(IllegalArgumentException iae) {
 			log.error("{} : user={} : {} ", requestService.requestToString(request), userId, iae.toString());
 			throw new UnexpectedRollbackException("Error while deleting user");
 		} catch(ResourceNotFoundException  rnfe) {
 			log.error("{} : user={} : {} ", requestService.requestToString(request), userId, rnfe.toString());
 			throw new ResourceNotFoundException(rnfe.getMessage());
-		}  catch(OptimisticLockingFailureException oe) {
+		} catch(OptimisticLockingFailureException oe) {
 			log.error("{} : user={} : {} ", requestService.requestToString(request), userId, oe.toString());
 			throw new UnexpectedRollbackException("Error while deleting user");
 		} catch(Exception e) {

@@ -60,7 +60,7 @@ public class UserController {
 
 	@GetMapping("/user/delete/{id}")
 	public String deleteUser(@PathVariable("id") Integer id, WebRequest request) {
-		userService.deleteUser(id, request);
+		userService.deleteUserById(id, request);
 		return "redirect:/user/list";
 	}
 }

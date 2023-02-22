@@ -15,5 +15,5 @@ public interface UserService {
 	User getUserByIdWithBlankPasswd(Integer userId, WebRequest request) throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException;
 	Page<User> getUsers(Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException;
 	User saveUser(User userToSave, WebRequest request) throws ResourceConflictException, ResourceNotFoundException, UnexpectedRollbackException;
-	void deleteUser(Integer userId, WebRequest request) throws UnexpectedRollbackException;	
+	void deleteUserById(Integer userId, WebRequest request) throws UnexpectedRollbackException;	
 }

@@ -60,7 +60,7 @@ public class BidListController {
 
     @GetMapping("/bidList/delete/{id}")
     public String deleteBid(@PathVariable("id") Integer id, WebRequest request) {
-		bidListService.deleteBidList(id, request);
+		bidListService.deleteBidListById(id, request);
         return "redirect:/bidList/list";
     }
     

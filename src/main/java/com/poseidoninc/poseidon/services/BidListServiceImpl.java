@@ -9,8 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.WebRequest;
 
 import com.poseidoninc.poseidon.domain.BidList;
-import com.poseidoninc.poseidon.domain.User;
-import com.poseidoninc.poseidon.exception.ResourceConflictException;
 import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
 import com.poseidoninc.poseidon.repositories.BidListRepository;
 
@@ -86,9 +84,24 @@ public class BidListServiceImpl implements BidListService {
 	}
 
 	@Override
-	public void deleteBidList(Integer bidListTId, WebRequest request) throws UnexpectedRollbackException {
-		// TODO Auto-generated method stub
-
+	@Transactional(rollbackFor = {IllegalArgumentException.class, ResourceNotFoundException.class, UnexpectedRollbackException.class})
+	public void deleteBidListById(Integer bidListId, WebRequest request) throws UnexpectedRollbackException {
+		try {
+			bidListRepository.delete(getBidListById(bidListId, request)); //getBidListById throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException
+		} catch(IllegalArgumentException iae) {
+			log.error("{} : bidList={} : {} ", requestService.requestToString(request), bidListId, iae.toString());
+			throw new UnexpectedRollbackException("Error while deleting bidList");
+		} catch(ResourceNotFoundException  rnfe) {
+			log.error("{} : bidList={} : {} ", requestService.requestToString(request), bidListId, rnfe.toString());
+			throw new ResourceNotFoundException(rnfe.getMessage());
+		} catch(OptimisticLockingFailureException oe) {
+			log.error("{} : bidList={} : {} ", requestService.requestToString(request), bidListId, oe.toString());
+			throw new UnexpectedRollbackException("Error while deleting bidList");
+		} catch(Exception e) {
+			log.error("{} : bidList={} : {} ", requestService.requestToString(request), bidListId, e.toString());
+			throw new UnexpectedRollbackException("Error while deleting bidList");
+		}
+		log.info("{} : bidList={} deleted", requestService.requestToString(request), bidListId);
 	}
 
 }
