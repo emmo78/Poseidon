@@ -81,7 +81,7 @@ public class UserRepositoryIT {
 		@ValueSource(strings = {"1=Passw", "aaa1=asswd", "aaa1Passwd", "aaa=Passwd"})
 		@Tag("UserRepositoryIT")
 		@DisplayName("save test with incorrect password should throw a ConstraintViolationException")
-		public void saveShouldThrowAConstraintViolationException(String passwd) {
+		public void saveTestShouldThrowAConstraintViolationException(String passwd) {
 	
 			//GIVEN
 			user.setId(null);
