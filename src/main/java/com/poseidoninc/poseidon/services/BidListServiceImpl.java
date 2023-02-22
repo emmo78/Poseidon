@@ -1,5 +1,6 @@
 package com.poseidoninc.poseidon.services;
 
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -36,13 +37,13 @@ public class BidListServiceImpl implements BidListService {
 			log.error("{} : {} ", requestService.requestToString(request), iae.toString());
 			throw new IllegalArgumentException ("Id must not be null");
 		} catch(ResourceNotFoundException  rnfe) {
-			log.error("{} : user={} : {} ", requestService.requestToString(request), bidListId, rnfe.toString());
+			log.error("{} : bidList={} : {} ", requestService.requestToString(request), bidListId, rnfe.toString());
 			throw new ResourceNotFoundException(rnfe.getMessage());
 		} catch (Exception e) {
-			log.error("{} : user={} : {} ", requestService.requestToString(request), bidListId, e.toString());
+			log.error("{} : bidList={} : {} ", requestService.requestToString(request), bidListId, e.toString());
 			throw new UnexpectedRollbackException("Error while getting bidlist");
 		}
-		log.info("{} : user={} gotten",  requestService.requestToString(request), bidList.getBidListId());
+		log.info("{} : bidList={} gotten",  requestService.requestToString(request), bidList.getBidListId());
 		return bidList;
 	}
 
@@ -60,7 +61,7 @@ public class BidListServiceImpl implements BidListService {
 			log.error("{} : {} ", requestService.requestToString(request), e.toString());
 			throw new UnexpectedRollbackException("Error while getting BidLists");
 		}
-		log.info("{} : users page number : {} of {}",
+		log.info("{} : bidLists page number : {} of {}",
 			requestService.requestToString(request),
 			pageBidList.getNumber()+1,
 			pageBidList.getTotalPages());
@@ -68,10 +69,20 @@ public class BidListServiceImpl implements BidListService {
 	}
 
 	@Override
-	public BidList saveBidList(BidList bidListToSave, WebRequest request)
-		throws ResourceConflictException, ResourceNotFoundException, UnexpectedRollbackException {
-		// TODO Auto-generated method stub
-		return null;
+	@Transactional(rollbackFor = {UnexpectedRollbackException.class})
+	public BidList saveBidList(BidList bidList, WebRequest request)
+		throws UnexpectedRollbackException {
+		try {
+			bidList = bidListRepository.save(bidList);
+		}  catch(IllegalArgumentException | OptimisticLockingFailureException re) {
+			log.error("{} : bidList={} : {} ", requestService.requestToString(request), bidList.getBidListId(), re.toString());
+			throw new UnexpectedRollbackException("Error while saving bidList");
+		} catch(Exception e) {
+			log.error("{} : bidList={} : {} ", requestService.requestToString(request), bidList.getBidListId(), e.toString());
+			throw new UnexpectedRollbackException("Error while saving bidList");
+		}
+		log.info("{} : bidList={} persisted", requestService.requestToString(request), bidList.getBidListId());
+		return bidList;
 	}
 
 	@Override

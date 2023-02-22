@@ -103,8 +103,7 @@ public class UserServiceImpl implements UserService {
 		String oldUsername = null;
 		try {
 			oldUsername = getUserById(id, request).getUsername(); //throw ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException
-		} catch (IllegalArgumentException iae) {
-			
+		} catch (IllegalArgumentException iae) {			
 		} finally {
 			if ((id == null || !username.equalsIgnoreCase(oldUsername)) && userRepository.existsByUsername(username)) {
 				ResourceConflictException rce = new ResourceConflictException("UserName already exists");
