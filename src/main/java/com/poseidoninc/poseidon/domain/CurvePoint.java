@@ -18,6 +18,7 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,7 +35,8 @@ public class CurvePoint {
 	Integer id;
 
 	@Column(name = "CurveId")
-	@Min(value = 0, message = "CurveId must be positive")
+	@NotNull
+	@Min(value = 1, message = "CurveId must be positive")
 	@Max(value = 127, message = "CurveId is a tinyint so max is 127")
 	Integer curveId;
 

@@ -113,6 +113,7 @@ public class UserServiceImpl implements UserService {
 		}
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		try {
+			//No need to test blank or null fields for update because constraint validation on each field
 			user = userRepository.save(user);
 		}  catch(IllegalArgumentException | OptimisticLockingFailureException re) {
 			log.error("{} : user={} : {} ", requestService.requestToString(request), user.getId(), re.toString());
