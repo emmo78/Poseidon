@@ -38,7 +38,7 @@ public class CurvePoint {
 	@NotNull
 	@Min(value = 1, message = "CurveId must be positive")
 	@Max(value = 127, message = "CurveId is a tinyint so max is 127")
-	Integer curveId;
+	Integer curvePointId;
 
 	@Column(name = "asOfDate")
 	@DateTimeFormat
