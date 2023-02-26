@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.WebRequest;
 
 import com.poseidoninc.poseidon.domain.CurvePoint;
+import com.poseidoninc.poseidon.domain.User;
 import com.poseidoninc.poseidon.exception.ResourceConflictException;
 import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
 import com.poseidoninc.poseidon.repositories.BidListRepository;
@@ -46,10 +47,23 @@ public class CurvePointServiceIpml implements CurvePointService {
 	}
 
 	@Override
-	public Page<CurvePoint> getCurvePoints(Pageable pageRequest, WebRequest request)
-			throws UnexpectedRollbackException {
-		// TODO Auto-generated method stub
-		return null;
+	public Page<CurvePoint> getCurvePoints(Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException {
+		Page<CurvePoint> pageCurvePoints = null;
+		try {
+			//throws NullPointerException if pageRequest is null
+			pageCurvePoints = curvePointRepository.findAll(pageRequest);
+		} catch(NullPointerException npe) {
+			log.error("{} : {} ", requestService.requestToString(request), npe.toString());
+			throw new UnexpectedRollbackException("Error while getting CurvePoints");
+		} catch(Exception e) {
+			log.error("{} : {} ", requestService.requestToString(request), e.toString());
+			throw new UnexpectedRollbackException("Error while getting CurvePoints");
+		}
+		log.info("{} : curvePoints page number : {} of {}",
+			requestService.requestToString(request),
+			pageCurvePoints.getNumber()+1,
+			pageCurvePoints.getTotalPages());
+		return pageCurvePoints;
 	}
 
 	@Override
