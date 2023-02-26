@@ -9,13 +9,22 @@ import org.springframework.web.context.request.WebRequest;
 import com.poseidoninc.poseidon.domain.CurvePoint;
 import com.poseidoninc.poseidon.exception.ResourceConflictException;
 import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
+import com.poseidoninc.poseidon.repositories.BidListRepository;
+import com.poseidoninc.poseidon.repositories.CurvePointRepository;
+
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@AllArgsConstructor
+@Slf4j
 public class CurvePointServiceIpml implements CurvePointService {
+	
+	private final CurvePointRepository curvePointRepository;
+	private final RequestService requestService;
 
 	@Override
-	public CurvePoint getCurvePointById(Integer curvePointId, WebRequest request)
-			throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException {
+	public CurvePoint getCurvePointById(Integer curvePointId, WebRequest request) throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException {
 		// TODO Auto-generated method stub
 		return null;
 	}
