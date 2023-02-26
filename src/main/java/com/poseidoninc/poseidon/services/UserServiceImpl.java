@@ -98,7 +98,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional(rollbackFor = {ResourceNotFoundException.class, ResourceConflictException.class, UnexpectedRollbackException.class})
 	public User saveUser(User user, WebRequest request) throws ResourceNotFoundException, ResourceConflictException, UnexpectedRollbackException {
-		Integer id = user.getId();
+		Integer id = user.getId(); //can be null;
 		String username = user.getUsername();
 		String oldUsername = null;
 		try {

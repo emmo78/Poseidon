@@ -1,5 +1,6 @@
 package com.poseidoninc.poseidon.services;
 
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -47,6 +48,7 @@ public class CurvePointServiceIpml implements CurvePointService {
 	}
 
 	@Override
+	@Transactional(rollbackFor = {ResourceNotFoundException.class, ResourceConflictException.class, UnexpectedRollbackException.class})
 	public Page<CurvePoint> getCurvePoints(Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException {
 		Page<CurvePoint> pageCurvePoints = null;
 		try {
@@ -67,10 +69,33 @@ public class CurvePointServiceIpml implements CurvePointService {
 	}
 
 	@Override
-	public CurvePoint saveCurvePoint(CurvePoint curvePointToSave, WebRequest request)
-			throws ResourceConflictException, ResourceNotFoundException, UnexpectedRollbackException {
-		// TODO Auto-generated method stub
-		return null;
+	@Transactional(rollbackFor = {ResourceNotFoundException.class, ResourceConflictException.class, UnexpectedRollbackException.class})
+	public CurvePoint saveCurvePoint(CurvePoint curvePoint, WebRequest request) throws ResourceConflictException, ResourceNotFoundException, UnexpectedRollbackException {
+		Integer id = curvePoint.getId(); //can be null;
+		Integer curveId = curvePoint.getCurveId();
+		Integer oldCurveId = null;
+		try {
+			oldCurveId = getCurvePointById(id, request).getCurveId(); //throw ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException
+		} catch (IllegalArgumentException iae) {			
+		} finally {
+			if ((id == null || !curveId.equals(oldCurveId)) && curvePointRepository.existsByCurveId(curveId)) {
+				ResourceConflictException rce = new ResourceConflictException("CurveId already exists");
+				log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), curveId, rce.toString());				
+				throw rce;
+			}
+		}
+		try {
+			//No need to test blank or null fields for update because constraint validation on each field
+			curvePoint = curvePointRepository.save(curvePoint);
+		}  catch(IllegalArgumentException | OptimisticLockingFailureException re) {
+			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), curvePoint.getId(), re.toString());
+			throw new UnexpectedRollbackException("Error while saving curvePoint");
+		} catch(Exception e) {
+			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), curvePoint.getId(), e.toString());
+			throw new UnexpectedRollbackException("Error while saving curvePoint");
+		}
+		log.info("{} : curvePoint={} persisted", requestService.requestToString(request), curvePoint.getId());
+		return curvePoint;
 	}
 
 	@Override

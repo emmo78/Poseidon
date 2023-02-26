@@ -12,6 +12,6 @@ import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
 public interface CurvePointService {
 	CurvePoint getCurvePointById(Integer curvePointId, WebRequest request) throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException;
 	Page<CurvePoint> getCurvePoints(Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException;
-	CurvePoint saveCurvePoint(CurvePoint curvePointToSave, WebRequest request) throws ResourceConflictException, ResourceNotFoundException, UnexpectedRollbackException;
+	CurvePoint saveCurvePoint(CurvePoint curvePoint, WebRequest request) throws ResourceConflictException, ResourceNotFoundException, UnexpectedRollbackException;
 	void deleteCurvePointById(Integer curvePointId, WebRequest request) throws UnexpectedRollbackException;	
 }
