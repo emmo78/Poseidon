@@ -214,7 +214,7 @@ public class UserRepositoryIT {
 	@DisplayName("Tests exists by userName")
 	@TestInstance(Lifecycle.PER_CLASS)
 	class ExistsByUserNameTests {
-
+		
 		@Test
 		@Tag("UserRepositoryIT")
 		@DisplayName("exists by Username should return true")
