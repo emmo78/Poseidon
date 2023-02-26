@@ -135,7 +135,7 @@ public class CurvePointServiceTest {
 			//THEN
 			assertThat(assertThrows(ResourceNotFoundException.class,
 				() -> curvePointService.getCurvePointById(1, request))
-				.getMessage()).isEqualTo("CurvePoint not found");
+				.getMessage()).isEqualTo("Curve Point not found");
 		}
 		
 		@Test
@@ -149,7 +149,7 @@ public class CurvePointServiceTest {
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
 				() -> curvePointService.getCurvePointById(1, request))
-				.getMessage()).isEqualTo("Error while getting bidlist");
+				.getMessage()).isEqualTo("Error while getting curvePoint");
 		}
 	}
 }
