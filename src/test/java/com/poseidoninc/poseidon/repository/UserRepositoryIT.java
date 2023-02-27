@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -78,10 +79,11 @@ public class UserRepositoryIT {
 		}
 		
 		@ParameterizedTest(name = "{0} should throw a ConstraintViolationException")
-		@ValueSource(strings = {"1=Passw", "aaa1=asswd", "aaa1Passwd", "aaa=Passwd"})
+		@NullAndEmptySource
+		@ValueSource(strings = {"1=Passw", "aaa1=asswd", "aaa1Passwd", "aaa=Passwd", "aaa1=Passwdaaa1=Passwd"})
 		@Tag("UserRepositoryIT")
 		@DisplayName("save test with incorrect password should throw a ConstraintViolationException")
-		public void saveTestShouldThrowAConstraintViolationException(String passwd) {
+		public void saveTestIncorrectPasswdShouldThrowAConstraintViolationException(String passwd) {
 	
 			//GIVEN
 			user.setId(null);
@@ -89,12 +91,44 @@ public class UserRepositoryIT {
 			user.setPassword(passwd);
 			user.setFullname("AAA");
 			user.setRole("USER");
+			String msg = passwd==null? "Password is mandatory":"Password must have at least 8 characters in length, max 13, containing at least 1 uppercase letter, 1 digit, and 1 symbol.";
+
+			//WHEN
+			//THEN
+			assertThat(assertThrows(ConstraintViolationException.class,
+					() -> userRepository.saveAndFlush(user))
+					.getMessage()).contains(msg);
+		}
+		
+		@ParameterizedTest(name = "{0} should throw a ConstraintViolationException")
+		@NullAndEmptySource
+		@ValueSource(strings = {"   ", "AbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyz"})//26*5=130
+		@Tag("UserRepositoryIT")
+		@DisplayName("save test with a incorrect String should throw a ConstraintViolationException")
+		public void saveTestStringTooLengthyShouldThrowAConstraintViolationException(String username) {
+	
+			//GIVEN
+			user.setId(null);
+			user.setUsername(username);
+			user.setPassword("aaa1=Passwd");
+			user.setFullname("AAA");
+			user.setRole("USER");
+			String msg = null;
+			if (!(username==null)) {
+				if (!username.isBlank()) {
+					msg = "Username must be maximum of 125 characters";//26*5=130
+				} else {
+					msg = "Username is mandatory"; //empty or blank
+				}
+			} else {
+				msg = "Username is mandatory"; //null
+			}
 	
 			//WHEN
 			//THEN
 			assertThat(assertThrows(ConstraintViolationException.class,
 					() -> userRepository.saveAndFlush(user))
-					.getMessage()).contains("Password must have at least 8 characters in length, max 13, containing at least 1 uppercase letter, 1 digit, and 1 symbol.");
+					.getMessage()).contains(msg);
 		}
 	}
 	
@@ -180,7 +214,7 @@ public class UserRepositoryIT {
 	@DisplayName("Tests exists by userName")
 	@TestInstance(Lifecycle.PER_CLASS)
 	class ExistsByUserNameTests {
-
+		
 		@Test
 		@Tag("UserRepositoryIT")
 		@DisplayName("exists by Username should return true")

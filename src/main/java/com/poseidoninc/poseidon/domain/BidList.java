@@ -35,12 +35,12 @@ public class BidList {
 	Integer bidListId;
 
 	@Column(name = "account")
-	@NotBlank(message = "Account must be not null and not blank")
+	@NotBlank(message = "Account is mandatory")
 	@Size(max = 30, message = "Account must be maximum of 30 characters")
 	String account;
 
 	@Column(name = "type")
-	@NotBlank(message = "Type must be not null and not blank")
+	@NotBlank(message = "Account is mandatory")
 	@Size(max = 30, message = "Type must be maximum of 30 characters")
 	String type;
 

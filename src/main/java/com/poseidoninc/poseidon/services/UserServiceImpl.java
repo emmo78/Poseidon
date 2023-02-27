@@ -48,19 +48,19 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional(readOnly = true, rollbackFor = {ResourceNotFoundException.class, IllegalArgumentException.class, UnexpectedRollbackException.class})
-	public User getUserById(Integer userId, WebRequest request) throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException {
+	public User getUserById(Integer id, WebRequest request) throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException {
 		User user = null;
 		try {
 			//Throws ResourceNotFoundException | IllegalArgumentException
-			user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+			user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 		} catch(IllegalArgumentException iae) {
 			log.error("{} : {} ", requestService.requestToString(request), iae.toString());
 			throw new IllegalArgumentException ("Id must not be null");
 		} catch(ResourceNotFoundException  rnfe) {
-			log.error("{} : user={} : {} ", requestService.requestToString(request), userId, rnfe.toString());
+			log.error("{} : user={} : {} ", requestService.requestToString(request), id, rnfe.toString());
 			throw new ResourceNotFoundException(rnfe.getMessage());
 		} catch (Exception e) {
-			log.error("{} : user={} : {} ", requestService.requestToString(request), userId, e.toString());
+			log.error("{} : user={} : {} ", requestService.requestToString(request), id, e.toString());
 			throw new UnexpectedRollbackException("Error while getting user profile");
 		}
 		log.info("{} : user={} gotten",  requestService.requestToString(request), user.getId());
@@ -98,7 +98,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional(rollbackFor = {ResourceNotFoundException.class, ResourceConflictException.class, UnexpectedRollbackException.class})
 	public User saveUser(User user, WebRequest request) throws ResourceNotFoundException, ResourceConflictException, UnexpectedRollbackException {
-		Integer id = user.getId();
+		Integer id = user.getId(); //can be null;
 		String username = user.getUsername();
 		String oldUsername = null;
 		try {
@@ -113,6 +113,7 @@ public class UserServiceImpl implements UserService {
 		}
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		try {
+			//No need to test blank or null fields for update because constraint validation on each field
 			user = userRepository.save(user);
 		}  catch(IllegalArgumentException | OptimisticLockingFailureException re) {
 			log.error("{} : user={} : {} ", requestService.requestToString(request), user.getId(), re.toString());
@@ -127,22 +128,22 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional(rollbackFor = {IllegalArgumentException.class, ResourceNotFoundException.class, UnexpectedRollbackException.class})
-	public void deleteUserById(Integer userId, WebRequest request) throws IllegalArgumentException, ResourceNotFoundException, UnexpectedRollbackException {
+	public void deleteUserById(Integer id, WebRequest request) throws IllegalArgumentException, ResourceNotFoundException, UnexpectedRollbackException {
 		try {
-			userRepository.delete(getUserById(userId, request)); //getUserById throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException
+			userRepository.delete(getUserById(id, request)); //getUserById throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException
 		} catch(IllegalArgumentException iae) {
-			log.error("{} : user={} : {} ", requestService.requestToString(request), userId, iae.toString());
+			log.error("{} : user={} : {} ", requestService.requestToString(request), id, iae.toString());
 			throw new UnexpectedRollbackException("Error while deleting user");
 		} catch(ResourceNotFoundException  rnfe) {
-			log.error("{} : user={} : {} ", requestService.requestToString(request), userId, rnfe.toString());
+			log.error("{} : user={} : {} ", requestService.requestToString(request), id, rnfe.toString());
 			throw new ResourceNotFoundException(rnfe.getMessage());
 		} catch(OptimisticLockingFailureException oe) {
-			log.error("{} : user={} : {} ", requestService.requestToString(request), userId, oe.toString());
+			log.error("{} : user={} : {} ", requestService.requestToString(request), id, oe.toString());
 			throw new UnexpectedRollbackException("Error while deleting user");
 		} catch(Exception e) {
-			log.error("{} : user={} : {} ", requestService.requestToString(request), userId, e.toString());
+			log.error("{} : user={} : {} ", requestService.requestToString(request), id, e.toString());
 			throw new UnexpectedRollbackException("Error while deleting user");
 		}
-		log.info("{} : user={} deleted", requestService.requestToString(request), userId);
+		log.info("{} : user={} deleted", requestService.requestToString(request), id);
 	}
 }

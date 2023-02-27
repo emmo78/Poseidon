@@ -123,10 +123,13 @@ public class BidListServiceIT {
 	}
 	
 	@ParameterizedTest(name = "{0} account or {1} bid quantity should throw error message {3}")
-	@CsvSource(value = {"null, 1.7976931348623157E308, Account must be not null and not blank",
+	@CsvSource(value = {"'', 1.7976931348623157E308, Account is mandatory",
+						"' ', 1.7976931348623157E308, Account is mandatory",
+						"null, 1.7976931348623157E308, Account is mandatory",
+						"AbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyz, 1.7976931348623157E308, Account must be maximum of 30 characters",
 						"account, 1.7976931348623159E308, Bidqantity must be a positive decimal number",
-						"account, -1.0, Bidqantity must be a positive decimal number"}
-						,nullValues = {"null"})
+						"account, -1.0, Bidqantity must be a positive decimal number"},
+				nullValues = {"null"})
 	@Tag("BidListRepositoryIT")
 	@DisplayName("save test with incorrect password should throw a ConstraintViolationException")
 	public void saveTestShouldThrowAConstraintViolationException(String account, Double bidQuantity, String errorMsg) {

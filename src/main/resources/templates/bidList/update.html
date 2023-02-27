@@ -3,7 +3,7 @@
 	  xmlns:th="http://www.thymeleaf.org">
 	<head>
 		<meta charset="utf-8"/>
-		<title>update Bid List</title>
+		<title>Update Bid List</title>
 		<link rel="stylesheet" href="../../css/bootstrap.min.css" >
 	</head>
 	<body>
@@ -14,12 +14,12 @@
 		
 			<div class="row">
 				<form action="#" th:action="@{/bidList/update}" th:object="${bidList}" method="post" class="form-horizontal" style="width: 100%">
-						<div class="form-group">
-						<label for="account​" class="col-sm-2 control-label">Account</label>
-						<div class="col-sm-10">
-							<input type="text" th:field="*{account​}" placeholder="Account" class="col-4">
-							<p class="text-danger" th:if="${#fields.hasErrors('account​')}" th:errors="*{account​}"></p>
-						</div>
+					<div class="form-group">
+					<label for="account​" class="col-sm-2 control-label">Account</label>
+					<div class="col-sm-10">
+						<input type="text" th:field="*{account​}" placeholder="Account" class="col-4">
+						<p class="text-danger" th:if="${#fields.hasErrors('account​')}" th:errors="*{account​}"></p>
+					</div>
 					</div>
 					<div class="form-group">
 						<label for="type​" class="col-sm-2 control-label">Type</label>
@@ -36,132 +36,6 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="​​askQuantity" class="col-sm-2 control-label">​Ask Quantity</label>
-						<div class="col-sm-10">
-							<input type="number" min="0.00" step="0.01" th:field="*{​​askQuantity}" placeholder="​Ask Quantity" class="col-4">
-							<p class="text-danger" th:if="${#fields.hasErrors('​​askQuantity')}" th:errors="*{​​askQuantity}"></p>
-						</div>
-					</div>
-					<div class="form-group">
-						<label for="​bid" class="col-sm-2 control-label">Bid</label>
-						<div class="col-sm-10">
-							<input type="number" min="0.00" step="0.01" th:field="*{​bid}" placeholder="Bid" class="col-4">
-							<p class="text-danger" th:if="${#fields.hasErrors('​bid')}" th:errors="*{​bid}"></p>
-						</div>
-					</div>
-					<div class="form-group">
-						<label for="​ask" class="col-sm-2 control-label">Ask</label>
-						<div class="col-sm-10">
-							<input type="number" min="0.00" step="0.01" th:field="*{​ask}" placeholder="Ask" class="col-4">
-							<p class="text-danger" th:if="${#fields.hasErrors('​ask')}" th:errors="*{​ask}"></p>
-						</div>
-					</div>
-					<div class="form-group">
-						<label for="benchmark​" class="col-sm-2 control-label">Benchmark</label>
-						<div class="col-sm-10">
-							<input type="text" th:field="*{benchmark​}" placeholder="Benchmark" class="col-4">
-							<p class="text-danger" th:if="${#fields.hasErrors('benchmark​')}" th:errors="*{benchmark​}"></p>
-						</div>
-					</div>
-					<div class="form-group">
-						<label for="bidListDate​" class="col-sm-2 control-label">BidListDate​</label>
-						<div class="col-sm-10">
-							<input type="datetime-local" th:field="*{bidListDate​}" placeholder="BidListDate​" class="col-4">
-							<p class="text-danger" th:if="${#fields.hasErrors('bidListDate​')}" th:errors="*{bidListDate​}"></p>
-						</div>
-					</div>
-					<div class="form-group">
-						<label for="commentary​" class="col-sm-2 control-label">Commentary​</label>
-						<div class="col-sm-10">
-							<input type="text" th:field="*{commentary​}" placeholder="Commentary​" class="col-4">
-							<p class="text-danger" th:if="${#fields.hasErrors('commentary​')}" th:errors="*{commentary​}"></p>
-						</div>
-					</div>
-					<div class="form-group">
-						<label for="security​" class="col-sm-2 control-label">Security​</label>
-						<div class="col-sm-10">
-							<input type="text" th:field="*{security​}" placeholder="Security​" class="col-4">
-							<p class="text-danger" th:if="${#fields.hasErrors('security​')}" th:errors="*{security​}"></p>
-						</div>
-					</div>
-					<div class="form-group">
-						<label for="status​" class="col-sm-2 control-label">Status​</label>
-						<div class="col-sm-10">
-							<input type="text" th:field="*{status​}" placeholder="Status​" class="col-4">
-							<p class="text-danger" th:if="${#fields.hasErrors('status​')}" th:errors="*{status​}"></p>
-						</div>
-					</div>
-					<div class="form-group">
-						<label for="trader​" class="col-sm-2 control-label">Trader​</label>
-						<div class="col-sm-10">
-							<input type="text" th:field="*{trader​}" placeholder="Trader​" class="col-4">
-							<p class="text-danger" th:if="${#fields.hasErrors('trader​')}" th:errors="*{trader​}"></p>
-						</div>
-					</div>
-					<div class="form-group">
-						<label for="book​" class="col-sm-2 control-label">Book​</label>
-						<div class="col-sm-10">
-							<input type="text" th:field="*{book​}" placeholder="Book​" class="col-4">
-							<p class="text-danger" th:if="${#fields.hasErrors('book​')}" th:errors="*{book​}"></p>
-						</div>
-					</div>
-					<div class="form-group">
-						<label for="creationName​" class="col-sm-2 control-label">CreationName​</label>
-						<div class="col-sm-10">
-							<input type="text" th:field="*{creationName​}" placeholder="CreationName​" class="col-4">
-							<p class="text-danger" th:if="${#fields.hasErrors('creationName​')}" th:errors="*{creationName​}"></p>
-						</div>
-					</div>
-					<div class="form-group">
-						<label for="creationDate​​" class="col-sm-2 control-label">CreationDate​​</label>
-						<div class="col-sm-10">
-							<input type="datetime-local" th:field="*{creationDate​​}" placeholder="CreationDate​​" class="col-4">
-							<p class="text-danger" th:if="${#fields.hasErrors('creationDate​​')}" th:errors="*{creationDate​​}"></p>
-						</div>
-					</div>
-					<div class="form-group">
-						<label for="revisionName" class="col-sm-2 control-label">RevisionName</label>
-						<div class="col-sm-10">
-							<input type="text" th:field="*{revisionName}" placeholder="RevisionName" class="col-4">
-							<p class="text-danger" th:if="${#fields.hasErrors('revisionName')}" th:errors="*{revisionName}"></p>
-						</div>
-					</div>
-					<div class="form-group">
-						<label for="revisionDate" class="col-sm-2 control-label">RevisionDate</label>
-						<div class="col-sm-10">
-							<input type="datetime-local" th:field="*{revisionDate}" placeholder="RevisionDate" class="col-4">
-							<p class="text-danger" th:if="${#fields.hasErrors('revisionDate')}" th:errors="*{revisionDate}"></p>
-						</div>
-					</div>
-					<div class="form-group">
-						<label for="dealName​" class="col-sm-2 control-label">DealName​</label>
-						<div class="col-sm-10">
-							<input type="text" th:field="*{dealName​}" placeholder="DealName​" class="col-4">
-							<p class="text-danger" th:if="${#fields.hasErrors('dealName​')}" th:errors="*{dealName​}"></p>
-						</div>
-					</div>
-					<div class="form-group">
-						<label for="dealType​" class="col-sm-2 control-label">DealType​</label>
-						<div class="col-sm-10">
-							<input type="text" th:field="*{dealType​}" placeholder="DealType​" class="col-4">
-							<p class="text-danger" th:if="${#fields.hasErrors('dealType​')}" th:errors="*{dealType​}"></p>
-						</div>
-					</div>
-					<div class="form-group">
-						<label for="sourceListId​" class="col-sm-2 control-label">SourceListId​</label>
-						<div class="col-sm-10">
-							<input type="text" th:field="*{sourceListId​}" placeholder="SourceListId​" class="col-4">
-							<p class="text-danger" th:if="${#fields.hasErrors('sourceListId​')}" th:errors="*{sourceListId​}"></p>
-						</div>
-					</div>
-					<div class="form-group">
-						<label for="side" class="col-sm-2 control-label">Side</label>
-						<div class="col-sm-10">
-							<input type="text" th:field="*{side}" placeholder="Side" class="col-4">
-							<p class="text-danger" th:if="${#fields.hasErrors('side')}" th:errors="*{side}"></p>
-						</div>
-					</div>
-					<div class="form-group">
 						<div class="col-sm-12">
 						
 							<input type="hidden" th:field="*{bidListId}">
@@ -170,8 +44,6 @@
 							<input class="btn btn-primary btn-sm" type="submit" value="Update Bid List">
 						</div>
 					</div>
-					
-
 				</form>
 			</div>
 		</div>
