@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.WebRequest;
 
 import com.poseidoninc.poseidon.domain.CurvePoint;
-import com.poseidoninc.poseidon.domain.User;
+import com.poseidoninc.poseidon.domain.CurvePoint;
 import com.poseidoninc.poseidon.exception.ResourceConflictException;
 import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
 import com.poseidoninc.poseidon.repositories.BidListRepository;
@@ -28,19 +28,19 @@ public class CurvePointServiceIpml implements CurvePointService {
 
 	@Override
 	@Transactional(readOnly = true, rollbackFor = {ResourceNotFoundException.class, IllegalArgumentException.class, UnexpectedRollbackException.class})
-	public CurvePoint getCurvePointById(Integer curvePointId, WebRequest request) throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException {
+	public CurvePoint getCurvePointById(Integer id, WebRequest request) throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException {
 		CurvePoint curvePoint = null;
 		try {
 			//Throws ResourceNotFoundException | IllegalArgumentException
-			curvePoint = curvePointRepository.findById(curvePointId).orElseThrow(() -> new ResourceNotFoundException("Curve Point not found"));
+			curvePoint = curvePointRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Curve Point not found"));
 		} catch(IllegalArgumentException iae) {
 			log.error("{} : {} ", requestService.requestToString(request), iae.toString());
 			throw new IllegalArgumentException ("Id must not be null");
 		} catch(ResourceNotFoundException  rnfe) {
-			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), curvePointId, rnfe.toString());
+			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), id, rnfe.toString());
 			throw new ResourceNotFoundException(rnfe.getMessage());
 		} catch (Exception e) {
-			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), curvePointId, e.toString());
+			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), id, e.toString());
 			throw new UnexpectedRollbackException("Error while getting curvePoint");
 		}
 		log.info("{} : curvePoint={} gotten",  requestService.requestToString(request), curvePoint.getId());
@@ -48,7 +48,7 @@ public class CurvePointServiceIpml implements CurvePointService {
 	}
 
 	@Override
-	@Transactional(rollbackFor = {ResourceNotFoundException.class, ResourceConflictException.class, UnexpectedRollbackException.class})
+	@Transactional(readOnly = true, rollbackFor = {ResourceNotFoundException.class, ResourceConflictException.class, UnexpectedRollbackException.class})
 	public Page<CurvePoint> getCurvePoints(Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException {
 		Page<CurvePoint> pageCurvePoints = null;
 		try {
@@ -99,8 +99,25 @@ public class CurvePointServiceIpml implements CurvePointService {
 	}
 
 	@Override
-	public void deleteCurvePointById(Integer curvePointId, WebRequest request) throws UnexpectedRollbackException {
-		// TODO Auto-generated method stub
+	@Transactional(rollbackFor = {ResourceNotFoundException.class, ResourceConflictException.class, UnexpectedRollbackException.class})
+	public void deleteCurvePointById(Integer id, WebRequest request) throws UnexpectedRollbackException {
+		try {
+			curvePointRepository.delete(getCurvePointById(id, request)); //getCurvePointById throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException
+		} catch(IllegalArgumentException iae) {
+			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), id, iae.toString());
+			throw new UnexpectedRollbackException("Error while deleting curvePoint");
+		} catch(ResourceNotFoundException  rnfe) {
+			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), id, rnfe.toString());
+			throw new ResourceNotFoundException(rnfe.getMessage());
+		} catch(OptimisticLockingFailureException oe) {
+			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), id, oe.toString());
+			throw new UnexpectedRollbackException("Error while deleting curvePoint");
+		} catch(Exception e) {
+			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), id, e.toString());
+			throw new UnexpectedRollbackException("Error while deleting curvePoint");
+		}
+		log.info("{} : curvePoint={} deleted", requestService.requestToString(request), id);
+
 
 	}
 
