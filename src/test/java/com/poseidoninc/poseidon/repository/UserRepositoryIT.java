@@ -80,7 +80,7 @@ public class UserRepositoryIT {
 		
 		@ParameterizedTest(name = "{0} should throw a ConstraintViolationException")
 		@NullAndEmptySource
-		@ValueSource(strings = {"1=Passw", "aaa1=asswd", "aaa1Passwd", "aaa=Passwd", "aaa1=Passwdaaa1=Passwd", "null"})
+		@ValueSource(strings = {"1=Passw", "aaa1=asswd", "aaa1Passwd", "aaa=Passwd", "aaa1=Passwdaaa1=Passwd"})
 		@Tag("UserRepositoryIT")
 		@DisplayName("save test with incorrect password should throw a ConstraintViolationException")
 		public void saveTestIncorrectPasswdShouldThrowAConstraintViolationException(String passwd) {
