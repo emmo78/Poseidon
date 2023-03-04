@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -41,7 +42,8 @@ public class Rating {
 	String fitchRating;
 
 	@Column(name = "orderNumber")
-	@Min(value = 0, message = "OrderNumber must be positive")
+	@NotNull(message = "must not be null")
+	@Min(value = 1, message = "OrderNumber must be positive")
 	@Max(value = 127, message = "OrderNumber is a tinyint so max is 127")
 	Integer orderNumber;
 }
