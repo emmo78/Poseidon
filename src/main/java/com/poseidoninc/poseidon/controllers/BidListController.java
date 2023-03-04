@@ -62,6 +62,5 @@ public class BidListController {
     public String deleteBid(@PathVariable("id") Integer id, WebRequest request) {
 		bidListService.deleteBidListById(id, request);
         return "redirect:/bidList/list";
-    }
-    
+    }   
 }

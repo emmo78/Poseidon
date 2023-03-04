@@ -12,6 +12,6 @@ import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
 public interface BidListService {
 	BidList getBidListById(Integer bidListId, WebRequest request) throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException;
 	Page<BidList> getBidLists(Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException;
-	BidList saveBidList(BidList bidListToSave, WebRequest request) throws ResourceConflictException, ResourceNotFoundException, UnexpectedRollbackException;
+	BidList saveBidList(BidList bidList, WebRequest request) throws ResourceConflictException, ResourceNotFoundException, UnexpectedRollbackException;
 	void deleteBidListById(Integer bidListId, WebRequest request) throws UnexpectedRollbackException;	
 }
