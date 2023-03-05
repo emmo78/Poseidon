@@ -3,7 +3,7 @@
 	  xmlns:th="http://www.thymeleaf.org">
 	<head>
 		<meta charset="utf-8"/>
-		<title>Add RuleName</title>
+		<title>Add Rule Name</title>
 		<link rel="stylesheet" href="../../css/bootstrap.min.css" >
 	</head>
 	<body>
@@ -57,6 +57,13 @@
 							<p class="text-danger" th:if="${#fields.hasErrors('sqlPart')}" th:errors="*{sqlPart​}"></p>
 						</div>
 					</div>
+					<div class="form-group">
+						<div class="col-sm-12">
+							<a class="btn btn-danger btn-sm" href="/ruleName/list">Cancel</a>
+							<input class="btn btn-primary btn-sm" type="submit" value="Add Rule">
+						</div>
+					</div>
+					
 				</form>
 			</div>
 		
