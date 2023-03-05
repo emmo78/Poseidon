@@ -42,7 +42,6 @@ public class Rating {
 	String fitchRating;
 
 	@Column(name = "orderNumber")
-	@NotNull(message = "must not be null")
 	@Min(value = 1, message = "OrderNumber must be positive")
 	@Max(value = 127, message = "OrderNumber is a tinyint so max is 127")
 	Integer orderNumber;
