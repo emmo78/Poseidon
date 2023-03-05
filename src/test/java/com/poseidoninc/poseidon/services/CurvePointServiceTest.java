@@ -214,6 +214,7 @@ public class CurvePointServiceTest {
 			curvePoint.setValue(4.0);
 			curvePoint.setCreationDate(LocalDateTime.parse("22/01/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
 			expectedCurvePoints.add(curvePoint);
+
 			CurvePoint curvePoint2 = new CurvePoint();			
 			curvePoint2.setId(2);
 			curvePoint2.setCurveId(3);
