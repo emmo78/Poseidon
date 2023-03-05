@@ -207,7 +207,6 @@ public class RatingServiceTest {
 			expectedRatings.add(rating);
 			
 			Rating rating2 = new Rating();
-			rating2 = new Rating();
 			rating2.setId(2);
 			rating2.setMoodysRating("Moody's Rating2");
 			rating2.setSandPRating("SandP's Rating2");
