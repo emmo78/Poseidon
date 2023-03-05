@@ -1,4 +1,4 @@
-Spackage com.poseidoninc.poseidon.services;
+package com.poseidoninc.poseidon.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -11,8 +11,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -96,7 +94,7 @@ public class RatingServiceTest {
 			//GIVEN
 			rating = new Rating();
 			rating.setId(1);
-			rating.setMoodyRating("Moody's Rating");
+			rating.setMoodysRating("Moody's Rating");
 			rating.setSandPRating("SandP's Rating");
 			rating.setFitchRating("Fitch's Rating");
 			rating.setOrderNumber(2);
@@ -108,14 +106,14 @@ public class RatingServiceTest {
 			//THEN
 			assertThat(ratingResult).extracting(
 					Rating::getId,
-					Rating::getMoodyRating,
+					Rating::getMoodysRating,
 					Rating::getSandPRating,
 					Rating::getFitchRating,
-					Rating::OrderNumber)
+					Rating::getOrderNumber)
 			.containsExactly(
 					1,
 					"Moody's Rating",
-					"SandP's Rating""type",
+					"SandP's Rating",
 					"Fitch's Rating",
 					2);
 		}
@@ -159,7 +157,7 @@ public class RatingServiceTest {
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
 				() -> ratingService.getRatingById(1, request))
-				.getMessage()).isEqualTo("Error while getting bidlist");
+				.getMessage()).isEqualTo("Error while getting rating");
 		}
 	}
 	
@@ -202,7 +200,7 @@ public class RatingServiceTest {
 			List<Rating> expectedRatings = new ArrayList<>();
 			rating = new Rating();
 			rating.setId(1);
-			rating.setMoodyRating("Moody's Rating");
+			rating.setMoodysRating("Moody's Rating");
 			rating.setSandPRating("SandP's Rating");
 			rating.setFitchRating("Fitch's Rating");
 			rating.setOrderNumber(2);
@@ -211,7 +209,7 @@ public class RatingServiceTest {
 			Rating rating2 = new Rating();
 			rating2 = new Rating();
 			rating2.setId(2);
-			rating2.setMoodyRating("Moody's Rating2");
+			rating2.setMoodysRating("Moody's Rating2");
 			rating2.setSandPRating("SandP's Rating2");
 			rating2.setFitchRating("Fitch's Rating2");
 			rating2.setOrderNumber(3);
@@ -275,7 +273,7 @@ public class RatingServiceTest {
 		@BeforeEach
 		public void setUpForEachTest() {
 			rating = new Rating();
-			rating.setMoodyRating("Moody's Rating");
+			rating.setMoodysRating("Moody's Rating");
 			rating.setSandPRating("SandP's Rating");
 			rating.setFitchRating("Fitch's Rating");
 			rating.setOrderNumber(2);
@@ -296,12 +294,12 @@ public class RatingServiceTest {
 		public void saveRatingTestShouldReturnRating(String state, Integer id) {
 			
 			//GIVEN
-			rating.setRatingId(id);
+			rating.setId(id);
 			when(ratingRepository.save(any(Rating.class))).then(invocation -> {
 				Rating ratingSaved = invocation.getArgument(0);
-				ratingSaved.setRatingId(Optional.ofNullable(ratingSaved.getRatingId()).orElseGet(() -> 1));
+				ratingSaved.setId(Optional.ofNullable(ratingSaved.getId()).orElseGet(() -> 1));
 				return ratingSaved;
-				});
+			});
 			
 			//WHEN
 			Rating ratingResult = ratingService.saveRating(rating, request);
@@ -310,14 +308,14 @@ public class RatingServiceTest {
 			verify(ratingRepository).save(rating); //times(1) is the default and can be omitted
 			assertThat(ratingResult).extracting(
 					Rating::getId,
-					Rating::getMoodyRating,
+					Rating::getMoodysRating,
 					Rating::getSandPRating,
 					Rating::getFitchRating,
-					Rating::OrderNumber)
+					Rating::getOrderNumber)
 			.containsExactly(
 					1,
 					"Moody's Rating",
-					"SandP's Rating""type",
+					"SandP's Rating",
 					"Fitch's Rating",
 					2);
 
@@ -329,7 +327,7 @@ public class RatingServiceTest {
 		public void saveRatingTestShouldThrowUnexpectedRollbackExceptionOnAnyRuntimeException() {
 			
 			//GIVEN
-			rating.setRatingId(1);
+			rating.setId(1);
 			when(ratingRepository.save(any(Rating.class))).thenThrow(new RuntimeException());
 
 			//WHEN
@@ -364,7 +362,7 @@ public class RatingServiceTest {
 		public void setUpForEachTest() {
 			rating = new Rating();
 			rating.setId(1);
-			rating.setMoodyRating("Moody's Rating");
+			rating.setMoodysRating("Moody's Rating");
 			rating.setSandPRating("SandP's Rating");
 			rating.setFitchRating("Fitch's Rating");
 			rating.setOrderNumber(2);
@@ -393,14 +391,14 @@ public class RatingServiceTest {
 			verify(ratingRepository, times(1)).delete(ratingBeingDeleted.capture());
 			assertThat(ratingBeingDeleted.getValue()).extracting(
 					Rating::getId,
-					Rating::getMoodyRating,
+					Rating::getMoodysRating,
 					Rating::getSandPRating,
 					Rating::getFitchRating,
-					Rating::OrderNumber)
+					Rating::getOrderNumber)
 			.containsExactly(
 					1,
 					"Moody's Rating",
-					"SandP's Rating""type",
+					"SandP's Rating",
 					"Fitch's Rating",
 					2);
 		}
