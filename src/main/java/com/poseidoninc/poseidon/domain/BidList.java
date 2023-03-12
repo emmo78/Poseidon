@@ -40,7 +40,7 @@ public class BidList {
 	String account;
 
 	@Column(name = "type")
-	@NotBlank(message = "Account is mandatory")
+	@NotBlank(message = "Type is mandatory")
 	@Size(max = 30, message = "Type must be maximum of 30 characters")
 	String type;
 
