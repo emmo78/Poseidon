@@ -639,5 +639,4 @@ public class BidListServiceTest {
 					.getMessage()).isEqualTo("Error while deleting bidList");
 		}	
 	}
-
 }
