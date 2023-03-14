@@ -208,7 +208,7 @@ public class TradeServiceTest {
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
 				() -> tradeService.getTradeById(1, request))
-				.getMessage()).isEqualTo("Error while getting bidlist");
+				.getMessage()).isEqualTo("Error while getting trade");
 		}
 	}
 	
@@ -316,7 +316,7 @@ public class TradeServiceTest {
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
 					() -> tradeService.getTrades(pageRequest, request))
-					.getMessage()).isEqualTo("Error while getting Trades");
+					.getMessage()).isEqualTo("Error while getting trades");
 		}
 		
 		@Test
@@ -329,7 +329,7 @@ public class TradeServiceTest {
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
 					() -> tradeService.getTrades(pageRequest, request))
-					.getMessage()).isEqualTo("Error while getting Trades");
+					.getMessage()).isEqualTo("Error while getting trades");
 		}
 	}
 	
