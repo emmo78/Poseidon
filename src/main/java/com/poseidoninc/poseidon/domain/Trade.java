@@ -16,6 +16,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,10 +35,12 @@ public class Trade {
 	Integer tradeId;
 
 	@Column(name = "account")
+	@NotBlank(message = "Account is mandatory")
 	@Size(max = 30, message = "Account must be maximum of 30 characters")
 	String account;
 	
 	@Column(name = "type")
+	@NotBlank(message = "Type is mandatory")
 	@Size(max = 30, message = "Type must be maximum of 30 characters")
 	String type;
 	
