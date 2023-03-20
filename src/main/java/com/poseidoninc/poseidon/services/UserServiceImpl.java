@@ -103,7 +103,10 @@ public class UserServiceImpl implements UserService {
 		String oldUsername = null;
 		try {
 			oldUsername = getUserById(id, request).getUsername(); //throw ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException
-		} catch (IllegalArgumentException iae) {			
+		} catch (IllegalArgumentException iae) {
+		} catch(ResourceNotFoundException  rnfe) {
+			log.error("{} : user={} : {} ", requestService.requestToString(request), id, rnfe.toString());
+			throw new ResourceNotFoundException(rnfe.getMessage());
 		} finally {
 			if ((id == null || !username.equalsIgnoreCase(oldUsername)) && userRepository.existsByUsername(username)) {
 				ResourceConflictException rce = new ResourceConflictException("UserName already exists");
@@ -127,8 +130,8 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	@Transactional(rollbackFor = {IllegalArgumentException.class, ResourceNotFoundException.class, UnexpectedRollbackException.class})
-	public void deleteUserById(Integer id, WebRequest request) throws IllegalArgumentException, ResourceNotFoundException, UnexpectedRollbackException {
+	@Transactional(rollbackFor = {ResourceNotFoundException.class, UnexpectedRollbackException.class})
+	public void deleteUserById(Integer id, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException {
 		try {
 			userRepository.delete(getUserById(id, request)); //getUserById throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException
 		} catch(IllegalArgumentException iae) {

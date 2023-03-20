@@ -67,9 +67,8 @@ public class RuleNameServiceImpl implements RuleNameService {
 	}
 
 	@Override
-	@Transactional(rollbackFor = {UnexpectedRollbackException.class})
-	public RuleName saveRuleName(RuleName ruleName, WebRequest request)
-		throws UnexpectedRollbackException {
+	@Transactional(rollbackFor = UnexpectedRollbackException.class)
+	public RuleName saveRuleName(RuleName ruleName, WebRequest request) throws UnexpectedRollbackException {
 		try {
 			ruleName = ruleNameRepository.save(ruleName);
 		}  catch(IllegalArgumentException | OptimisticLockingFailureException re) {
@@ -84,8 +83,8 @@ public class RuleNameServiceImpl implements RuleNameService {
 	}
 
 	@Override
-	@Transactional(rollbackFor = {IllegalArgumentException.class, ResourceNotFoundException.class, UnexpectedRollbackException.class})
-	public void deleteRuleNameById(Integer id, WebRequest request) throws UnexpectedRollbackException {
+	@Transactional(rollbackFor = {ResourceNotFoundException.class, UnexpectedRollbackException.class})
+	public void deleteRuleNameById(Integer id, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException {
 		try {
 			ruleNameRepository.delete(getRuleNameById(id, request)); //getRuleNameById throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException
 		} catch(IllegalArgumentException iae) {
@@ -103,5 +102,4 @@ public class RuleNameServiceImpl implements RuleNameService {
 		}
 		log.info("{} : ruleName={} deleted", requestService.requestToString(request), id);
 	}
-
 }

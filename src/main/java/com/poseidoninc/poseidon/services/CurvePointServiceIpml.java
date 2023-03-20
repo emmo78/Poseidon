@@ -9,10 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.WebRequest;
 
 import com.poseidoninc.poseidon.domain.CurvePoint;
-import com.poseidoninc.poseidon.domain.CurvePoint;
 import com.poseidoninc.poseidon.exception.ResourceConflictException;
 import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
-import com.poseidoninc.poseidon.repositories.BidListRepository;
 import com.poseidoninc.poseidon.repositories.CurvePointRepository;
 
 import lombok.AllArgsConstructor;
@@ -48,7 +46,7 @@ public class CurvePointServiceIpml implements CurvePointService {
 	}
 
 	@Override
-	@Transactional(readOnly = true, rollbackFor = {ResourceNotFoundException.class, ResourceConflictException.class, UnexpectedRollbackException.class})
+	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
 	public Page<CurvePoint> getCurvePoints(Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException {
 		Page<CurvePoint> pageCurvePoints = null;
 		try {
@@ -77,6 +75,9 @@ public class CurvePointServiceIpml implements CurvePointService {
 		try {
 			oldCurveId = getCurvePointById(id, request).getCurveId(); //throw ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException
 		} catch (IllegalArgumentException iae) {			
+		} catch(ResourceNotFoundException  rnfe) {
+			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), id, rnfe.toString());
+			throw new ResourceNotFoundException(rnfe.getMessage());
 		} finally {
 			if ((id == null || !curveId.equals(oldCurveId)) && curvePointRepository.existsByCurveId(curveId)) {
 				ResourceConflictException rce = new ResourceConflictException("CurveId already exists");
@@ -99,8 +100,8 @@ public class CurvePointServiceIpml implements CurvePointService {
 	}
 
 	@Override
-	@Transactional(rollbackFor = {ResourceNotFoundException.class, ResourceConflictException.class, UnexpectedRollbackException.class})
-	public void deleteCurvePointById(Integer id, WebRequest request) throws UnexpectedRollbackException {
+	@Transactional(rollbackFor = {ResourceNotFoundException.class, UnexpectedRollbackException.class})
+	public void deleteCurvePointById(Integer id, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException {
 		try {
 			curvePointRepository.delete(getCurvePointById(id, request)); //getCurvePointById throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException
 		} catch(IllegalArgumentException iae) {
@@ -117,8 +118,5 @@ public class CurvePointServiceIpml implements CurvePointService {
 			throw new UnexpectedRollbackException("Error while deleting curvePoint");
 		}
 		log.info("{} : curvePoint={} deleted", requestService.requestToString(request), id);
-
-
 	}
-
 }

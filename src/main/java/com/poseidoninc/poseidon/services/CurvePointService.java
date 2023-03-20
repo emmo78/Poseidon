@@ -13,5 +13,5 @@ public interface CurvePointService {
 	CurvePoint getCurvePointById(Integer id, WebRequest request) throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException;
 	Page<CurvePoint> getCurvePoints(Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException;
 	CurvePoint saveCurvePoint(CurvePoint curvePoint, WebRequest request) throws ResourceConflictException, ResourceNotFoundException, UnexpectedRollbackException;
-	void deleteCurvePointById(Integer id, WebRequest request) throws UnexpectedRollbackException;	
+	void deleteCurvePointById(Integer id, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException;	
 }

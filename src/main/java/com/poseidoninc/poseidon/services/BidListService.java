@@ -6,12 +6,11 @@ import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.web.context.request.WebRequest;
 
 import com.poseidoninc.poseidon.domain.BidList;
-import com.poseidoninc.poseidon.exception.ResourceConflictException;
 import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
 
 public interface BidListService {
 	BidList getBidListById(Integer bidListId, WebRequest request) throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException;
 	Page<BidList> getBidLists(Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException;
-	BidList saveBidList(BidList bidList, WebRequest request) throws ResourceConflictException, ResourceNotFoundException, UnexpectedRollbackException;
-	void deleteBidListById(Integer bidListId, WebRequest request) throws UnexpectedRollbackException;	
+	BidList saveBidList(BidList bidList, WebRequest request) throws UnexpectedRollbackException;
+	void deleteBidListById(Integer bidListId, WebRequest request) throws  ResourceNotFoundException, UnexpectedRollbackException;	
 }

@@ -2,6 +2,7 @@ package com.poseidoninc.poseidon.controllers;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.context.request.WebRequest;
 
 import com.poseidoninc.poseidon.domain.Rating;
+import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
 import com.poseidoninc.poseidon.services.RatingService;
 
 import jakarta.validation.Valid;
@@ -22,7 +24,7 @@ public class RatingController {
 	private final RatingService ratingService;
 
 	@GetMapping("/rating/list")
-    public String home(Model model, WebRequest request) {
+    public String home(Model model, WebRequest request) throws UnexpectedRollbackException {
 		Pageable pageRequest = Pageable.unpaged();
 		model.addAttribute("ratings", ratingService.getRatings(pageRequest, request));
 		return "rating/list";
@@ -34,7 +36,7 @@ public class RatingController {
     }
 
     @PostMapping("/rating/validate")
-    public String validate(@Valid Rating rating, BindingResult result, WebRequest request) {
+    public String validate(@Valid Rating rating, BindingResult result, WebRequest request) throws UnexpectedRollbackException {
 		if (result.hasErrors()) {
         	return "rating/add";
 		}
@@ -43,14 +45,14 @@ public class RatingController {
     }
 
     @GetMapping("/rating/update/{id}")
-    public String showUpdateForm(@PathVariable("id") Integer id, Model model, WebRequest request) {
+    public String showUpdateForm(@PathVariable("id") Integer id, Model model, WebRequest request)  throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException {
         Rating rating = ratingService.getRatingById(id, request);
 		model.addAttribute("rating", rating);       
         return "rating/update";
     }
 
     @PostMapping("/rating/update")
-    public String updateRating(@Valid Rating rating, BindingResult result, WebRequest request) {
+    public String updateRating(@Valid Rating rating, BindingResult result, WebRequest request) throws UnexpectedRollbackException {
 		if (result.hasErrors()) {
 			return "rating/update";			
 		}
@@ -59,7 +61,7 @@ public class RatingController {
     }
 
     @GetMapping("/rating/delete/{id}")
-    public String deleteRating(@PathVariable("id") Integer id, WebRequest request) {
+    public String deleteRating(@PathVariable("id") Integer id, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException {
         ratingService.deleteRatingById(id, request);
         return "redirect:/rating/list";
     }

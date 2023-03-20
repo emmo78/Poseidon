@@ -84,8 +84,8 @@ public class RatingServiceImpl implements RatingService {
 	}
 
 	@Override
-	@Transactional(rollbackFor = {IllegalArgumentException.class, ResourceNotFoundException.class, UnexpectedRollbackException.class})
-	public void deleteRatingById(Integer id, WebRequest request) throws UnexpectedRollbackException {
+	@Transactional(rollbackFor = {ResourceNotFoundException.class, UnexpectedRollbackException.class})
+	public void deleteRatingById(Integer id, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException {
 		try {
 			ratingRepository.delete(getRatingById(id, request)); //getRatingById throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException
 		} catch(IllegalArgumentException iae) {
@@ -103,5 +103,4 @@ public class RatingServiceImpl implements RatingService {
 		}
 		log.info("{} : rating={} deleted", requestService.requestToString(request), id);
 	}
-
 }

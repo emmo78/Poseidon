@@ -67,7 +67,7 @@ public class TradeServiceImpl implements TradeService {
 	}
 
 	@Override
-	@Transactional(rollbackFor = {UnexpectedRollbackException.class})
+	@Transactional(rollbackFor = UnexpectedRollbackException.class)
 	public Trade saveTrade(Trade trade, WebRequest request)
 		throws UnexpectedRollbackException {
 		try {
@@ -84,8 +84,8 @@ public class TradeServiceImpl implements TradeService {
 	}
 
 	@Override
-	@Transactional(rollbackFor = {IllegalArgumentException.class, ResourceNotFoundException.class, UnexpectedRollbackException.class})
-	public void deleteTradeById(Integer tradeId, WebRequest request) throws UnexpectedRollbackException {
+	@Transactional(rollbackFor = {ResourceNotFoundException.class, UnexpectedRollbackException.class})
+	public void deleteTradeById(Integer tradeId, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException {
 		try {
 			tradeRepository.delete(getTradeById(tradeId, request)); //getTradeById throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException
 		} catch(IllegalArgumentException iae) {
@@ -103,5 +103,4 @@ public class TradeServiceImpl implements TradeService {
 		}
 		log.info("{} : trade={} deleted", requestService.requestToString(request), tradeId);
 	}
-
 }

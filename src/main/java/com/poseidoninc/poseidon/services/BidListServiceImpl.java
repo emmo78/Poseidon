@@ -67,9 +67,8 @@ public class BidListServiceImpl implements BidListService {
 	}
 
 	@Override
-	@Transactional(rollbackFor = {UnexpectedRollbackException.class})
-	public BidList saveBidList(BidList bidList, WebRequest request)
-		throws UnexpectedRollbackException {
+	@Transactional(rollbackFor = UnexpectedRollbackException.class)
+	public BidList saveBidList(BidList bidList, WebRequest request) throws UnexpectedRollbackException {
 		try {
 			bidList = bidListRepository.save(bidList);
 		}  catch(IllegalArgumentException | OptimisticLockingFailureException re) {
@@ -84,8 +83,8 @@ public class BidListServiceImpl implements BidListService {
 	}
 
 	@Override
-	@Transactional(rollbackFor = {IllegalArgumentException.class, ResourceNotFoundException.class, UnexpectedRollbackException.class})
-	public void deleteBidListById(Integer bidListId, WebRequest request) throws UnexpectedRollbackException {
+	@Transactional(rollbackFor = {ResourceNotFoundException.class, UnexpectedRollbackException.class})
+	public void deleteBidListById(Integer bidListId, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException {
 		try {
 			bidListRepository.delete(getBidListById(bidListId, request)); //getBidListById throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException
 		} catch(IllegalArgumentException iae) {

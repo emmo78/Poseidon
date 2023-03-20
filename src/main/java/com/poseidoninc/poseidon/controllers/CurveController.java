@@ -2,6 +2,7 @@ package com.poseidoninc.poseidon.controllers;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,7 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.WebRequest;
 
 import com.poseidoninc.poseidon.domain.CurvePoint;
-import com.poseidoninc.poseidon.domain.User;
+import com.poseidoninc.poseidon.exception.ResourceConflictException;
+import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
 import com.poseidoninc.poseidon.services.CurvePointService;
 
 import jakarta.validation.Valid;
@@ -24,7 +26,7 @@ public class CurveController {
 	private final CurvePointService curvePointService;
 	
     @RequestMapping("/curvePoint/list")
-    public String home(Model model, WebRequest request){
+    public String home(Model model, WebRequest request) throws UnexpectedRollbackException {
 		Pageable pageRequest = Pageable.unpaged();
 		model.addAttribute("curvePoints", curvePointService.getCurvePoints(pageRequest, request));
         return "curvePoint/list";
@@ -36,7 +38,7 @@ public class CurveController {
     }
 
     @PostMapping("/curvePoint/validate")
-    public String validate(@Valid CurvePoint curvePoint, BindingResult result, WebRequest request) {
+    public String validate(@Valid CurvePoint curvePoint, BindingResult result, WebRequest request) throws ResourceConflictException, ResourceNotFoundException, UnexpectedRollbackException {
 		if (result.hasErrors()) {
 			return "curvePoint/add";
 		}
@@ -45,14 +47,14 @@ public class CurveController {
     }
 
     @GetMapping("/curvePoint/update/{id}")
-    public String showUpdateForm(@PathVariable("id") Integer id, Model model, WebRequest request) {
+    public String showUpdateForm(@PathVariable("id") Integer id, Model model, WebRequest request) throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException {
     	CurvePoint curvePoint = curvePointService.getCurvePointById(id, request);
 		model.addAttribute("curvePoint", curvePoint);
         return "curvePoint/update";
     }
 
     @PostMapping("/curvePoint/update")
-    public String updateBid(@Valid CurvePoint curvePoint, BindingResult result, WebRequest request) {
+    public String updateBid(@Valid CurvePoint curvePoint, BindingResult result, WebRequest request) throws ResourceConflictException, ResourceNotFoundException, UnexpectedRollbackException {
 		if (result.hasErrors()) {
 			return "user/update";
 		}
@@ -61,7 +63,7 @@ public class CurveController {
     }
 
     @GetMapping("/curvePoint/delete/{id}")
-    public String deleteBid(@PathVariable("id") Integer id, WebRequest request) {
+    public String deleteBid(@PathVariable("id") Integer id, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException {
 		curvePointService.deleteCurvePointById(id, request);
         return "redirect:/curvePoint/list";
     }
