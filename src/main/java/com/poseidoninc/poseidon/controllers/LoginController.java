@@ -10,9 +10,6 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class LoginController {
 
-    @Autowired
-    private UserRepository userRepository;
-
     @GetMapping("/login")
     public ModelAndView login() {
         ModelAndView mav = new ModelAndView();

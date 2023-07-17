@@ -34,7 +34,7 @@ public class CurvePoint {
 	@Column(name = "Id")
 	Integer id;
 
-	@Column(name = "CurveId")
+	@Column(name = "CurveId", unique = true)
 	@NotNull(message = "must not be null")
 	@Min(value = 1, message = "CurveId min is 1")
 	@Max(value = 127, message = "CurveId is a tinyint so max is 127")

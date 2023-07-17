@@ -22,48 +22,48 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class UserController {
 
-	private final UserService userService;
+    private final UserService userService;
 
-	@GetMapping("/user/list")
-	public String home(Model model, WebRequest request) throws UnexpectedRollbackException {
-		Pageable pageRequest = Pageable.unpaged();
-		model.addAttribute("users", userService.getUsers(pageRequest, request));
-		return "user/list";
-	}
+    @GetMapping("/user/list")
+    public String home(Model model, WebRequest request) throws UnexpectedRollbackException {
+        Pageable pageRequest = Pageable.unpaged();
+        model.addAttribute("users", userService.getUsers(pageRequest, request));
+        return "user/list";
+    }
 
-	@GetMapping("/user/add")
-	public String addUser(User user) {
+    @GetMapping("/user/add")
+    public String addUser(User user) {
 		return "user/add";
-	}
+    }
 
-	@PostMapping("/user/validate")
-	public String validate(@Valid User user, BindingResult result, WebRequest request) throws ResourceConflictException, ResourceNotFoundException, UnexpectedRollbackException {
-		if (result.hasErrors()) {
-			return "user/add";
-		}
-		userService.saveUser(user, request);
-		return "redirect:/user/list";
-	}
+    @PostMapping("/user/validate")
+    public String validate(@Valid User user, BindingResult result, WebRequest request) throws ResourceConflictException, ResourceNotFoundException, UnexpectedRollbackException {
+        if (result.hasErrors()) {
+            return "user/add";
+        }
+        userService.saveUser(user, request);
+        return "redirect:/user/list";
+    }
 
-	@GetMapping("/user/update/{id}")
-	public String showUpdateForm(@PathVariable("id") Integer id, Model model, WebRequest request) throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException {
-		User user = userService.getUserByIdWithBlankPasswd(id, request);
-		model.addAttribute("user", user);
-		return "user/update";
-	}
+    @GetMapping("/user/update/{id}")
+    public String showUpdateForm(@PathVariable("id") Integer id, Model model, WebRequest request) throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException {
+        User user = userService.getUserByIdWithBlankPasswd(id, request);
+        model.addAttribute("user", user);
+        return "user/update";
+    }
 
-	@PostMapping("/user/update")
-	public String updateUser(@Valid User user, BindingResult result, WebRequest request) throws ResourceConflictException, ResourceNotFoundException, UnexpectedRollbackException {
-		if (result.hasErrors()) {
-			return "user/update";
-		}
-		userService.saveUser(user, request);
-		return "redirect:/user/list";
-	}
+    @PostMapping("/user/update")
+    public String updateUser(@Valid User user, BindingResult result, WebRequest request) throws ResourceConflictException, ResourceNotFoundException, UnexpectedRollbackException {
+        if (result.hasErrors()) {
+            return "user/update";
+        }
+        userService.saveUser(user, request);
+        return "redirect:/user/list";
+    }
 
-	@GetMapping("/user/delete/{id}")
-	public String deleteUser(@PathVariable("id") Integer id, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException{
-		userService.deleteUserById(id, request);
-		return "redirect:/user/list";
-	}
+    @GetMapping("/user/delete/{id}")
+    public String deleteUser(@PathVariable("id") Integer id, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException {
+        userService.deleteUserById(id, request);
+        return "redirect:/user/list";
+    }
 }

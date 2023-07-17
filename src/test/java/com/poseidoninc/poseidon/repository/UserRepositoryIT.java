@@ -23,8 +23,10 @@ import com.poseidoninc.poseidon.domain.User;
 import com.poseidoninc.poseidon.repositories.UserRepository;
 
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
+@ActiveProfiles("mytest")
 public class UserRepositoryIT {
 	
 	@Autowired
@@ -229,7 +231,7 @@ public class UserRepositoryIT {
 			userRepository.saveAndFlush(user);
 	
 			//WHEN
-			boolean result = userRepository.existsByUsername("Aaa");
+			boolean result = userRepository.existsByUsernameIgnoreCase("Aaa");
 			
 			//THEN
 			assertThat(result).isTrue();	
@@ -249,10 +251,29 @@ public class UserRepositoryIT {
 			userRepository.saveAndFlush(user);
 	
 			//WHEN
-			boolean result = userRepository.existsByUsername("Bbb");
+			boolean result = userRepository.existsByUsernameIgnoreCase("Bbb");
 			
 			//THEN
 			assertThat(result).isFalse();	
+		}
+		@Test
+		@Tag("UserRepositoryIT")
+		@DisplayName("exists by Username should return true")
+		public void findByUsernameTestShouldReturnTrueCaseInsensitive() {
+
+			//GIVEN
+			user.setId(null);
+			user.setUsername("Aaa");
+			user.setPassword("aaa1=Passwd");
+			user.setFullname("AAA");
+			user.setRole("USER");
+			userRepository.saveAndFlush(user);
+
+			//WHEN
+			boolean result = userRepository.existsByUsernameIgnoreCase("aaa");
+
+			//THEN
+			assertThat(result).isTrue();
 		}
 	}
 }

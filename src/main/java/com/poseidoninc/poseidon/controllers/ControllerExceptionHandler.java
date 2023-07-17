@@ -23,11 +23,12 @@ public class ControllerExceptionHandler {
 	@ExceptionHandler(ResourceConflictException.class)
     public String ressourceConflictException(ResourceConflictException ex, WebRequest request, RedirectAttributes attributes) {
 		String errorMessage = ex.getMessage();
+		String requestStr = requestService.requestToString(request);
 		log.error("{} : {} : {}",
-				requestService.requestToString(request),
+				requestStr,
 				((ServletWebRequest) request).getHttpMethod(),
 				errorMessage);
 		attributes.addAttribute("errorMessage", errorMessage);
-        return "redirect:/register";
+        return "redirect:"+requestStr.split("uri=")[0];
     }
 }

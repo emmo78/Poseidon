@@ -520,7 +520,7 @@ public class UserServiceTest {
 					return Optional.of(user);
 				}
 			});
-			lenient().when(userRepository.existsByUsername(anyString())).thenReturn(existsByUserName);
+			lenient().when(userRepository.existsByUsernameIgnoreCase(anyString())).thenReturn(existsByUserName);
 			ArgumentCaptor<User> userBeingSaved = ArgumentCaptor.forClass(User.class);
 			when(userRepository.save(any(User.class))).then(invocation -> {
 				User userSaved = invocation.getArgument(0);
@@ -563,7 +563,7 @@ public class UserServiceTest {
 			userToSave.setRole("USER");
 
 			when(userRepository.findById(nullable(Integer.class))).thenReturn(Optional.of(user));
-			lenient().when(userRepository.existsByUsername(anyString())).thenReturn(existsByUserName);
+			lenient().when(userRepository.existsByUsernameIgnoreCase(anyString())).thenReturn(existsByUserName);
 
 			//WHEN
 			//THEN
@@ -601,7 +601,7 @@ public class UserServiceTest {
 			userToSave.setRole("USER");
 
 			when(userRepository.findById(nullable(Integer.class))).thenReturn(Optional.of(user));
-			lenient().when(userRepository.existsByUsername(anyString())).thenReturn(true);
+			lenient().when(userRepository.existsByUsernameIgnoreCase(anyString())).thenReturn(true);
 			when(userRepository.save(any(User.class))).thenThrow(new RuntimeException());
 
 			//WHEN

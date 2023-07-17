@@ -28,7 +28,7 @@ public class User {
 	@Column(name = "Id")
     private Integer id;
     
-	@Column(name = "username")
+	@Column(name = "username", unique = true) //@Column(unique = true)
     @NotBlank(message = "Username is mandatory")
 	@Size(max = 125, message = "Username must be maximum of 125 characters")
     private String username;
