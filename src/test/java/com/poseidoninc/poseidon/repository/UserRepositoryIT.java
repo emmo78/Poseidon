@@ -23,6 +23,7 @@ import com.poseidoninc.poseidon.domain.User;
 import com.poseidoninc.poseidon.repositories.UserRepository;
 
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
@@ -53,7 +54,7 @@ public class UserRepositoryIT {
 		@Test
 		@Tag("UserRepositoryIT")
 		@DisplayName("save test should persist user with new id")
-		public void saveShouldPersistUserWithNewId() {
+		public void saveTestShouldPersistUserWithNewId() {
 	
 			//GIVEN
 			user.setId(null);
@@ -107,7 +108,7 @@ public class UserRepositoryIT {
 		@ValueSource(strings = {"   ", "AbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyz"})//26*5=130
 		@Tag("UserRepositoryIT")
 		@DisplayName("save test with a incorrect String should throw a ConstraintViolationException")
-		public void saveTestStringTooLengthyShouldThrowAConstraintViolationException(String username) {
+		public void saveTestIncorrectStringShouldThrowAConstraintViolationException(String username) {
 	
 			//GIVEN
 			user.setId(null);
@@ -131,6 +132,35 @@ public class UserRepositoryIT {
 			assertThat(assertThrows(ConstraintViolationException.class,
 					() -> userRepository.saveAndFlush(user))
 					.getMessage()).contains(msg);
+		}
+
+		@ParameterizedTest(name = "{0} should throw a ConstraintViolationException")
+		@ValueSource(strings = {"Aaa", "aaa", "AAA", "aAA"})
+		@Tag("UserRepositoryIT")
+		@DisplayName("save test an user with an existent username case insensitive should throw a DataIntegrityViolationException")
+		public void saveTestAnUserWithAnExistentUsernameCaseInsensitiveShouldThrowDataIntegrityViolationException(String username) {
+
+			//GIVEN
+			user.setId(null);
+			user.setUsername("Aaa");
+			user.setPassword("aaa1=Passwd");
+			user.setFullname("AAA");
+			user.setRole("USER");
+			userRepository.saveAndFlush(user);
+
+			User userTest = new User();
+			userTest.setId(null);
+			userTest.setUsername(username);
+			userTest.setPassword("aaa2=Passwd");
+			userTest.setFullname("AAATEST");
+			userTest.setRole("USER");
+
+
+			//WHEN
+			//THEN
+			assertThat(assertThrows(DataIntegrityViolationException.class,
+					() -> userRepository.saveAndFlush(userTest))
+					.getMessage()).contains(("Unique index or primary key violation"));;
 		}
 	}
 	
