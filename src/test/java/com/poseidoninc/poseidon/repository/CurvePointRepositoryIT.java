@@ -1,6 +1,7 @@
 package com.poseidoninc.poseidon.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDateTime;
@@ -82,7 +83,74 @@ public class CurvePointRepositoryIT {
 							4.0,
 							"22/01/2023 12:22:32"
 					));
+		}
 
+		@Test
+		@Tag("CurvePointRepositoryIT")
+		@DisplayName("save test update curve point with same curveId should persist it")
+		public void saveTestUpdateCurvePointShouldPersistIt() {
+
+			//GIVEN
+			curvePoint.setId(null);
+			curvePoint.setCurveId(2);
+			curvePoint.setAsOfDate(LocalDateTime.parse("21/01/2023 10:20:30", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			curvePoint.setTerm(3.0);
+			curvePoint.setValue(4.0);
+			curvePoint.setCreationDate(LocalDateTime.parse("22/01/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			Integer id = curvePointRepository.saveAndFlush(curvePoint).getId();
+			CurvePoint updatedCurvePoint = new CurvePoint();
+			updatedCurvePoint.setId(id);
+			updatedCurvePoint.setCurveId(2);
+			updatedCurvePoint.setAsOfDate(LocalDateTime.parse("21/02/2023 10:20:30", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			updatedCurvePoint.setTerm(5.0);
+			updatedCurvePoint.setValue(6.0);
+			updatedCurvePoint.setCreationDate(LocalDateTime.parse("22/02/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+
+			//WHEN
+			//THEN
+			assertThat(assertDoesNotThrow(() -> curvePointRepository.saveAndFlush(updatedCurvePoint))).extracting(
+							CurvePoint::getId,
+							CurvePoint::getCurveId,
+							curve -> curve.getAsOfDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")),
+							CurvePoint::getTerm,
+							CurvePoint::getValue,
+							curve -> curve.getCreationDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")))
+					.containsExactly(
+							id,
+							2,
+							"21/02/2023 10:20:30",
+							5.0,
+							6.0,
+							"22/02/2023 12:22:32"
+					);
+		}
+
+		@Test
+		@Tag("CurvePointRepositoryIT")
+		@DisplayName("save test a new curvePoint with existent curveId should throw a DataIntegrityViolationException")
+		public void saveTestACurvePointWithAnExistentIdShouldThrowDataIntegrityViolationException() {
+
+			//GIVEN
+			curvePoint.setId(null);
+			curvePoint.setCurveId(2);
+			curvePoint.setAsOfDate(LocalDateTime.parse("21/01/2023 10:20:30", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			curvePoint.setTerm(3.0);
+			curvePoint.setValue(4.0);
+			curvePoint.setCreationDate(LocalDateTime.parse("22/01/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			curvePointRepository.saveAndFlush(curvePoint);
+
+			CurvePoint curvePointTest = new CurvePoint();
+			curvePointTest.setId(null);
+			curvePointTest.setCurveId(2);
+			curvePointTest.setAsOfDate(LocalDateTime.parse("21/02/2023 10:20:30", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			curvePointTest.setTerm(5.0);
+			curvePointTest.setValue(6.0);
+			curvePointTest.setCreationDate(LocalDateTime.parse("22/02/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			//WHEN
+			//THEN
+			assertThat(assertThrows(DataIntegrityViolationException.class,
+					() -> curvePointRepository.saveAndFlush(curvePointTest))
+					.getMessage()).contains(("Unique index or primary key violation"));
 		}
 
 		@ParameterizedTest(name = "{0} should throw a ConstraintViolationException")
@@ -110,34 +178,6 @@ public class CurvePointRepositoryIT {
 			assertThat(assertThrows(ConstraintViolationException.class,
 					() -> curvePointRepository.saveAndFlush(curvePoint))
 					.getMessage()).contains(msg);
-		}
-
-		@Test
-		@Tag("CurvePointRepositoryIT")
-		@DisplayName("save test a curvePoint with existent id should throw a DataIntegrityViolationException")
-		public void saveTestACurvePointWithAnExistentIdShouldThrowDataIntegrityViolationException() {
-
-			//GIVEN
-			curvePoint.setId(null);
-			curvePoint.setCurveId(2);
-			curvePoint.setAsOfDate(LocalDateTime.parse("21/01/2023 10:20:30", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
-			curvePoint.setTerm(3.0);
-			curvePoint.setValue(4.0);
-			curvePoint.setCreationDate(LocalDateTime.parse("22/01/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
-			curvePointRepository.saveAndFlush(curvePoint);
-
-			CurvePoint curvePointTest = new CurvePoint();
-			curvePointTest.setId(null);
-			curvePointTest.setCurveId(2);
-			curvePointTest.setAsOfDate(LocalDateTime.parse("21/02/2023 10:20:30", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
-			curvePointTest.setTerm(5.0);
-			curvePointTest.setValue(6.0);
-			curvePointTest.setCreationDate(LocalDateTime.parse("22/02/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
-			//WHEN
-			//THEN
-			assertThat(assertThrows(DataIntegrityViolationException.class,
-					() -> curvePointRepository.saveAndFlush(curvePointTest))
-					.getMessage()).contains(("Unique index or primary key violation"));
 		}
 	}
 

@@ -1,6 +1,7 @@
 package com.poseidoninc.poseidon.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Optional;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +55,7 @@ public class UserRepositoryIT {
 
 		@Test
 		@Tag("UserRepositoryIT")
-		@DisplayName("save test should persist user with new id")
+		@DisplayName("save test new user should persist user with new id")
 		public void saveTestShouldPersistUserWithNewId() {
 	
 			//GIVEN
@@ -80,7 +82,71 @@ public class UserRepositoryIT {
 					"AAA",
 					"USER"));
 		}
-		
+
+		@Test
+		@Tag("UserRepositoryIT")
+		@DisplayName("save test update user with same username should persist him")
+		public void saveTestUpdateUserShouldPersistHim() {
+
+			//GIVEN
+			user.setId(null);
+			user.setUsername("Aaa");
+			user.setPassword("aaa1=Passwd");
+			user.setFullname("AAA");
+			user.setRole("USER");
+			Integer id = userRepository.saveAndFlush(user).getId();
+			User updatedUser = new User();
+			updatedUser.setId(id);
+			updatedUser.setUsername("Aaa");
+			updatedUser.setPassword("upd1=Passwd");
+			updatedUser.setFullname("UPDT");
+			updatedUser.setRole("USER");
+
+			//WHEN
+			//THEN
+			assertThat(assertDoesNotThrow(() -> userRepository.saveAndFlush(updatedUser)))
+					.extracting(
+							User::getId,
+							User::getUsername,
+							User::getPassword,
+							User::getFullname,
+							User::getRole)
+					.containsExactly(
+							id,
+							"Aaa",
+							"upd1=Passwd",
+							"UPDT",
+							"USER");
+		}
+		@ParameterizedTest(name = "{0} should throw a DataIntegrityViolationException")
+		@ValueSource(strings = {"Aaa", "aaa", "AAA", "aAA"})
+		@Tag("UserRepositoryIT")
+		@DisplayName("save test an new user with an existent username case insensitive should throw a DataIntegrityViolationException")
+		public void saveTestAnUserWithAnExistentUsernameCaseInsensitiveShouldThrowDataIntegrityViolationException(String username) {
+
+			//GIVEN
+			user.setId(null);
+			user.setUsername("Aaa");
+			user.setPassword("aaa1=Passwd");
+			user.setFullname("AAA");
+			user.setRole("USER");
+			userRepository.saveAndFlush(user);
+
+			User userTest = new User();
+			userTest.setId(null);
+			userTest.setUsername(username);
+			userTest.setPassword("aaa2=Passwd");
+			userTest.setFullname("AAATEST");
+			userTest.setRole("USER");
+
+			//WHEN
+			//THEN
+			assertThat(assertThrows(DataIntegrityViolationException.class,
+					() -> userRepository.saveAndFlush(userTest))
+					.getMessage()).contains(("Unique index or primary key violation"));
+		}
+
+
 		@ParameterizedTest(name = "{0} should throw a ConstraintViolationException")
 		@NullAndEmptySource
 		@ValueSource(strings = {"1=Passw", "aaa1=asswd", "aaa1Passwd", "aaa=Passwd", "aaa1=Passwdaaa1=Passwd"})
@@ -132,35 +198,6 @@ public class UserRepositoryIT {
 			assertThat(assertThrows(ConstraintViolationException.class,
 					() -> userRepository.saveAndFlush(user))
 					.getMessage()).contains(msg);
-		}
-
-		@ParameterizedTest(name = "{0} should throw a ConstraintViolationException")
-		@ValueSource(strings = {"Aaa", "aaa", "AAA", "aAA"})
-		@Tag("UserRepositoryIT")
-		@DisplayName("save test an user with an existent username case insensitive should throw a DataIntegrityViolationException")
-		public void saveTestAnUserWithAnExistentUsernameCaseInsensitiveShouldThrowDataIntegrityViolationException(String username) {
-
-			//GIVEN
-			user.setId(null);
-			user.setUsername("Aaa");
-			user.setPassword("aaa1=Passwd");
-			user.setFullname("AAA");
-			user.setRole("USER");
-			userRepository.saveAndFlush(user);
-
-			User userTest = new User();
-			userTest.setId(null);
-			userTest.setUsername(username);
-			userTest.setPassword("aaa2=Passwd");
-			userTest.setFullname("AAATEST");
-			userTest.setRole("USER");
-
-
-			//WHEN
-			//THEN
-			assertThat(assertThrows(DataIntegrityViolationException.class,
-					() -> userRepository.saveAndFlush(userTest))
-					.getMessage()).contains(("Unique index or primary key violation"));;
 		}
 	}
 	
@@ -238,72 +275,6 @@ public class UserRepositoryIT {
 			
 			//THEN
 			assertThat(userResult).isNull();	
-		}
-	}
-	
-	@Nested
-	@Tag("existsByUsernameTests")
-	@DisplayName("Tests exists by userName")
-	@TestInstance(Lifecycle.PER_CLASS)
-	class ExistsByUserNameTests {
-		
-		@Test
-		@Tag("UserRepositoryIT")
-		@DisplayName("exists by Username should return true")
-		public void findByUsernameTestShouldReturnTrue() {
-	
-			//GIVEN
-			user.setId(null);
-			user.setUsername("Aaa");
-			user.setPassword("aaa1=Passwd");
-			user.setFullname("AAA");
-			user.setRole("USER");
-			userRepository.saveAndFlush(user);
-	
-			//WHEN
-			boolean result = userRepository.existsByUsernameIgnoreCase("Aaa");
-			
-			//THEN
-			assertThat(result).isTrue();	
-		}
-		
-		@Test
-		@Tag("UserRepositoryIT")
-		@DisplayName("exists by Username should return false")
-		public void findByUsernameTestShouldReturnFalse() {
-	
-			//GIVEN
-			user.setId(null);
-			user.setUsername("Aaa");
-			user.setPassword("aaa1=Passwd");
-			user.setFullname("AAA");
-			user.setRole("USER");
-			userRepository.saveAndFlush(user);
-	
-			//WHEN
-			boolean result = userRepository.existsByUsernameIgnoreCase("Bbb");
-			
-			//THEN
-			assertThat(result).isFalse();	
-		}
-		@Test
-		@Tag("UserRepositoryIT")
-		@DisplayName("exists by Username should return true")
-		public void findByUsernameTestShouldReturnTrueCaseInsensitive() {
-
-			//GIVEN
-			user.setId(null);
-			user.setUsername("Aaa");
-			user.setPassword("aaa1=Passwd");
-			user.setFullname("AAA");
-			user.setRole("USER");
-			userRepository.saveAndFlush(user);
-
-			//WHEN
-			boolean result = userRepository.existsByUsernameIgnoreCase("aaa");
-
-			//THEN
-			assertThat(result).isTrue();
 		}
 	}
 }

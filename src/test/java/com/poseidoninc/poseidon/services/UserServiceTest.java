@@ -495,10 +495,10 @@ public class UserServiceTest {
 			user = null;
 		}
 
-		@ParameterizedTest(name = "id = {0}, userToSaveName = {1}, existsByUserName return {2}, saveUser should return user")
-		@CsvSource(value = {"null, Aaa, false", // save new user not already in data base
-							"1, Aaa, true", // update user already in data base
-							"1, Bbb, false"} // user update user name not existing yet in data base
+		@ParameterizedTest(name = "id = {0}, username to save = {1}, saveUser should persist and return user")
+		@CsvSource(value = {"null, Aaa", // save new user not already in database
+							"1, Aaa", // update user already in data base
+							"1, Bbb"} // user update his username not existing yet in database
 							,nullValues = {"null"})
 		@Tag("UserServiceTest")
 		@DisplayName("test saveUser should return user")
