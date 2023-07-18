@@ -8,7 +8,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,13 +27,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -46,7 +44,6 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 import com.poseidoninc.poseidon.domain.User;
-import com.poseidoninc.poseidon.exception.ResourceConflictException;
 import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
 import com.poseidoninc.poseidon.repositories.UserRepository;
 
@@ -99,7 +96,7 @@ public class UserServiceTest {
 		@Test
 		@Tag("UserServiceTest")
 		@DisplayName("test getUserByUserName should return expected user")
-		public void getUserByUserNameTestShouldRetrunExcpectedUser() {
+		public void getUserByUserNameTestShouldReturnExpectedUser() {
 			
 			//GIVEN
 			user = new User();
@@ -200,7 +197,7 @@ public class UserServiceTest {
 		@Test
 		@Tag("UserServiceTest")
 		@DisplayName("test getUserById should return expected user")
-		public void getUserByIdTestShouldRetrunExcpectedUser() {
+		public void getUserByIdTestShouldReturnExpectedUser() {
 			
 			//GIVEN
 			user = new User();
@@ -301,7 +298,7 @@ public class UserServiceTest {
 		@Test
 		@Tag("UserServiceTest")
 		@DisplayName("test getUserByIdWithBlankPasswd should return expected user")
-		public void getUserByIdWithBlankPasswdTestShouldRetrunExcpectedUser() {
+		public void getUserByIdWithBlankPasswdTestShouldReturnExpectedUser() {
 			
 			//GIVEN
 			user = new User();
@@ -406,7 +403,7 @@ public class UserServiceTest {
 		@Test
 		@Tag("UserServiceTest")
 		@DisplayName("test getUsers should return users")
-		public void getUsersTesthouldRetrunExcpectedUsers() {
+		public void getUsersTestShouldReturnExpectedUsers() {
 			
 			//GIVEN
 			List<User> expectedUsers = new ArrayList<>();
@@ -481,8 +478,7 @@ public class UserServiceTest {
 		
 		@BeforeEach
 		public void setUpForEachTest() {
-			user = new User(); // user already in data base
-			user.setId(1);
+			user = new User();
 			user.setUsername("Aaa");
 			user.setPassword("aaa1=Passwd");
 			user.setFullname("AAA");
@@ -495,41 +491,21 @@ public class UserServiceTest {
 			user = null;
 		}
 
-		@ParameterizedTest(name = "id = {0}, username to save = {1}, saveUser should persist and return user")
-		@CsvSource(value = {"null, Aaa", // save new user not already in database
-							"1, Aaa", // update user already in data base
-							"1, Bbb"} // user update his username not existing yet in database
-							,nullValues = {"null"})
+		@Test
 		@Tag("UserServiceTest")
-		@DisplayName("test saveUser should return user")
-		public void saveUserTestShouldReturnUser(Integer id, String userToSaveName, boolean existsByUserName) {
+		@DisplayName("test saveUser should persist and return user")
+		public void saveUserTestShouldPersistAndReturnUser() {
 			
 			//GIVEN
-			User userToSave = new User();
-			userToSave.setId(id);
-			userToSave.setUsername(userToSaveName);
-			userToSave.setPassword("aaa1=Passwd");
-			userToSave.setFullname("AAA");
-			userToSave.setRole("USER");
-			
-			when(userRepository.findById(nullable(Integer.class))).then(invocation -> {
-				Integer index = invocation.getArgument(0);
-				if (index == null) {
-					throw new IllegalArgumentException ("Id must not be null");
-				} else {
-					return Optional.of(user);
-				}
-			});
-			lenient().when(userRepository.existsByUsernameIgnoreCase(anyString())).thenReturn(existsByUserName);
 			ArgumentCaptor<User> userBeingSaved = ArgumentCaptor.forClass(User.class);
 			when(userRepository.save(any(User.class))).then(invocation -> {
 				User userSaved = invocation.getArgument(0);
-				userSaved.setId(Optional.ofNullable(userSaved.getId()).orElseGet(() -> 1));
+				userSaved.setId(1);
 				return userSaved;
 				});
 			
 			//WHEN
-			User resultedUser = userService.saveUser(userToSave, request);
+			User resultedUser = userService.saveUser(user, request);
 			
 			//THEN
 			verify(userRepository, times(1)).save(userBeingSaved.capture());
@@ -541,51 +517,25 @@ public class UserServiceTest {
 					User::getRole)
 				.containsExactly(
 					1,	
-					userToSaveName,
+					"Aaa",
 					"AAA",
 					"USER");	
 		}
 		
-		@ParameterizedTest(name = "id = {0}, userToSaveName = {1}, existsByUserName return {2}, saveUser should throw ResourceConflictException")
-		@CsvSource(value = {"null, Aaa, true", // do not save new user with user name already in data base
-							"1, Bbb, true"} // does not update the user who changed his name to an existing one in the database
-							,nullValues = {"null"})
-		@Tag("UserServiceTest")
-		@DisplayName("test saveUser should throw ResourceConflictException")
-		public void saveUserTestShouldThrowsResourceConflictException(Integer id, String userToSaveName, boolean existsByUserName) {
-
-			//GIVEN
-			User userToSave = new User();
-			userToSave.setId(id);
-			userToSave.setUsername(userToSaveName);
-			userToSave.setPassword("aaa1=Passwd");
-			userToSave.setFullname("AAA");
-			userToSave.setRole("USER");
-
-			when(userRepository.findById(nullable(Integer.class))).thenReturn(Optional.of(user));
-			lenient().when(userRepository.existsByUsernameIgnoreCase(anyString())).thenReturn(existsByUserName);
-
-			//WHEN
-			//THEN
-			assertThat(assertThrows(ResourceConflictException.class,
-					() -> userService.saveUser(userToSave, request))
-					.getMessage()).isEqualTo("UserName already exists");
-		}
-		
 		@Test
 		@Tag("UserServiceTest")
-		@DisplayName("test saveUser with unknow id should throw a ResourceNotFoundException")
-		public void saveUserTestWithUnknownIdShouldThrowAResourceNotFoundException() {
-			
+		@DisplayName("test saveUser should throw DataIntegrityViolationException")
+		public void saveUserTestShouldThrowsDataIntegrityViolationException() {
+
 			//GIVEN
-			when(userRepository.findById(nullable(Integer.class))).thenThrow(new ResourceNotFoundException("User not found"));
+			when(userRepository.save(any(User.class))).thenThrow(new DataIntegrityViolationException("Unique index or primary key violation"));
 
 			//WHEN
 			//THEN
-			assertThat(assertThrows(ResourceNotFoundException.class,
+			assertThat(assertThrows(DataIntegrityViolationException.class,
 					() -> userService.saveUser(user, request))
-					.getMessage()).isEqualTo("User not found");
-		}	
+					.getMessage()).contains("Unique index or primary key violation");
+		}
 		
 		@Test
 		@Tag("UserServiceTest")
@@ -593,21 +543,12 @@ public class UserServiceTest {
 		public void saveUserTestShouldThrowUnexpectedRollbackExceptionOnAnyRuntimeException() {
 			
 			//GIVEN
-			User userToSave = new User();
-			userToSave.setId(1);
-			userToSave.setUsername("Aaa");
-			userToSave.setPassword("aaa1=Passwd");
-			userToSave.setFullname("AAA");
-			userToSave.setRole("USER");
-
-			when(userRepository.findById(nullable(Integer.class))).thenReturn(Optional.of(user));
-			lenient().when(userRepository.existsByUsernameIgnoreCase(anyString())).thenReturn(true);
 			when(userRepository.save(any(User.class))).thenThrow(new RuntimeException());
 
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> userService.saveUser(userToSave, request))
+					() -> userService.saveUser(user, request))
 					.getMessage()).isEqualTo("Error while saving user");
 		}	
 	}
@@ -710,7 +651,7 @@ public class UserServiceTest {
 		
 		@Test
 		@Tag("UserServiceTest")
-		@DisplayName("test deleteUser by Id should throw UnexpectedRollbackException On Any RuntimeExpceptioin")
+		@DisplayName("test deleteUser by Id should throw UnexpectedRollbackException On Any RuntimeException")
 		public void deleteUserByIdTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
 
 			//GIVEN

@@ -29,23 +29,23 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest
 @ActiveProfiles("mytest")
 public class CurvePointRepositoryIT {
-	
+
 	@Autowired
 	private CurvePointRepository curvePointRepository;
-	
+
 	private CurvePoint curvePoint;
-	
+
 	@BeforeEach
 	public void setUpPerTest() {
 		curvePoint = new CurvePoint();
 	}
-	
+
 	@AfterEach
 	public void undefPerTest() {
 		curvePointRepository.deleteAll();
 		curvePoint = null;
 	}
-	
+
 	@Nested
 	@Tag("saveCurvePointTests")
 	@DisplayName("Tests for validation and saving curvePoint")
@@ -180,54 +180,4 @@ public class CurvePointRepositoryIT {
 					.getMessage()).contains(msg);
 		}
 	}
-
-	@Nested
-	@Tag("existsByCurveIdTests")
-	@DisplayName("Tests exists by curvePointId")
-	@TestInstance(Lifecycle.PER_CLASS)
-	class ExistsByCurvePointNameTests {
-		
-		@Test
-		@Tag("CurvePointRepositoryIT")
-		@DisplayName("exists by CurveId should return true")
-		public void findByCurveIdTestShouldReturnTrue() {
-	
-			//GIVEN
-			curvePoint.setId(null);
-			curvePoint.setCurveId(2);
-			curvePoint.setAsOfDate(LocalDateTime.parse("21/01/2023 10:20:30", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
-			curvePoint.setTerm(3.0);
-			curvePoint.setValue(4.0);
-			curvePoint.setCreationDate(LocalDateTime.parse("22/01/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
-			curvePointRepository.saveAndFlush(curvePoint);
-	
-			//WHEN
-			boolean result = curvePointRepository.existsByCurveId(2);
-			
-			//THEN
-			assertThat(result).isTrue();	
-		}
-		
-		@Test
-		@Tag("CurvePointRepositoryIT")
-		@DisplayName("exists by CurveId should return false")
-		public void findByCurveIdTestShouldReturnFalse() {
-	
-			//GIVEN
-			curvePoint.setId(null);
-			curvePoint.setCurveId(2);
-			curvePoint.setAsOfDate(LocalDateTime.parse("21/01/2023 10:20:30", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
-			curvePoint.setTerm(3.0);
-			curvePoint.setValue(4.0);
-			curvePoint.setCreationDate(LocalDateTime.parse("22/01/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
-			curvePointRepository.saveAndFlush(curvePoint);
-	
-			//WHEN
-			boolean result = curvePointRepository.existsByCurveId(3);
-			
-			//THEN
-			assertThat(result).isFalse();	
-		}
-	}
-
 }
