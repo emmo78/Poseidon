@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -36,6 +35,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -282,8 +282,7 @@ public class CurvePointServiceTest {
 		
 		@BeforeEach
 		public void setUpForEachTest() {
-			curvePoint = new CurvePoint(); // curvePoint already in data base
-			curvePoint.setId(1);
+			curvePoint = new CurvePoint();
 			curvePoint.setCurveId(2);
 			curvePoint.setAsOfDate(LocalDateTime.parse("21/01/2023 10:20:30", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
 			curvePoint.setTerm(3.0);
@@ -297,41 +296,21 @@ public class CurvePointServiceTest {
 			curvePoint = null;
 		}
 
-		@ParameterizedTest(name = "id = {0}, curveIdToSave = {1}, existsByCurveId return {2}, saveCurvePoint should return curvePoint")
-		@CsvSource(value = {"null, 2, false", // save new curvePoint not already in data base
-							"1, 2, true", // update curvePoint already in data base
-							"1, 3, false"} // curvePoint update curveId not existing yet in data base
-							,nullValues = {"null"})
+		@Test
 		@Tag("CurvePointServiceTest")
-		@DisplayName("test saveCurvePoint should return curvePoint")
-		public void saveCurvePointTestShouldReturnCurvePoint(Integer id, Integer curveIdToSave, boolean existsByCurveId) {
+		@DisplayName("test saveCurvePoint should persist and return curvePoint")
+		public void saveCurvePointTestShouldPersistAndReturnCurvePoint() {
 			
 			//GIVEN
-			CurvePoint curvePointToSave = new CurvePoint();
-			curvePointToSave.setId(id);
-			curvePointToSave.setCurveId(curveIdToSave);
-			curvePointToSave.setAsOfDate(LocalDateTime.parse("21/01/2023 10:20:30", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
-			curvePointToSave.setTerm(3.0);
-			curvePointToSave.setValue(4.0);
-			curvePointToSave.setCreationDate(LocalDateTime.parse("22/01/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
-			
-			when(curvePointRepository.findById(nullable(Integer.class))).then(invocation -> {
-				Integer index = invocation.getArgument(0);
-				if (index == null) {
-					throw new IllegalArgumentException ("Id must not be null");
-				} else {
-					return Optional.of(curvePoint);
-				}
-			});
 			ArgumentCaptor<CurvePoint> curvePointBeingSaved = ArgumentCaptor.forClass(CurvePoint.class);
 			when(curvePointRepository.save(any(CurvePoint.class))).then(invocation -> {
 				CurvePoint curvePointSaved = invocation.getArgument(0);
-				curvePointSaved.setId(Optional.ofNullable(curvePointSaved.getId()).orElseGet(() -> 1));
+				curvePointSaved.setId(1);
 				return curvePointSaved;
 				});
 			
 			//WHEN
-			CurvePoint resultedCurvePoint = curvePointService.saveCurvePoint(curvePointToSave, request);
+			CurvePoint resultedCurvePoint = curvePointService.saveCurvePoint(curvePoint, request);
 			
 			//THEN
 			verify(curvePointRepository, times(1)).save(curvePointBeingSaved.capture());
@@ -344,53 +323,27 @@ public class CurvePointServiceTest {
 					curve -> curve.getCreationDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")))
 				.containsExactly(
 					1,	
-					curveIdToSave,
+					2,
 					"21/01/2023 10:20:30",
 					3.0,
 					4.0,
 					"22/01/2023 12:22:32");
 		}
 		
-		@ParameterizedTest(name = "id = {0}, curveIdToSave = {1}, existsByCurveId return {2}, saveCurvePoint should throw ResourceConflictException")
-		@CsvSource(value = {"null, 2, true", // do not save new curvePoint with curveId already in data base
-							"1, 3, true"} // does not update the curvePoint who changed his curveId to an existing one in the database
-							,nullValues = {"null"})
-		@Tag("CurvePointServiceTest")
-		@DisplayName("test saveCurvePoint should throw ResourceConflictException")
-		public void saveCurvePointTestShouldThrowsResourceConflictException(Integer id, Integer curveId, boolean existsByCurvePointName) {
-
-			//GIVEN
-			CurvePoint curvePointToSave = new CurvePoint();
-			curvePointToSave.setId(id);
-			curvePointToSave.setCurveId(curveId);
-			curvePointToSave.setAsOfDate(LocalDateTime.parse("21/01/2023 10:20:30", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
-			curvePointToSave.setTerm(3.0);
-			curvePointToSave.setValue(4.0);
-			curvePointToSave.setCreationDate(LocalDateTime.parse("22/01/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
-
-			when(curvePointRepository.findById(nullable(Integer.class))).thenReturn(Optional.of(curvePoint));
-
-			//WHEN
-			//THEN
-			assertThat(assertThrows(ResourceConflictException.class,
-					() -> curvePointService.saveCurvePoint(curvePointToSave, request))
-					.getMessage()).isEqualTo("CurveId already exists");
-		}
-		
 		@Test
 		@Tag("CurvePointServiceTest")
-		@DisplayName("test saveCurvePoint with unknow id should throw a ResourceNotFoundException")
-		public void saveCurvePointTestWithUnknownIdShouldThrowAResourceNotFoundException() {
-			
+		@DisplayName("test saveCurvePoint should throw DataIntegrityViolationException")
+		public void saveCurvePointTestShouldThrowsDataIntegrityViolationException() {
+
 			//GIVEN
-			when(curvePointRepository.findById(nullable(Integer.class))).thenThrow(new ResourceNotFoundException("CurvePoint not found"));
+			when(curvePointRepository.save(any(CurvePoint.class))).thenThrow(new DataIntegrityViolationException("Unique index or primary key violation"));
 
 			//WHEN
 			//THEN
-			assertThat(assertThrows(ResourceNotFoundException.class,
+			assertThat(assertThrows(DataIntegrityViolationException.class,
 					() -> curvePointService.saveCurvePoint(curvePoint, request))
-					.getMessage()).isEqualTo("CurvePoint not found");
-		}	
+					.getMessage()).isEqualTo("CurveId already exists");
+		}
 		
 		@Test
 		@Tag("CurvePointServiceTest")
@@ -398,21 +351,12 @@ public class CurvePointServiceTest {
 		public void saveCurvePointTestShouldThrowUnexpectedRollbackExceptionOnAnyRuntimeException() {
 			
 			//GIVEN
-			CurvePoint curvePointToSave = new CurvePoint();
-			curvePointToSave.setId(1);
-			curvePointToSave.setCurveId(2);
-			curvePointToSave.setAsOfDate(LocalDateTime.parse("21/01/2023 10:20:30", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
-			curvePointToSave.setTerm(3.0);
-			curvePointToSave.setValue(4.0);
-			curvePointToSave.setCreationDate(LocalDateTime.parse("22/01/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
-
-			when(curvePointRepository.findById(nullable(Integer.class))).thenReturn(Optional.of(curvePoint));
 			when(curvePointRepository.save(any(CurvePoint.class))).thenThrow(new RuntimeException());
 
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> curvePointService.saveCurvePoint(curvePointToSave, request))
+					() -> curvePointService.saveCurvePoint(curvePoint, request))
 					.getMessage()).isEqualTo("Error while saving curvePoint");
 		}	
 	}
