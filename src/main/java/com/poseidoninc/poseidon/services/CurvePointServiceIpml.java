@@ -1,5 +1,6 @@
 package com.poseidoninc.poseidon.services;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -67,30 +68,17 @@ public class CurvePointServiceIpml implements CurvePointService {
 	}
 
 	@Override
-	@Transactional(rollbackFor = {ResourceNotFoundException.class, ResourceConflictException.class, UnexpectedRollbackException.class})
-	public CurvePoint saveCurvePoint(CurvePoint curvePoint, WebRequest request) throws ResourceConflictException, ResourceNotFoundException, UnexpectedRollbackException {
-		Integer id = curvePoint.getId(); //can be null;
-		Integer curveId = curvePoint.getCurveId();
-		Integer oldCurveId = null;
-		try {
-			oldCurveId = getCurvePointById(id, request).getCurveId(); //throw ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException
-		} catch (IllegalArgumentException iae) {			
-		} catch(ResourceNotFoundException  rnfe) {
-			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), id, rnfe.toString());
-			throw new ResourceNotFoundException(rnfe.getMessage());
-		} finally {
-			if (id == null || !curveId.equals(oldCurveId)) {
-				ResourceConflictException rce = new ResourceConflictException("CurveId already exists");
-				log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), curveId, rce.toString());				
-				throw rce;
-			}
-		}
+	@Transactional(rollbackFor = {DataIntegrityViolationException.class, UnexpectedRollbackException.class})
+	public CurvePoint saveCurvePoint(CurvePoint curvePoint, WebRequest request) throws DataIntegrityViolationException, UnexpectedRollbackException {
 		try {
 			//No need to test blank or null fields for update because constraint validation on each field
 			curvePoint = curvePointRepository.save(curvePoint);
 		}  catch(IllegalArgumentException | OptimisticLockingFailureException re) {
 			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), curvePoint.getId(), re.toString());
 			throw new UnexpectedRollbackException("Error while saving curvePoint");
+		} catch(DataIntegrityViolationException dive) {
+			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), curvePoint.getId(), dive.toString());
+			throw new DataIntegrityViolationException("CurveId already exists");
 		} catch(Exception e) {
 			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), curvePoint.getId(), e.toString());
 			throw new UnexpectedRollbackException("Error while saving curvePoint");
