@@ -2,6 +2,7 @@ package com.poseidoninc.poseidon.services;
 
 import java.util.Optional;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -96,31 +97,18 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	@Transactional(rollbackFor = {ResourceNotFoundException.class, ResourceConflictException.class, UnexpectedRollbackException.class})
-	public User saveUser(User user, WebRequest request) throws ResourceNotFoundException, ResourceConflictException, UnexpectedRollbackException {
-		Integer id = user.getId(); //can be null if new one;
-		String username = user.getUsername();
-		String oldUsername = null;
-		try {
-			oldUsername = getUserById(id, request).getUsername(); //throw ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException
-		} catch (IllegalArgumentException iae) { // thrown if id is null, this case occurs for a new user, go to finally
-		} catch(ResourceNotFoundException  rnfe) { // id is not null, the case of updating user but not found
-			log.error("{} : user={} : {} ", requestService.requestToString(request), id, rnfe.toString());
-			throw new ResourceNotFoundException(rnfe.getMessage());
-		} finally {
-			if ((id == null || !username.equalsIgnoreCase(oldUsername)) && userRepository.existsByUsernameIgnoreCase(username)) {
-				ResourceConflictException rce = new ResourceConflictException("UserName already exists");
-				log.error("{} : user={} : {} ", requestService.requestToString(request), username, rce.toString());				
-				throw rce;
-			}
-		}
+	@Transactional(rollbackFor = {DataIntegrityViolationException.class, UnexpectedRollbackException.class})
+	public User saveUser(User user, WebRequest request) throws DataIntegrityViolationException, UnexpectedRollbackException {
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		try {
 			//No need to test blank or null fields for update because constraint validation on each field
 			user = userRepository.save(user);
-		}  catch(IllegalArgumentException | OptimisticLockingFailureException re) {
+		} catch(IllegalArgumentException | OptimisticLockingFailureException re) {
 			log.error("{} : user={} : {} ", requestService.requestToString(request), user.getId(), re.toString());
 			throw new UnexpectedRollbackException("Error while saving user");
+		} catch(DataIntegrityViolationException dive) {
+			log.error("{} : user={} : {} ", requestService.requestToString(request), user.getId(), dive.toString());
+			throw new DataIntegrityViolationException("Username already exist, try another one");
 		} catch(Exception e) {
 			log.error("{} : user={} : {} ", requestService.requestToString(request), user.getId(), e.toString());
 			throw new UnexpectedRollbackException("Error while saving user");

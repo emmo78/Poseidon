@@ -534,7 +534,7 @@ public class UserServiceTest {
 			//THEN
 			assertThat(assertThrows(DataIntegrityViolationException.class,
 					() -> userService.saveUser(user, request))
-					.getMessage()).contains("Unique index or primary key violation");
+					.getMessage()).isEqualTo("Username already exist, try another one");
 		}
 		
 		@Test

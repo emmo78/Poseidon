@@ -323,7 +323,6 @@ public class CurvePointServiceTest {
 					return Optional.of(curvePoint);
 				}
 			});
-			lenient().when(curvePointRepository.existsByCurveId(any(Integer.class))).thenReturn(existsByCurveId);
 			ArgumentCaptor<CurvePoint> curvePointBeingSaved = ArgumentCaptor.forClass(CurvePoint.class);
 			when(curvePointRepository.save(any(CurvePoint.class))).then(invocation -> {
 				CurvePoint curvePointSaved = invocation.getArgument(0);
@@ -370,7 +369,6 @@ public class CurvePointServiceTest {
 			curvePointToSave.setCreationDate(LocalDateTime.parse("22/01/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
 
 			when(curvePointRepository.findById(nullable(Integer.class))).thenReturn(Optional.of(curvePoint));
-			lenient().when(curvePointRepository.existsByCurveId(any(Integer.class))).thenReturn(existsByCurvePointName);
 
 			//WHEN
 			//THEN
@@ -409,7 +407,6 @@ public class CurvePointServiceTest {
 			curvePointToSave.setCreationDate(LocalDateTime.parse("22/01/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
 
 			when(curvePointRepository.findById(nullable(Integer.class))).thenReturn(Optional.of(curvePoint));
-			lenient().when(curvePointRepository.existsByCurveId(any(Integer.class))).thenReturn(true);
 			when(curvePointRepository.save(any(CurvePoint.class))).thenThrow(new RuntimeException());
 
 			//WHEN

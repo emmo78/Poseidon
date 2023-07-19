@@ -79,7 +79,7 @@ public class CurvePointServiceIpml implements CurvePointService {
 			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), id, rnfe.toString());
 			throw new ResourceNotFoundException(rnfe.getMessage());
 		} finally {
-			if ((id == null || !curveId.equals(oldCurveId)) && curvePointRepository.existsByCurveId(curveId)) {
+			if (id == null || !curveId.equals(oldCurveId)) {
 				ResourceConflictException rce = new ResourceConflictException("CurveId already exists");
 				log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), curveId, rce.toString());				
 				throw rce;
