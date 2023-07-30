@@ -1,5 +1,6 @@
 package com.poseidoninc.poseidon.domain;
 
+import com.poseidoninc.poseidon.annotations.ValidUniqueUsername;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -22,6 +23,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "users")
+@ValidUniqueUsername
 public class User {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
