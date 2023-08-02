@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.WebRequest;
 
 import com.poseidoninc.poseidon.domain.CurvePoint;
-import com.poseidoninc.poseidon.exception.ResourceConflictException;
 import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
 import com.poseidoninc.poseidon.repositories.CurvePointRepository;
 
@@ -21,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 @Slf4j
 public class CurvePointServiceIpml implements CurvePointService {
-	
+
 	private final CurvePointRepository curvePointRepository;
 	private final RequestService requestService;
 
@@ -92,15 +91,12 @@ public class CurvePointServiceIpml implements CurvePointService {
 	public void deleteCurvePointById(Integer id, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException {
 		try {
 			curvePointRepository.delete(getCurvePointById(id, request)); //getCurvePointById throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException
-		} catch(IllegalArgumentException iae) {
-			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), id, iae.toString());
+		} catch(IllegalArgumentException | OptimisticLockingFailureException re) {
+			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), id, re.toString());
 			throw new UnexpectedRollbackException("Error while deleting curvePoint");
 		} catch(ResourceNotFoundException  rnfe) {
 			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), id, rnfe.toString());
 			throw new ResourceNotFoundException(rnfe.getMessage());
-		} catch(OptimisticLockingFailureException oe) {
-			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), id, oe.toString());
-			throw new UnexpectedRollbackException("Error while deleting curvePoint");
 		} catch(Exception e) {
 			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), id, e.toString());
 			throw new UnexpectedRollbackException("Error while deleting curvePoint");

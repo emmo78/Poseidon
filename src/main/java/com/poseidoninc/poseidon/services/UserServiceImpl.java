@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.WebRequest;
 
 import com.poseidoninc.poseidon.domain.User;
-import com.poseidoninc.poseidon.exception.ResourceConflictException;
 import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
 import com.poseidoninc.poseidon.repositories.UserRepository;
 
@@ -122,15 +121,12 @@ public class UserServiceImpl implements UserService {
 	public void deleteUserById(Integer id, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException {
 		try {
 			userRepository.delete(getUserById(id, request)); //getUserById throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException
-		} catch(IllegalArgumentException iae) {
-			log.error("{} : user={} : {} ", requestService.requestToString(request), id, iae.toString());
+		} catch(IllegalArgumentException | OptimisticLockingFailureException re) {
+			log.error("{} : user={} : {} ", requestService.requestToString(request), id, re.toString());
 			throw new UnexpectedRollbackException("Error while deleting user");
 		} catch(ResourceNotFoundException  rnfe) {
 			log.error("{} : user={} : {} ", requestService.requestToString(request), id, rnfe.toString());
 			throw new ResourceNotFoundException(rnfe.getMessage());
-		} catch(OptimisticLockingFailureException oe) {
-			log.error("{} : user={} : {} ", requestService.requestToString(request), id, oe.toString());
-			throw new UnexpectedRollbackException("Error while deleting user");
 		} catch(Exception e) {
 			log.error("{} : user={} : {} ", requestService.requestToString(request), id, e.toString());
 			throw new UnexpectedRollbackException("Error while deleting user");

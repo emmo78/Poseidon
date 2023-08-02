@@ -1,5 +1,6 @@
 package com.poseidoninc.poseidon.controllers;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.UnexpectedRollbackException;
@@ -12,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.WebRequest;
 
 import com.poseidoninc.poseidon.domain.CurvePoint;
-import com.poseidoninc.poseidon.exception.ResourceConflictException;
 import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
 import com.poseidoninc.poseidon.services.CurvePointService;
 
@@ -38,7 +38,7 @@ public class CurveController {
     }
 
     @PostMapping("/curvePoint/validate")
-    public String validate(@Valid CurvePoint curvePoint, BindingResult result, WebRequest request) throws ResourceConflictException, ResourceNotFoundException, UnexpectedRollbackException {
+    public String validate(@Valid CurvePoint curvePoint, BindingResult result, WebRequest request) throws DataIntegrityViolationException, ResourceNotFoundException, UnexpectedRollbackException {
 		if (result.hasErrors()) {
 			return "curvePoint/add";
 		}
@@ -54,7 +54,7 @@ public class CurveController {
     }
 
     @PostMapping("/curvePoint/update")
-    public String updateBid(@Valid CurvePoint curvePoint, BindingResult result, WebRequest request) throws ResourceConflictException, ResourceNotFoundException, UnexpectedRollbackException {
+    public String updateBid(@Valid CurvePoint curvePoint, BindingResult result, WebRequest request) throws DataIntegrityViolationException, ResourceNotFoundException, UnexpectedRollbackException {
 		if (result.hasErrors()) {
 			return "user/update";
 		}

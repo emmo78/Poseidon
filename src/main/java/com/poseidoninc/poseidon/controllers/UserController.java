@@ -1,5 +1,6 @@
 package com.poseidoninc.poseidon.controllers;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.UnexpectedRollbackException;
@@ -11,7 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.context.request.WebRequest;
 
 import com.poseidoninc.poseidon.domain.User;
-import com.poseidoninc.poseidon.exception.ResourceConflictException;
 import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
 import com.poseidoninc.poseidon.services.UserService;
 
@@ -37,7 +37,7 @@ public class UserController {
     }
 
     @PostMapping("/user/validate")
-    public String validate(@Valid User user, BindingResult result, WebRequest request) throws ResourceConflictException, ResourceNotFoundException, UnexpectedRollbackException {
+    public String validate(@Valid User user, BindingResult result, WebRequest request) throws DataIntegrityViolationException, ResourceNotFoundException, UnexpectedRollbackException {
         if (result.hasErrors()) {
             return "user/add";
         }
@@ -53,7 +53,7 @@ public class UserController {
     }
 
     @PostMapping("/user/update")
-    public String updateUser(@Valid User user, BindingResult result, WebRequest request) throws ResourceConflictException, ResourceNotFoundException, UnexpectedRollbackException {
+    public String updateUser(@Valid User user, BindingResult result, WebRequest request) throws DataIntegrityViolationException, ResourceNotFoundException, UnexpectedRollbackException {
         if (result.hasErrors()) {
             return "user/update";
         }

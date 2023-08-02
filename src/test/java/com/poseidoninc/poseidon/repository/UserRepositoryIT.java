@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Optional;
 
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -277,4 +278,6 @@ public class UserRepositoryIT {
 			assertThat(userResult).isNull();	
 		}
 	}
+
+	//InvalidDataAccessApiUsageException
 }
