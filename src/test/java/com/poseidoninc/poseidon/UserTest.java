@@ -2,14 +2,12 @@ package com.poseidoninc.poseidon;
 
 import com.poseidoninc.poseidon.domain.User;
 import com.poseidoninc.poseidon.repositories.UserRepository;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
+import jakarta.validation.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,25 +17,30 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 @TestInstance(Lifecycle.PER_CLASS)
 public class UserTest {
 
     private ValidatorFactory factory;
-    private Validator validator;
-    private User user;
+
+    // private Validator validator;
+
+    private User userA;
+
+    private User userB;
 
     @BeforeAll
     public void setUpForAllTests() {
-        factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
+        //factory = Validation.buildDefaultValidatorFactory();
+        //validator = factory.getValidator();
     }
 
     @AfterAll
     public void undefForAllTests() {
-        validator = null;
-        factory = null;
+        //validator = null;
+        //factory = null;
     }
 
     @Nested
@@ -51,36 +54,33 @@ public class UserTest {
         @Autowired
         private UserRepository userRepository;
 
-        private Integer id;
-
+        @Autowired
+        private Validator validator;
         private User userTest;
-
-        //@BeforeAll
-        //public void setUpForAllNestedValidTests() {}
-
-        //@AfterAll
-        //public void undefForAllNestedValidTests() {}
 
         @BeforeEach
         public void setUpForEachTests() {
-            user = new User();
-            user.setUsername("Aaa");
-            user.setPassword("aaa1=Passwd");
-            user.setFullname("AAA");
-            user.setRole("USER");
-            id = userRepository.saveAndFlush(user).getId();
+            userA = new User();
+            userA.setUsername("Aaa");
+            userA.setPassword("aaa1=Passwd");
+            userA.setFullname("AAA");
+            userA.setRole("USER");
+            userRepository.saveAndFlush(userA);
         }
 
         @AfterEach
         public void undefForEachTests() {
             userRepository.deleteAll();
-            user = null;
+            userA = null;
+            userB = null;
             userTest = null;
-            id = null;
         }
 
         @ParameterizedTest(name = "id = {0}, userTestName = {1}, Valid UserTest should not returns ConstraintViolation object")
-        @MethodSource
+        @CsvSource(value = {"null, Bbb", // new user not already in data base
+                "1, Aaa", // user already in data base update
+                "1, Bbb"} // user update user name not existing in data base
+                ,nullValues = {"null"})
         @Tag("UserTest")
         @DisplayName("Test @Valid should valid unique username ignoring case ")
         public void validUsernameTestShouldBeValid(Integer idTest, String userTestName) {
@@ -100,14 +100,37 @@ public class UserTest {
             assertThat(constraintViolations).isEmpty();
         }
 
-        Stream<Arguments> validUsernameTestShouldBeValid() {
-            return Stream.of(
-                    arguments(null, "Bbb"), // save new user not already in database
-                    arguments(id, "Aaa"), // update user already in data base
-                    arguments(id, "Bbb") // user update username not existing yet in database
-            );
+        @ParameterizedTest(name = "id = {0}, userTestName = {1}, Valid UserTest should return ConstraintViolation object")
+        @CsvSource(value = {"null, Aaa", // new user with user name already in data base
+                "2, Aaa", // user changed his name to an existing one in the database
+                "3, Ccc"} // user update not existing in database
+                ,nullValues = {"null"})
+        @Tag("UserTest")
+        @DisplayName("Test @Valid should not valid unique username ignoring case ")
+        public void validUsernameTestShouldNotBeValid(Integer idTest, String userTestName) {
+
+            //GIVEN
+            userB = new User();
+            userB.setId(2);
+            userB.setUsername("Bbb");
+            userB.setPassword("bbb1=Passwd");
+            userB.setFullname("BBB");
+            userB.setRole("USER");
+            userRepository.saveAndFlush(userB);
+
+            userTest = new User();
+            userTest.setId(idTest);
+            userTest.setUsername(userTestName);
+            userTest.setPassword("ccc1=Passwd");
+            userTest.setFullname("CCC");
+            userTest.setRole("USER");
+
+            //WHEN
+            Set<ConstraintViolation<User>> constraintViolations = validator.validate(userTest);
+
+            //THEN
+            assertThat(constraintViolations).hasSize(1);
+            assertThat(constraintViolations.iterator().next().getMessage()).isEqualTo("UserName already exists");
         }
-
     }
-
 }
