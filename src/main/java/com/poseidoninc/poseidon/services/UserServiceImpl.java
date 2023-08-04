@@ -3,6 +3,7 @@ package com.poseidoninc.poseidon.services;
 import java.util.Optional;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,9 +34,9 @@ public class UserServiceImpl implements UserService {
 	public User getUserByUserName(String userName, WebRequest request) throws UnexpectedRollbackException {
 		User user = null;
 		try {
-			//Throws ResourceNotFoundException | IllegalArgumentException
+			//Throws ResourceNotFoundException | InvalidDataAccessApiUsageException
 			user = Optional.ofNullable(userRepository.findByUsername(userName)).orElseThrow(() -> new ResourceNotFoundException("User not found"));
-		} catch(ResourceNotFoundException | IllegalArgumentException re) {
+		} catch(ResourceNotFoundException | InvalidDataAccessApiUsageException re) {
 			log.error("{} : user={} : {} ", requestService.requestToString(request), userName, re.toString());
 			throw new UnexpectedRollbackException("Error while getting user profile");
 		} catch (Exception e) {
@@ -47,15 +48,15 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	@Transactional(readOnly = true, rollbackFor = {ResourceNotFoundException.class, IllegalArgumentException.class, UnexpectedRollbackException.class})
-	public User getUserById(Integer id, WebRequest request) throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException {
+	@Transactional(readOnly = true, rollbackFor = {ResourceNotFoundException.class, InvalidDataAccessApiUsageException.class, UnexpectedRollbackException.class})
+	public User getUserById(Integer id, WebRequest request) throws ResourceNotFoundException, InvalidDataAccessApiUsageException, UnexpectedRollbackException {
 		User user = null;
 		try {
-			//Throws ResourceNotFoundException | IllegalArgumentException
+			//Throws ResourceNotFoundException | InvalidDataAccessApiUsageException
 			user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
-		} catch(IllegalArgumentException iae) {
+		} catch(InvalidDataAccessApiUsageException iae) {
 			log.error("{} : {} ", requestService.requestToString(request), iae.toString());
-			throw new IllegalArgumentException ("Id must not be null");
+			throw new InvalidDataAccessApiUsageException ("Id must not be null");
 		} catch(ResourceNotFoundException  rnfe) {
 			log.error("{} : user={} : {} ", requestService.requestToString(request), id, rnfe.toString());
 			throw new ResourceNotFoundException(rnfe.getMessage());
@@ -68,7 +69,7 @@ public class UserServiceImpl implements UserService {
 	}
 	
 	@Override
-	public User getUserByIdWithBlankPasswd(Integer userId, WebRequest request) throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException {
+	public User getUserByIdWithBlankPasswd(Integer userId, WebRequest request) throws ResourceNotFoundException, InvalidDataAccessApiUsageException, UnexpectedRollbackException {
 		User user = getUserById(userId, request);
 		user.setPassword("");
 		return user;
@@ -102,7 +103,7 @@ public class UserServiceImpl implements UserService {
 		try {
 			//No need to test blank or null fields for update because constraint validation on each field
 			user = userRepository.save(user);
-		} catch(IllegalArgumentException | OptimisticLockingFailureException re) {
+		} catch(InvalidDataAccessApiUsageException | OptimisticLockingFailureException re) {
 			log.error("{} : user={} : {} ", requestService.requestToString(request), user.getId(), re.toString());
 			throw new UnexpectedRollbackException("Error while saving user");
 		} catch(DataIntegrityViolationException dive) {
@@ -120,8 +121,8 @@ public class UserServiceImpl implements UserService {
 	@Transactional(rollbackFor = {ResourceNotFoundException.class, UnexpectedRollbackException.class})
 	public void deleteUserById(Integer id, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException {
 		try {
-			userRepository.delete(getUserById(id, request)); //getUserById throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException
-		} catch(IllegalArgumentException | OptimisticLockingFailureException re) {
+			userRepository.delete(getUserById(id, request)); //getUserById throws ResourceNotFoundException, InvalidDataAccessApiUsageException, UnexpectedRollbackException
+		} catch(InvalidDataAccessApiUsageException | OptimisticLockingFailureException re) {
 			log.error("{} : user={} : {} ", requestService.requestToString(request), id, re.toString());
 			throw new UnexpectedRollbackException("Error while deleting user");
 		} catch(ResourceNotFoundException  rnfe) {

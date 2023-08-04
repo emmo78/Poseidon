@@ -1,5 +1,6 @@
 package com.poseidoninc.poseidon.services;
 
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,15 +26,15 @@ public class RatingServiceImpl implements RatingService {
 
 	
 	@Override
-	@Transactional(readOnly = true, rollbackFor = {ResourceNotFoundException.class, IllegalArgumentException.class, UnexpectedRollbackException.class})
-	public Rating getRatingById(Integer id, WebRequest request) throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException {
+	@Transactional(readOnly = true, rollbackFor = {ResourceNotFoundException.class, InvalidDataAccessApiUsageException.class, UnexpectedRollbackException.class})
+	public Rating getRatingById(Integer id, WebRequest request) throws ResourceNotFoundException, InvalidDataAccessApiUsageException, UnexpectedRollbackException {
 		Rating rating = null;
 		try {
-			//Throws ResourceNotFoundException | IllegalArgumentException
+			//Throws ResourceNotFoundException | InvalidDataAccessApiUsageException
 			rating = ratingRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Rating not found"));
-		} catch(IllegalArgumentException iae) {
-			log.error("{} : {} ", requestService.requestToString(request), iae.toString());
-			throw new IllegalArgumentException ("Id must not be null");
+		} catch(InvalidDataAccessApiUsageException idaaue) {
+			log.error("{} : {} ", requestService.requestToString(request), idaaue.toString());
+			throw new InvalidDataAccessApiUsageException ("Id must not be null");
 		} catch(ResourceNotFoundException  rnfe) {
 			log.error("{} : rating={} : {} ", requestService.requestToString(request), id, rnfe.toString());
 			throw new ResourceNotFoundException(rnfe.getMessage());
@@ -72,7 +73,7 @@ public class RatingServiceImpl implements RatingService {
 		throws UnexpectedRollbackException {
 		try {
 			rating = ratingRepository.save(rating);
-		}  catch(IllegalArgumentException | OptimisticLockingFailureException re) {
+		}  catch(InvalidDataAccessApiUsageException | OptimisticLockingFailureException re) {
 			log.error("{} : rating={} : {} ", requestService.requestToString(request), rating.getId(), re.toString());
 			throw new UnexpectedRollbackException("Error while saving rating");
 		} catch(Exception e) {
@@ -87,16 +88,13 @@ public class RatingServiceImpl implements RatingService {
 	@Transactional(rollbackFor = {ResourceNotFoundException.class, UnexpectedRollbackException.class})
 	public void deleteRatingById(Integer id, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException {
 		try {
-			ratingRepository.delete(getRatingById(id, request)); //getRatingById throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException
-		} catch(IllegalArgumentException iae) {
-			log.error("{} : rating={} : {} ", requestService.requestToString(request), id, iae.toString());
+			ratingRepository.delete(getRatingById(id, request)); //getRatingById throws ResourceNotFoundException, InvalidDataAccessApiUsageException, UnexpectedRollbackException
+		} catch(InvalidDataAccessApiUsageException | OptimisticLockingFailureException re) {
+			log.error("{} : rating={} : {} ", requestService.requestToString(request), id, re.toString());
 			throw new UnexpectedRollbackException("Error while deleting rating");
 		} catch(ResourceNotFoundException  rnfe) {
 			log.error("{} : rating={} : {} ", requestService.requestToString(request), id, rnfe.toString());
 			throw new ResourceNotFoundException(rnfe.getMessage());
-		} catch(OptimisticLockingFailureException oe) {
-			log.error("{} : rating={} : {} ", requestService.requestToString(request), id, oe.toString());
-			throw new UnexpectedRollbackException("Error while deleting rating");
 		} catch(Exception e) {
 			log.error("{} : rating={} : {} ", requestService.requestToString(request), id, e.toString());
 			throw new UnexpectedRollbackException("Error while deleting rating");

@@ -1,5 +1,6 @@
 package com.poseidoninc.poseidon.services;
 
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,15 +26,15 @@ public class TradeServiceImpl implements TradeService {
 
 	
 	@Override
-	@Transactional(readOnly = true, rollbackFor = {ResourceNotFoundException.class, IllegalArgumentException.class, UnexpectedRollbackException.class})
-	public Trade getTradeById(Integer tradeId, WebRequest request) throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException {
+	@Transactional(readOnly = true, rollbackFor = {ResourceNotFoundException.class, InvalidDataAccessApiUsageException.class, UnexpectedRollbackException.class})
+	public Trade getTradeById(Integer tradeId, WebRequest request) throws ResourceNotFoundException, InvalidDataAccessApiUsageException, UnexpectedRollbackException {
 		Trade trade = null;
 		try {
-			//Throws ResourceNotFoundException | IllegalArgumentException
+			//Throws ResourceNotFoundException | InvalidDataAccessApiUsageException
 			trade = tradeRepository.findById(tradeId).orElseThrow(() -> new ResourceNotFoundException("Trade not found"));
-		} catch(IllegalArgumentException iae) {
-			log.error("{} : {} ", requestService.requestToString(request), iae.toString());
-			throw new IllegalArgumentException ("Id must not be null");
+		} catch(InvalidDataAccessApiUsageException idaaue) {
+			log.error("{} : {} ", requestService.requestToString(request), idaaue.toString());
+			throw new InvalidDataAccessApiUsageException ("Id must not be null");
 		} catch(ResourceNotFoundException  rnfe) {
 			log.error("{} : trade={} : {} ", requestService.requestToString(request), tradeId, rnfe.toString());
 			throw new ResourceNotFoundException(rnfe.getMessage());
@@ -72,7 +73,7 @@ public class TradeServiceImpl implements TradeService {
 		throws UnexpectedRollbackException {
 		try {
 			trade = tradeRepository.save(trade);
-		}  catch(IllegalArgumentException | OptimisticLockingFailureException re) {
+		}  catch(InvalidDataAccessApiUsageException | OptimisticLockingFailureException re) {
 			log.error("{} : trade={} : {} ", requestService.requestToString(request), trade.getTradeId(), re.toString());
 			throw new UnexpectedRollbackException("Error while saving trade");
 		} catch(Exception e) {
@@ -87,16 +88,13 @@ public class TradeServiceImpl implements TradeService {
 	@Transactional(rollbackFor = {ResourceNotFoundException.class, UnexpectedRollbackException.class})
 	public void deleteTradeById(Integer tradeId, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException {
 		try {
-			tradeRepository.delete(getTradeById(tradeId, request)); //getTradeById throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException
-		} catch(IllegalArgumentException iae) {
-			log.error("{} : trade={} : {} ", requestService.requestToString(request), tradeId, iae.toString());
+			tradeRepository.delete(getTradeById(tradeId, request)); //getTradeById throws ResourceNotFoundException, InvalidDataAccessApiUsageException, UnexpectedRollbackException
+		} catch(InvalidDataAccessApiUsageException | OptimisticLockingFailureException re) {
+			log.error("{} : trade={} : {} ", requestService.requestToString(request), tradeId, re.toString());
 			throw new UnexpectedRollbackException("Error while deleting trade");
 		} catch(ResourceNotFoundException  rnfe) {
 			log.error("{} : trade={} : {} ", requestService.requestToString(request), tradeId, rnfe.toString());
 			throw new ResourceNotFoundException(rnfe.getMessage());
-		} catch(OptimisticLockingFailureException oe) {
-			log.error("{} : trade={} : {} ", requestService.requestToString(request), tradeId, oe.toString());
-			throw new UnexpectedRollbackException("Error while deleting trade");
 		} catch(Exception e) {
 			log.error("{} : trade={} : {} ", requestService.requestToString(request), tradeId, e.toString());
 			throw new UnexpectedRollbackException("Error while deleting trade");

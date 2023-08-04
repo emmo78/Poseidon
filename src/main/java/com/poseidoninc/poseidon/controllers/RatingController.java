@@ -1,5 +1,6 @@
 package com.poseidoninc.poseidon.controllers;
 
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.UnexpectedRollbackException;
@@ -45,7 +46,7 @@ public class RatingController {
     }
 
     @GetMapping("/rating/update/{id}")
-    public String showUpdateForm(@PathVariable("id") Integer id, Model model, WebRequest request)  throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException {
+    public String showUpdateForm(@PathVariable("id") Integer id, Model model, WebRequest request)  throws ResourceNotFoundException, InvalidDataAccessApiUsageException, UnexpectedRollbackException {
         Rating rating = ratingService.getRatingById(id, request);
 		model.addAttribute("rating", rating);       
         return "rating/update";

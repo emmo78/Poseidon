@@ -1,5 +1,6 @@
 package com.poseidoninc.poseidon.services;
 
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,15 +26,15 @@ public class BidListServiceImpl implements BidListService {
 
 	
 	@Override
-	@Transactional(readOnly = true, rollbackFor = {ResourceNotFoundException.class, IllegalArgumentException.class, UnexpectedRollbackException.class})
-	public BidList getBidListById(Integer bidListId, WebRequest request) throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException {
+	@Transactional(readOnly = true, rollbackFor = {ResourceNotFoundException.class, InvalidDataAccessApiUsageException.class, UnexpectedRollbackException.class})
+	public BidList getBidListById(Integer bidListId, WebRequest request) throws ResourceNotFoundException, InvalidDataAccessApiUsageException, UnexpectedRollbackException {
 		BidList bidList = null;
 		try {
-			//Throws ResourceNotFoundException | IllegalArgumentException
+			//Throws ResourceNotFoundException | InvalidDataAccessApiUsageException
 			bidList = bidListRepository.findById(bidListId).orElseThrow(() -> new ResourceNotFoundException("BidList not found"));
-		} catch(IllegalArgumentException iae) {
-			log.error("{} : {} ", requestService.requestToString(request), iae.toString());
-			throw new IllegalArgumentException ("Id must not be null");
+		} catch(InvalidDataAccessApiUsageException idaaue) {
+			log.error("{} : {} ", requestService.requestToString(request), idaaue.toString());
+			throw new InvalidDataAccessApiUsageException ("Id must not be null");
 		} catch(ResourceNotFoundException  rnfe) {
 			log.error("{} : bidList={} : {} ", requestService.requestToString(request), bidListId, rnfe.toString());
 			throw new ResourceNotFoundException(rnfe.getMessage());
@@ -71,7 +72,7 @@ public class BidListServiceImpl implements BidListService {
 	public BidList saveBidList(BidList bidList, WebRequest request) throws UnexpectedRollbackException {
 		try {
 			bidList = bidListRepository.save(bidList);
-		}  catch(IllegalArgumentException | OptimisticLockingFailureException re) {
+		}  catch(InvalidDataAccessApiUsageException | OptimisticLockingFailureException re) {
 			log.error("{} : bidList={} : {} ", requestService.requestToString(request), bidList.getBidListId(), re.toString());
 			throw new UnexpectedRollbackException("Error while saving bidList");
 		} catch(Exception e) {
@@ -86,16 +87,13 @@ public class BidListServiceImpl implements BidListService {
 	@Transactional(rollbackFor = {ResourceNotFoundException.class, UnexpectedRollbackException.class})
 	public void deleteBidListById(Integer bidListId, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException {
 		try {
-			bidListRepository.delete(getBidListById(bidListId, request)); //getBidListById throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException
-		} catch(IllegalArgumentException iae) {
-			log.error("{} : bidList={} : {} ", requestService.requestToString(request), bidListId, iae.toString());
+			bidListRepository.delete(getBidListById(bidListId, request)); //getBidListById throws ResourceNotFoundException, InvalidDataAccessApiUsageException, UnexpectedRollbackException
+		} catch(InvalidDataAccessApiUsageException | OptimisticLockingFailureException re) {
+			log.error("{} : bidList={} : {} ", requestService.requestToString(request), bidListId, re.toString());
 			throw new UnexpectedRollbackException("Error while deleting bidList");
 		} catch(ResourceNotFoundException  rnfe) {
 			log.error("{} : bidList={} : {} ", requestService.requestToString(request), bidListId, rnfe.toString());
 			throw new ResourceNotFoundException(rnfe.getMessage());
-		} catch(OptimisticLockingFailureException oe) {
-			log.error("{} : bidList={} : {} ", requestService.requestToString(request), bidListId, oe.toString());
-			throw new UnexpectedRollbackException("Error while deleting bidList");
 		} catch(Exception e) {
 			log.error("{} : bidList={} : {} ", requestService.requestToString(request), bidListId, e.toString());
 			throw new UnexpectedRollbackException("Error while deleting bidList");

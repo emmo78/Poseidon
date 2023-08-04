@@ -1,5 +1,6 @@
 package com.poseidoninc.poseidon.services;
 
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.UnexpectedRollbackException;
@@ -9,7 +10,7 @@ import com.poseidoninc.poseidon.domain.BidList;
 import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
 
 public interface BidListService {
-	BidList getBidListById(Integer bidListId, WebRequest request) throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException;
+	BidList getBidListById(Integer bidListId, WebRequest request) throws ResourceNotFoundException, InvalidDataAccessApiUsageException, UnexpectedRollbackException;
 	Page<BidList> getBidLists(Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException;
 	BidList saveBidList(BidList bidList, WebRequest request) throws UnexpectedRollbackException;
 	void deleteBidListById(Integer bidListId, WebRequest request) throws  ResourceNotFoundException, UnexpectedRollbackException;	

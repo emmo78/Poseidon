@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Optional;
 
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +25,7 @@ import com.poseidoninc.poseidon.repositories.UserRepository;
 
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
@@ -278,6 +277,15 @@ public class UserRepositoryIT {
 			assertThat(userResult).isNull();	
 		}
 	}
-
-	//InvalidDataAccessApiUsageException
+	@Test
+	@Tag("UserRepositoryIT")
+	@DisplayName("find by Id null  should throw an InvalidDataAccessApiUsageException")
+	public void findByIdNullShouldThrowAnInvalidDataAccessApiUsageException() {
+		//GIVEN
+		//WHEN
+		//THEN
+		assertThat(assertThrows(InvalidDataAccessApiUsageException.class, () -> userRepository.findById(null)).getMessage())
+				.contains("The given id must not be null");
+	}
+		//InvalidDataAccessApiUsageException
 }

@@ -35,6 +35,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -91,7 +92,7 @@ public class BidListServiceTest {
 		@Test
 		@Tag("BidListServiceTest")
 		@DisplayName("test getBidListById should return expected bidList")
-		public void getBidListByIdTestShouldRetrunExcpectedBidList() {
+		public void getBidListByIdTestShouldReturnExpectedBidList() {
 			
 			//GIVEN
 			bidList = new BidList();
@@ -174,14 +175,14 @@ public class BidListServiceTest {
 				
 		@Test
 		@Tag("BidListServiceTest")
-		@DisplayName("test getBidListById should throw IllegalArgumentException")
-		public void getBidListByIdTestShouldThrowsUnexpectedRollbackExceptionOnIllegalArgumentException() {
+		@DisplayName("test getBidListById should throw InvalidDataAccessApiUsageException")
+		public void getBidListByIdTestShouldThrowsUnexpectedRollbackExceptionOnInvalidDataAccessApiUsageException() {
 			//GIVEN
-			when(bidListRepository.findById(nullable(Integer.class))).thenThrow(new IllegalArgumentException());
+			when(bidListRepository.findById(nullable(Integer.class))).thenThrow(new InvalidDataAccessApiUsageException("The given id must not be null"));
 			
 			//WHEN
 			//THEN
-			assertThat(assertThrows(IllegalArgumentException.class,
+			assertThat(assertThrows(InvalidDataAccessApiUsageException.class,
 				() -> bidListService.getBidListById(null, request))
 				.getMessage()).isEqualTo("Id must not be null");
 		}
@@ -191,7 +192,7 @@ public class BidListServiceTest {
 		@DisplayName("test getBidListById should throw ResourceNotFoundException")
 		public void getBidListByIdTestShouldThrowsResourceNotFoundException() {
 			//GIVEN
-			when(bidListRepository.findById(anyInt())).thenReturn(Optional.ofNullable(null));
+			when(bidListRepository.findById(anyInt())).thenReturn(Optional.empty());
 			
 			//WHEN
 			//THEN
@@ -248,7 +249,7 @@ public class BidListServiceTest {
 		@Test
 		@Tag("BidListServiceTest")
 		@DisplayName("test getBidLists should return bidLists")
-		public void getBidListsTesthouldRetrunExcpectedBidLists() {
+		public void getBidListsTestShouldReturnBidLists() {
 			
 			//GIVEN
 			List<BidList> expectedBidLists = new ArrayList<>();
@@ -610,12 +611,12 @@ public class BidListServiceTest {
 
 		@Test
 		@Tag("BidListServiceTest")
-		@DisplayName("test deleteBidList by Id should throw UnexpectedRollbackException On IllegalArgumentException()")
-		public void deleteBidListByIdTestShouldThrowsUnexpectedRollbackExceptionOnIllegalArgumentException() {
+		@DisplayName("test deleteBidList by Id should throw UnexpectedRollbackException On InvalidDataAccessApiUsageException()")
+		public void deleteBidListByIdTestShouldThrowsUnexpectedRollbackExceptionOnInvalidDataAccessApiUsageException() {
 
 			//GIVEN
 			when(bidListRepository.findById(anyInt())).thenReturn(Optional.of(bidList));
-			doThrow(new IllegalArgumentException()).when(bidListRepository).delete(any(BidList.class));
+			doThrow(new InvalidDataAccessApiUsageException("The given id must not be null")).when(bidListRepository).delete(any(BidList.class));
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,

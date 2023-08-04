@@ -36,6 +36,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -45,7 +46,6 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 import com.poseidoninc.poseidon.domain.CurvePoint;
-import com.poseidoninc.poseidon.exception.ResourceConflictException;
 import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
 import com.poseidoninc.poseidon.repositories.CurvePointRepository;
 
@@ -93,7 +93,7 @@ public class CurvePointServiceTest {
 		@Test
 		@Tag("CurvePointServiceTest")
 		@DisplayName("test getCurvePointById should return expected curvePoint")
-		public void getCurvePointByIdTestShouldRetrunExcpectedCurvePoint() {
+		public void getCurvePointByIdTestShouldReturnExpectedCurvePoint() {
 			
 			//GIVEN
 			curvePoint = new CurvePoint();
@@ -128,14 +128,14 @@ public class CurvePointServiceTest {
 				
 		@Test
 		@Tag("CurvePointServiceTest")
-		@DisplayName("test getCurvePointById should throw IllegalArgumentException")
-		public void getCurvePointByIdTestShouldThrowsUnexpectedRollbackExceptionOnIllegalArgumentException() {
+		@DisplayName("test getCurvePointById should throw InvalidDataAccessApiUsageException")
+		public void getCurvePointByIdTestShouldThrowsUnexpectedRollbackExceptionOnInvalidDataAccessApiUsageException() {
 			//GIVEN
-			when(curvePointRepository.findById(nullable(Integer.class))).thenThrow(new IllegalArgumentException());
+			when(curvePointRepository.findById(nullable(Integer.class))).thenThrow(new InvalidDataAccessApiUsageException("The given id must not be null"));
 			
 			//WHEN
 			//THEN
-			assertThat(assertThrows(IllegalArgumentException.class,
+			assertThat(assertThrows(InvalidDataAccessApiUsageException.class,
 				() -> curvePointService.getCurvePointById(null, request))
 				.getMessage()).isEqualTo("Id must not be null");
 		}
@@ -145,7 +145,7 @@ public class CurvePointServiceTest {
 		@DisplayName("test getCurvePointById should throw ResourceNotFoundException")
 		public void getCurvePointByIdTestShouldThrowsResourceNotFoundException() {
 			//GIVEN
-			when(curvePointRepository.findById(anyInt())).thenReturn(Optional.ofNullable(null));
+			when(curvePointRepository.findById(anyInt())).thenReturn(Optional.empty());
 			
 			//WHEN
 			//THEN
@@ -202,7 +202,7 @@ public class CurvePointServiceTest {
 		@Test
 		@Tag("CurvePointServiceTest")
 		@DisplayName("test getCurvePoints should return curvePoints")
-		public void getCurvePointsTesthouldRetrunExcpectedCurvePoints() {
+		public void getCurvePointsTestShouldReturnCurvePoints() {
 			
 			//GIVEN
 			List<CurvePoint> expectedCurvePoints = new ArrayList<>();
@@ -446,12 +446,12 @@ public class CurvePointServiceTest {
 
 		@Test
 		@Tag("CurvePointServiceTest")
-		@DisplayName("test deleteCurvePoint by Id should throw UnexpectedRollbackException On IllegalArgumentException")
-		public void deleteCurvePointByIdTestShouldThrowsUnexpectedRollbackExceptionOnIllegalArgumentException() {
+		@DisplayName("test deleteCurvePoint by Id should throw UnexpectedRollbackException On InvalidDataAccessApiUsageException")
+		public void deleteCurvePointByIdTestShouldThrowsUnexpectedRollbackExceptionOnInvalidDataAccessApiUsageException() {
 
 			//GIVEN
 			when(curvePointRepository.findById(anyInt())).thenReturn(Optional.of(curvePoint));
-			doThrow(new IllegalArgumentException()).when(curvePointRepository).delete(any(CurvePoint.class));
+			doThrow(new InvalidDataAccessApiUsageException("The given id must not be null")).when(curvePointRepository).delete(any(CurvePoint.class));
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,

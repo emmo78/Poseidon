@@ -33,6 +33,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -141,10 +142,10 @@ public class UserServiceTest {
 		
 		@Test
 		@Tag("UserServiceTest")
-		@DisplayName("test getUserByUserName should throw UnexpectedRollbackException on IllegalArgumentException")
-		public void getUserByUserNameTestShouldThrowsUnexpectedRollbackExceptionOnIllegalArgumentException() {
+		@DisplayName("test getUserByUserName should throw UnexpectedRollbackException on InvalidDataAccessApiUsageException")
+		public void getUserByUserNameTestShouldThrowsUnexpectedRollbackExceptionOnInvalidDataAccessApiUsageException() {
 			//GIVEN
-			when(userRepository.findByUsername(anyString())).thenThrow(new IllegalArgumentException());
+			when(userRepository.findByUsername(anyString())).thenThrow(new InvalidDataAccessApiUsageException("The given id must not be null"));
 			
 			//WHEN
 			//THEN
@@ -228,14 +229,14 @@ public class UserServiceTest {
 		
 		@Test
 		@Tag("UserServiceTest")
-		@DisplayName("test getUserById should throw IllegalArgumentException")
-		public void getUserByIdTestShouldThrowsUnexpectedRollbackExceptionOnIllegalArgumentException() {
+		@DisplayName("test getUserById should throw InvalidDataAccessApiUsageException")
+		public void getUserByIdTestShouldThrowsUnexpectedRollbackExceptionOnInvalidDataAccessApiUsageException() {
 			//GIVEN
-			when(userRepository.findById(nullable(Integer.class))).thenThrow(new IllegalArgumentException());
+			when(userRepository.findById(nullable(Integer.class))).thenThrow(new InvalidDataAccessApiUsageException("The given id must not be null"));
 			
 			//WHEN
 			//THEN
-			assertThat(assertThrows(IllegalArgumentException.class,
+			assertThat(assertThrows(InvalidDataAccessApiUsageException.class,
 				() -> userService.getUserById(null, request))
 				.getMessage()).isEqualTo("Id must not be null");
 		}
@@ -245,7 +246,7 @@ public class UserServiceTest {
 		@DisplayName("test getUserById should throw ResourceNotFoundException")
 		public void getUserByIdTestShouldThrowsResourceNotFoundException() {
 			//GIVEN
-			when(userRepository.findById(anyInt())).thenReturn(Optional.ofNullable(null));
+			when(userRepository.findById(anyInt())).thenReturn(Optional.empty());
 			
 			//WHEN
 			//THEN
@@ -329,14 +330,14 @@ public class UserServiceTest {
 		
 		@Test
 		@Tag("UserServiceTest")
-		@DisplayName("test getUserByIdWithBlankPasswd should throw IllegalArgumentException")
-		public void getUserByIdWithBlankPasswdTestShouldThrowsUnexpectedRollbackExceptionOnIllegalArgumentException() {
+		@DisplayName("test getUserByIdWithBlankPasswd should throw InvalidDataAccessApiUsageException")
+		public void getUserByIdWithBlankPasswdTestShouldThrowsUnexpectedRollbackExceptionOnInvalidDataAccessApiUsageException() {
 			//GIVEN
-			when(userRepository.findById(anyInt())).thenThrow(new IllegalArgumentException());
+			when(userRepository.findById(anyInt())).thenThrow(new InvalidDataAccessApiUsageException("The given id must not be null"));
 			
 			//WHEN
 			//THEN
-			assertThat(assertThrows(IllegalArgumentException.class,
+			assertThat(assertThrows(InvalidDataAccessApiUsageException.class,
 				() -> userService.getUserByIdWithBlankPasswd(1, request))
 				.getMessage()).isEqualTo("Id must not be null");
 		}
@@ -346,7 +347,7 @@ public class UserServiceTest {
 		@DisplayName("test getUserByIdWithBlankPasswd should throw ResourceNotFoundException")
 		public void getUserByIdWithBlankPasswdTestShouldThrowsResourceNotFoundException() {
 			//GIVEN
-			when(userRepository.findById(anyInt())).thenReturn(Optional.ofNullable(null));
+			when(userRepository.findById(anyInt())).thenReturn(Optional.empty());
 			
 			//WHEN
 			//THEN
@@ -635,12 +636,12 @@ public class UserServiceTest {
 
 		@Test
 		@Tag("UserServiceTest")
-		@DisplayName("test deleteUser by Id should throw UnexpectedRollbackException On IllegalArgumentException")
-		public void deleteUserByIdTestShouldThrowsUnexpectedRollbackExceptionOnIllegalArgumentException() {
+		@DisplayName("test deleteUser by Id should throw UnexpectedRollbackException On InvalidDataAccessApiUsageException")
+		public void deleteUserByIdTestShouldThrowsUnexpectedRollbackExceptionOnInvalidDataAccessApiUsageException() {
 
 			//GIVEN
 			when(userRepository.findById(anyInt())).thenReturn(Optional.of(user));
-			doThrow(new IllegalArgumentException()).when(userRepository).delete(any(User.class));
+			doThrow(new InvalidDataAccessApiUsageException("The given id must not be null")).when(userRepository).delete(any(User.class));
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,

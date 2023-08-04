@@ -1,6 +1,7 @@
 package com.poseidoninc.poseidon.services;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,15 +26,15 @@ public class CurvePointServiceIpml implements CurvePointService {
 	private final RequestService requestService;
 
 	@Override
-	@Transactional(readOnly = true, rollbackFor = {ResourceNotFoundException.class, IllegalArgumentException.class, UnexpectedRollbackException.class})
-	public CurvePoint getCurvePointById(Integer id, WebRequest request) throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException {
+	@Transactional(readOnly = true, rollbackFor = {ResourceNotFoundException.class, InvalidDataAccessApiUsageException.class, UnexpectedRollbackException.class})
+	public CurvePoint getCurvePointById(Integer id, WebRequest request) throws ResourceNotFoundException, InvalidDataAccessApiUsageException, UnexpectedRollbackException {
 		CurvePoint curvePoint = null;
 		try {
-			//Throws ResourceNotFoundException | IllegalArgumentException
+			//Throws ResourceNotFoundException | InvalidDataAccessApiUsageException
 			curvePoint = curvePointRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Curve Point not found"));
-		} catch(IllegalArgumentException iae) {
-			log.error("{} : {} ", requestService.requestToString(request), iae.toString());
-			throw new IllegalArgumentException ("Id must not be null");
+		} catch(InvalidDataAccessApiUsageException idaaue) {
+			log.error("{} : {} ", requestService.requestToString(request), idaaue.toString());
+			throw new InvalidDataAccessApiUsageException ("Id must not be null");
 		} catch(ResourceNotFoundException  rnfe) {
 			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), id, rnfe.toString());
 			throw new ResourceNotFoundException(rnfe.getMessage());
@@ -72,7 +73,7 @@ public class CurvePointServiceIpml implements CurvePointService {
 		try {
 			//No need to test blank or null fields for update because constraint validation on each field
 			curvePoint = curvePointRepository.save(curvePoint);
-		}  catch(IllegalArgumentException | OptimisticLockingFailureException re) {
+		}  catch(InvalidDataAccessApiUsageException | OptimisticLockingFailureException re) {
 			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), curvePoint.getId(), re.toString());
 			throw new UnexpectedRollbackException("Error while saving curvePoint");
 		} catch(DataIntegrityViolationException dive) {
@@ -90,8 +91,8 @@ public class CurvePointServiceIpml implements CurvePointService {
 	@Transactional(rollbackFor = {ResourceNotFoundException.class, UnexpectedRollbackException.class})
 	public void deleteCurvePointById(Integer id, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException {
 		try {
-			curvePointRepository.delete(getCurvePointById(id, request)); //getCurvePointById throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException
-		} catch(IllegalArgumentException | OptimisticLockingFailureException re) {
+			curvePointRepository.delete(getCurvePointById(id, request)); //getCurvePointById throws ResourceNotFoundException, InvalidDataAccessApiUsageException, UnexpectedRollbackException
+		} catch(InvalidDataAccessApiUsageException | OptimisticLockingFailureException re) {
 			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), id, re.toString());
 			throw new UnexpectedRollbackException("Error while deleting curvePoint");
 		} catch(ResourceNotFoundException  rnfe) {

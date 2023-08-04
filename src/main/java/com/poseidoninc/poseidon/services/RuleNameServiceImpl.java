@@ -1,5 +1,6 @@
 package com.poseidoninc.poseidon.services;
 
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,15 +26,15 @@ public class RuleNameServiceImpl implements RuleNameService {
 
 	
 	@Override
-	@Transactional(readOnly = true, rollbackFor = {ResourceNotFoundException.class, IllegalArgumentException.class, UnexpectedRollbackException.class})
-	public RuleName getRuleNameById(Integer id, WebRequest request) throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException {
+	@Transactional(readOnly = true, rollbackFor = {ResourceNotFoundException.class, InvalidDataAccessApiUsageException.class, UnexpectedRollbackException.class})
+	public RuleName getRuleNameById(Integer id, WebRequest request) throws ResourceNotFoundException, InvalidDataAccessApiUsageException, UnexpectedRollbackException {
 		RuleName ruleName = null;
 		try {
-			//Throws ResourceNotFoundException | IllegalArgumentException
+			//Throws ResourceNotFoundException | InvalidDataAccessApiUsageException
 			ruleName = ruleNameRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("RuleName not found"));
-		} catch(IllegalArgumentException iae) {
-			log.error("{} : {} ", requestService.requestToString(request), iae.toString());
-			throw new IllegalArgumentException ("Id must not be null");
+		} catch(InvalidDataAccessApiUsageException idaaue) {
+			log.error("{} : {} ", requestService.requestToString(request), idaaue.toString());
+			throw new InvalidDataAccessApiUsageException ("Id must not be null");
 		} catch(ResourceNotFoundException  rnfe) {
 			log.error("{} : ruleName={} : {} ", requestService.requestToString(request), id, rnfe.toString());
 			throw new ResourceNotFoundException(rnfe.getMessage());
@@ -71,7 +72,7 @@ public class RuleNameServiceImpl implements RuleNameService {
 	public RuleName saveRuleName(RuleName ruleName, WebRequest request) throws UnexpectedRollbackException {
 		try {
 			ruleName = ruleNameRepository.save(ruleName);
-		}  catch(IllegalArgumentException | OptimisticLockingFailureException re) {
+		}  catch(InvalidDataAccessApiUsageException | OptimisticLockingFailureException re) {
 			log.error("{} : ruleName={} : {} ", requestService.requestToString(request), ruleName.getId(), re.toString());
 			throw new UnexpectedRollbackException("Error while saving ruleName");
 		} catch(Exception e) {
@@ -86,16 +87,13 @@ public class RuleNameServiceImpl implements RuleNameService {
 	@Transactional(rollbackFor = {ResourceNotFoundException.class, UnexpectedRollbackException.class})
 	public void deleteRuleNameById(Integer id, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException {
 		try {
-			ruleNameRepository.delete(getRuleNameById(id, request)); //getRuleNameById throws ResourceNotFoundException, IllegalArgumentException, UnexpectedRollbackException
-		} catch(IllegalArgumentException iae) {
-			log.error("{} : ruleName={} : {} ", requestService.requestToString(request), id, iae.toString());
+			ruleNameRepository.delete(getRuleNameById(id, request)); //getRuleNameById throws ResourceNotFoundException, InvalidDataAccessApiUsageException, UnexpectedRollbackException
+		} catch(InvalidDataAccessApiUsageException | OptimisticLockingFailureException re) {
+			log.error("{} : ruleName={} : {} ", requestService.requestToString(request), id, re.toString());
 			throw new UnexpectedRollbackException("Error while deleting ruleName");
 		} catch(ResourceNotFoundException  rnfe) {
 			log.error("{} : ruleName={} : {} ", requestService.requestToString(request), id, rnfe.toString());
 			throw new ResourceNotFoundException(rnfe.getMessage());
-		} catch(OptimisticLockingFailureException oe) {
-			log.error("{} : ruleName={} : {} ", requestService.requestToString(request), id, oe.toString());
-			throw new UnexpectedRollbackException("Error while deleting ruleName");
 		} catch(Exception e) {
 			log.error("{} : ruleName={} : {} ", requestService.requestToString(request), id, e.toString());
 			throw new UnexpectedRollbackException("Error while deleting ruleName");

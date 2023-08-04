@@ -33,6 +33,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -89,7 +90,7 @@ public class RatingServiceTest {
 		@Test
 		@Tag("RatingServiceTest")
 		@DisplayName("test getRatingById should return expected rating")
-		public void getRatingByIdTestShouldRetrunExcpectedRating() {
+		public void getRatingByIdTestShouldReturnExpectedRating() {
 			
 			//GIVEN
 			rating = new Rating();
@@ -120,14 +121,14 @@ public class RatingServiceTest {
 				
 		@Test
 		@Tag("RatingServiceTest")
-		@DisplayName("test getRatingById should throw IllegalArgumentException")
-		public void getRatingByIdTestShouldThrowsUnexpectedRollbackExceptionOnIllegalArgumentException() {
+		@DisplayName("test getRatingById should throw InvalidDataAccessApiUsageException")
+		public void getRatingByIdTestShouldThrowsUnexpectedRollbackExceptionOnInvalidDataAccessApiUsageException() {
 			//GIVEN
-			when(ratingRepository.findById(nullable(Integer.class))).thenThrow(new IllegalArgumentException());
+			when(ratingRepository.findById(nullable(Integer.class))).thenThrow(new InvalidDataAccessApiUsageException("The given id must not be null"));
 			
 			//WHEN
 			//THEN
-			assertThat(assertThrows(IllegalArgumentException.class,
+			assertThat(assertThrows(InvalidDataAccessApiUsageException.class,
 				() -> ratingService.getRatingById(null, request))
 				.getMessage()).isEqualTo("Id must not be null");
 		}
@@ -137,7 +138,7 @@ public class RatingServiceTest {
 		@DisplayName("test getRatingById should throw ResourceNotFoundException")
 		public void getRatingByIdTestShouldThrowsResourceNotFoundException() {
 			//GIVEN
-			when(ratingRepository.findById(anyInt())).thenReturn(Optional.ofNullable(null));
+			when(ratingRepository.findById(anyInt())).thenReturn(Optional.empty());
 			
 			//WHEN
 			//THEN
@@ -194,7 +195,7 @@ public class RatingServiceTest {
 		@Test
 		@Tag("RatingServiceTest")
 		@DisplayName("test getRatings should return ratings")
-		public void getRatingsTesthouldRetrunExcpectedRatings() {
+		public void getRatingsTestShouldReturnRatings() {
 			
 			//GIVEN
 			List<Rating> expectedRatings = new ArrayList<>();
@@ -419,12 +420,12 @@ public class RatingServiceTest {
 
 		@Test
 		@Tag("RatingServiceTest")
-		@DisplayName("test deleteRating by Id should throw UnexpectedRollbackException On IllegalArgumentException()")
-		public void deleteRatingByIdTestShouldThrowsUnexpectedRollbackExceptionOnIllegalArgumentException() {
+		@DisplayName("test deleteRating by Id should throw UnexpectedRollbackException On InvalidDataAccessApiUsageException()")
+		public void deleteRatingByIdTestShouldThrowsUnexpectedRollbackExceptionOnInvalidDataAccessApiUsageException() {
 
 			//GIVEN
 			when(ratingRepository.findById(anyInt())).thenReturn(Optional.of(rating));
-			doThrow(new IllegalArgumentException()).when(ratingRepository).delete(any(Rating.class));
+			doThrow(new InvalidDataAccessApiUsageException("The given id must not be null")).when(ratingRepository).delete(any(Rating.class));
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,

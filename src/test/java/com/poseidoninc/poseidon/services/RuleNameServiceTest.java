@@ -33,6 +33,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -89,7 +90,7 @@ public class RuleNameServiceTest {
 		@Test
 		@Tag("RuleNameServiceTest")
 		@DisplayName("test getRuleNameById should return expected ruleName")
-		public void getRuleNameByIdTestShouldRetrunExcpectedRuleName() {
+		public void getRuleNameByIdTestShouldReturnExpectedRuleName() {
 			
 			//GIVEN
 			ruleName = new RuleName();
@@ -126,14 +127,14 @@ public class RuleNameServiceTest {
 		
 		@Test
 		@Tag("RuleNameServiceTest")
-		@DisplayName("test getRuleNameById should throw IllegalArgumentException")
-		public void getRuleNameByIdTestShouldThrowsUnexpectedRollbackExceptionOnIllegalArgumentException() {
+		@DisplayName("test getRuleNameById should throw InvalidDataAccessApiUsageException")
+		public void getRuleNameByIdTestShouldThrowsUnexpectedRollbackExceptionOnInvalidDataAccessApiUsageException() {
 			//GIVEN
-			when(ruleNameRepository.findById(nullable(Integer.class))).thenThrow(new IllegalArgumentException());
+			when(ruleNameRepository.findById(nullable(Integer.class))).thenThrow(new InvalidDataAccessApiUsageException("The given id must not be null"));
 			
 			//WHEN
 			//THEN
-			assertThat(assertThrows(IllegalArgumentException.class,
+			assertThat(assertThrows(InvalidDataAccessApiUsageException.class,
 				() -> ruleNameService.getRuleNameById(null, request))
 				.getMessage()).isEqualTo("Id must not be null");
 		}
@@ -143,7 +144,7 @@ public class RuleNameServiceTest {
 		@DisplayName("test getRuleNameById should throw ResourceNotFoundException")
 		public void getRuleNameByIdTestShouldThrowsResourceNotFoundException() {
 			//GIVEN
-			when(ruleNameRepository.findById(anyInt())).thenReturn(Optional.ofNullable(null));
+			when(ruleNameRepository.findById(anyInt())).thenReturn(Optional.empty());
 			
 			//WHEN
 			//THEN
@@ -200,7 +201,7 @@ public class RuleNameServiceTest {
 		@Test
 		@Tag("RuleNameServiceTest")
 		@DisplayName("test getRuleNames should return ruleNames")
-		public void getRuleNamesTesthouldRetrunExcpectedRuleNames() {
+		public void getRuleNamesTestShouldReturnRuleNames() {
 			
 			//GIVEN
 			List<RuleName> expectedRuleNames = new ArrayList<>();
@@ -441,12 +442,12 @@ public class RuleNameServiceTest {
 
 		@Test
 		@Tag("RuleNameServiceTest")
-		@DisplayName("test deleteRuleName by Id should throw UnexpectedRollbackException On IllegalArgumentException()")
-		public void deleteRuleNameByIdTestShouldThrowsUnexpectedRollbackExceptionOnIllegalArgumentException() {
+		@DisplayName("test deleteRuleName by Id should throw UnexpectedRollbackException On InvalidDataAccessApiUsageException()")
+		public void deleteRuleNameByIdTestShouldThrowsUnexpectedRollbackExceptionOnInvalidDataAccessApiUsageException() {
 
 			//GIVEN
 			when(ruleNameRepository.findById(anyInt())).thenReturn(Optional.of(ruleName));
-			doThrow(new IllegalArgumentException()).when(ruleNameRepository).delete(any(RuleName.class));
+			doThrow(new InvalidDataAccessApiUsageException("The given id must not be null")).when(ruleNameRepository).delete(any(RuleName.class));
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
