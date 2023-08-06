@@ -30,6 +30,7 @@
 	</properties>
 
 	<dependencies>
+		<!-- https://docs.spring.io/spring-boot/docs/1.2.3.RELEASE/reference/html/using-boot-build-systems.html#using-boot-starter-poms -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-oauth2-client</artifactId>
@@ -92,6 +93,11 @@
             		<artifactId>spring-boot-starter-logging</artifactId>
         		</exclusion>
     		</exclusions>
+		</dependency>
+		<dependency>
+			<!-- Support for exposing Spring Data repositories over REST via spring-data-rest-webmvc -->
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-rest</artifactId>
 		</dependency>
 		<!-- Include Log4j2 for logging, needs log4j2.xml in main/resources-->
 		<dependency>

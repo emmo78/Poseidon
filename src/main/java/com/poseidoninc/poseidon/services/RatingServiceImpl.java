@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.WebRequest;
 
 import com.poseidoninc.poseidon.domain.Rating;
-import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import com.poseidoninc.poseidon.repositories.RatingRepository;
 
 import lombok.AllArgsConstructor;

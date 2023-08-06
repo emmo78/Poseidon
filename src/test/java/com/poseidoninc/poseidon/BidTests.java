@@ -14,8 +14,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.poseidoninc.poseidon.domain.BidList;
 import com.poseidoninc.poseidon.repositories.BidListRepository;
+import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
+@ActiveProfiles("mytest")
 public class BidTests {
 
 	@Autowired

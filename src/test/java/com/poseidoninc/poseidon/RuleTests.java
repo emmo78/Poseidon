@@ -14,8 +14,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.poseidoninc.poseidon.domain.RuleName;
 import com.poseidoninc.poseidon.repositories.RuleNameRepository;
+import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
+@ActiveProfiles("mytest")
 public class RuleTests {
 
 	@Autowired

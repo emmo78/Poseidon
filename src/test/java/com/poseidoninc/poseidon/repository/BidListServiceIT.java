@@ -21,8 +21,10 @@ import com.poseidoninc.poseidon.domain.BidList;
 import com.poseidoninc.poseidon.repositories.BidListRepository;
 
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
+@ActiveProfiles("mytest")
 public class BidListServiceIT {
 
 	@Autowired

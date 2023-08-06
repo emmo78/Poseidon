@@ -13,8 +13,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.poseidoninc.poseidon.domain.Rating;
 import com.poseidoninc.poseidon.repositories.RatingRepository;
+import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
+@ActiveProfiles("mytest")
 public class RatingTests {
 
 	@Autowired

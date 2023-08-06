@@ -43,7 +43,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 import com.poseidoninc.poseidon.domain.RuleName;
-import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import com.poseidoninc.poseidon.repositories.RuleNameRepository;
 
 @ExtendWith(MockitoExtension.class)

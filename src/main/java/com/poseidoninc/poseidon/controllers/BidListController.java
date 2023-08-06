@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 
 import com.poseidoninc.poseidon.domain.BidList;
-import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
 import com.poseidoninc.poseidon.services.BidListService;
 
 import jakarta.validation.Valid;

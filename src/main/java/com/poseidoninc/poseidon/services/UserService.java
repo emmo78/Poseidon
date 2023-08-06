@@ -1,7 +1,7 @@
 package com.poseidoninc.poseidon.services;
 
 import com.poseidoninc.poseidon.domain.User;
-import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;

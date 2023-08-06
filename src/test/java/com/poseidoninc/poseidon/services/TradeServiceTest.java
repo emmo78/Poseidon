@@ -45,7 +45,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 import com.poseidoninc.poseidon.domain.Trade;
-import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import com.poseidoninc.poseidon.repositories.TradeRepository;
 
 @ExtendWith(MockitoExtension.class)

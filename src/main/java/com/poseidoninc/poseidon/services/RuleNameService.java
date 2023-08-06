@@ -7,7 +7,7 @@ import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.web.context.request.WebRequest;
 
 import com.poseidoninc.poseidon.domain.RuleName;
-import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 
 public interface RuleNameService {
 	RuleName getRuleNameById(Integer id, WebRequest request) throws ResourceNotFoundException, InvalidDataAccessApiUsageException, UnexpectedRollbackException;

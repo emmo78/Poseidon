@@ -7,7 +7,7 @@ import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.web.context.request.WebRequest;
 
 import com.poseidoninc.poseidon.domain.BidList;
-import com.poseidoninc.poseidon.exception.ResourceNotFoundException;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 
 public interface BidListService {
 	BidList getBidListById(Integer bidListId, WebRequest request) throws ResourceNotFoundException, InvalidDataAccessApiUsageException, UnexpectedRollbackException;
