@@ -9,20 +9,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.poseidoninc.poseidon.domain.CurvePoint;
-import com.poseidoninc.poseidon.domain.CurvePoint;
-import com.poseidoninc.poseidon.repositories.CurvePointRepository;
 
 import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.constraints.Null;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 

@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.poseidoninc.poseidon.domain.BidList;
-import com.poseidoninc.poseidon.repositories.BidListRepository;
 
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.test.context.ActiveProfiles;

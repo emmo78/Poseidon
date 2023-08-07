@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.poseidoninc.poseidon.domain.Rating;
-import com.poseidoninc.poseidon.repositories.RatingRepository;
+import com.poseidoninc.poseidon.repository.RatingRepository;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
