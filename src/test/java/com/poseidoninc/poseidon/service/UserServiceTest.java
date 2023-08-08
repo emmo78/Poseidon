@@ -103,7 +103,7 @@ public class UserServiceTest {
 			user = new User();
 			user.setId(1);
 			user.setUsername("Aaa");
-			user.setPassword("aaa1=Passwd");
+			user.setPassword("apw1=Passwd");
 			user.setFullname("AAA");
 			user.setRole("USER");
 			when(userRepository.findByUsername(anyString())).thenReturn(user);
@@ -121,7 +121,7 @@ public class UserServiceTest {
 				.containsExactly(
 					1,
 					"Aaa",
-					"aaa1=Passwd",
+					"apw1=Passwd",
 					"AAA",
 					"USER");	
 		}
@@ -204,7 +204,7 @@ public class UserServiceTest {
 			user = new User();
 			user.setId(1);
 			user.setUsername("Aaa");
-			user.setPassword("aaa1=Passwd");
+			user.setPassword("apw1=Passwd");
 			user.setFullname("AAA");
 			user.setRole("USER");
 			when(userRepository.findById(anyInt())).thenReturn(Optional.of(user));
@@ -222,7 +222,7 @@ public class UserServiceTest {
 				.containsExactly(
 					1,
 					"Aaa",
-					"aaa1=Passwd",
+					"apw1=Passwd",
 					"AAA",
 					"USER");	
 		}
@@ -305,7 +305,7 @@ public class UserServiceTest {
 			user = new User();
 			user.setId(1);
 			user.setUsername("Aaa");
-			user.setPassword("aaa1=Passwd");
+			user.setPassword("apw1=Passwd");
 			user.setFullname("AAA");
 			user.setRole("USER");
 			when(userRepository.findById(anyInt())).thenReturn(Optional.of(user));
@@ -411,14 +411,14 @@ public class UserServiceTest {
 			user = new User();
 			user.setId(1);
 			user.setUsername("Aaa");
-			user.setPassword("aaa1=Passwd");
+			user.setPassword("apw1=Passwd");
 			user.setFullname("AAA");
 			user.setRole("USER");
 			expectedUsers.add(user);
 			User user2 = new User();			
 			user2.setId(2);
 			user2.setUsername("Bbb");
-			user2.setPassword("bbb2=Passwd");
+			user2.setPassword("bpw2=Passwd");
 			user2.setFullname("BBB");
 			expectedUsers.add(user2);
 			when(userRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<User>(expectedUsers, pageRequest, 2));
@@ -481,7 +481,7 @@ public class UserServiceTest {
 		public void setUpForEachTest() {
 			user = new User();
 			user.setUsername("Aaa");
-			user.setPassword("aaa1=Passwd");
+			user.setPassword("apw1=Passwd");
 			user.setFullname("AAA");
 			user.setRole("USER");
 		}
@@ -510,7 +510,7 @@ public class UserServiceTest {
 			
 			//THEN
 			verify(userRepository, times(1)).save(userBeingSaved.capture());
-			assertThat(passwordEncoder.matches("aaa1=Passwd", userBeingSaved.getValue().getPassword())).isTrue();
+			assertThat(passwordEncoder.matches("apw1=Passwd", userBeingSaved.getValue().getPassword())).isTrue();
 			assertThat(resultedUser).extracting(
 					User::getId,
 					User::getUsername,
@@ -579,7 +579,7 @@ public class UserServiceTest {
 			user = new User();
 			user.setId(1);
 			user.setUsername("Aaa");
-			user.setPassword("aaa1=Passwd");
+			user.setPassword("apw1=Passwd");
 			user.setFullname("AAA");
 			user.setRole("USER");
 		}
@@ -614,7 +614,7 @@ public class UserServiceTest {
 				.containsExactly(
 					1,
 					"Aaa",
-					"aaa1=Passwd",
+					"apw1=Passwd",
 					"AAA",
 					"USER");	
 		}

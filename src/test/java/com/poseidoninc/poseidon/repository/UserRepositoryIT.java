@@ -60,7 +60,7 @@ public class UserRepositoryIT {
 			//GIVEN
 			user.setId(null);
 			user.setUsername("Aaa");
-			user.setPassword("aaa1=Passwd");
+			user.setPassword("apw1=Passwd");
 			user.setFullname("AAA");
 			user.setRole("USER");
 	
@@ -77,7 +77,7 @@ public class UserRepositoryIT {
 					User::getRole)
 				.containsExactly(
 					"Aaa",
-					"aaa1=Passwd",
+					"apw1=Passwd",
 					"AAA",
 					"USER"));
 		}
@@ -90,7 +90,7 @@ public class UserRepositoryIT {
 			//GIVEN
 			user.setId(null);
 			user.setUsername("Aaa");
-			user.setPassword("aaa1=Passwd");
+			user.setPassword("apw1=Passwd");
 			user.setFullname("AAA");
 			user.setRole("USER");
 			Integer id = userRepository.saveAndFlush(user).getId();
@@ -126,7 +126,7 @@ public class UserRepositoryIT {
 			//GIVEN
 			user.setId(null);
 			user.setUsername("Aaa");
-			user.setPassword("aaa1=Passwd");
+			user.setPassword("apw1=Passwd");
 			user.setFullname("AAA");
 			user.setRole("USER");
 			userRepository.saveAndFlush(user);
@@ -134,7 +134,7 @@ public class UserRepositoryIT {
 			User userTest = new User();
 			userTest.setId(null);
 			userTest.setUsername(username);
-			userTest.setPassword("aaa2=Passwd");
+			userTest.setPassword("apw2=Passwd");
 			userTest.setFullname("AAATEST");
 			userTest.setRole("USER");
 
@@ -148,7 +148,7 @@ public class UserRepositoryIT {
 
 		@ParameterizedTest(name = "{0} should throw a ConstraintViolationException")
 		@NullAndEmptySource
-		@ValueSource(strings = {"1=Passw", "aaa1=asswd", "aaa1Passwd", "aaa=Passwd", "aaa1=Passwdaaa1=Passwd"})
+		@ValueSource(strings = {"1=Passw", "apw1=asswd", "apw1Passwd", "apw=Passwd", "apw1=Passwdapw1=Passwd"})
 		@Tag("UserRepositoryIT")
 		@DisplayName("save test with incorrect password should throw a ConstraintViolationException")
 		public void saveTestIncorrectPasswdShouldThrowAConstraintViolationException(String passwd) {
@@ -178,7 +178,7 @@ public class UserRepositoryIT {
 			//GIVEN
 			user.setId(null);
 			user.setUsername(username);
-			user.setPassword("aaa1=Passwd");
+			user.setPassword("apw1=Passwd");
 			user.setFullname("AAA");
 			user.setRole("USER");
 			String msg = null;
@@ -214,7 +214,7 @@ public class UserRepositoryIT {
 			//GIVEN
 			user.setId(null);
 			user.setUsername("Aaa");
-			user.setPassword("aaa1=Passwd");
+			user.setPassword("apw1=Passwd");
 			user.setFullname("AAA");
 			user.setRole("USER");
 			userRepository.saveAndFlush(user);
@@ -230,7 +230,7 @@ public class UserRepositoryIT {
 					User::getRole)
 				.containsExactly(
 					"Aaa",
-					"aaa1=Passwd",
+					"apw1=Passwd",
 					"AAA",
 					"USER");	
 		}
@@ -243,7 +243,7 @@ public class UserRepositoryIT {
 			//GIVEN
 			user.setId(null);
 			user.setUsername("Aaa");
-			user.setPassword("aaa1=Passwd");
+			user.setPassword("apw1=Passwd");
 			user.setFullname("AAA");
 			user.setRole("USER");
 			userRepository.saveAndFlush(user);
@@ -264,7 +264,7 @@ public class UserRepositoryIT {
 			//GIVEN
 			user.setId(null);
 			user.setUsername("Aaa");
-			user.setPassword("aaa1=Passwd");
+			user.setPassword("apw1=Passwd");
 			user.setFullname("AAA");
 			user.setRole("USER");
 			userRepository.saveAndFlush(user);

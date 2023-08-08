@@ -26,7 +26,7 @@ public class UserControllerTest {
 		User user = new User();
 		user.setId(null);
 		user.setUsername("");
-		user.setPassword("aaa1=Passwd");
+		user.setPassword("apw1=Passwd");
 		user.setFullname("AAA");
 		user.setRole("USER");
 		
