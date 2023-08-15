@@ -12,7 +12,7 @@ public class ValidPasswordValidator implements ConstraintValidator<ValidPassword
 
     @Override
     public boolean isValid(String password, ConstraintValidatorContext context) {
-        PasswordValidator validator = new PasswordValidator(Arrays.asList(
+        PasswordValidator passwordValidator = new PasswordValidator(Arrays.asList(
                 // at least 8 characters
                 new LengthRule(8, 13),
                 // at least one upper-case character
@@ -32,11 +32,11 @@ public class ValidPasswordValidator implements ConstraintValidator<ValidPassword
                 // rejects passwords that contain a sequence of >= 5 characters numerical   (e.g. 12345)
                 new IllegalSequenceRule(EnglishSequenceData.Numerical, 5, false)
         ));
-        RuleResult result = validator.validate(new PasswordData(password));
+        RuleResult result = passwordValidator.validate(new PasswordData(password));
         if (result.isValid()) {
             return true;
         }
-        List<String> messages = validator.getMessages(result);
+        List<String> messages = passwordValidator.getMessages(result);
 
         String messageTemplate = String.join(",", messages);
         context.buildConstraintViolationWithTemplate(messageTemplate)

@@ -145,29 +145,6 @@ public class UserRepositoryIT {
 					.getMessage()).contains(("Unique index or primary key violation"));
 		}
 
-
-		@ParameterizedTest(name = "{0} should throw a ConstraintViolationException")
-		@NullAndEmptySource
-		@ValueSource(strings = {"1=Passw", "apw1=asswd", "apw1Passwd", "apw=Passwd", "apw1=Passwdapw1=Passwd"})
-		@Tag("UserRepositoryIT")
-		@DisplayName("save test with incorrect password should throw a ConstraintViolationException")
-		public void saveTestIncorrectPasswdShouldThrowAConstraintViolationException(String passwd) {
-	
-			//GIVEN
-			user.setId(null);
-			user.setUsername("Aaa");
-			user.setPassword(passwd);
-			user.setFullname("AAA");
-			user.setRole("USER");
-			String msg = passwd==null? "Password is mandatory":"Password must have at least 8 characters in length, max 13, containing at least 1 uppercase letter, 1 digit, and 1 symbol.";
-
-			//WHEN
-			//THEN
-			assertThat(assertThrows(ConstraintViolationException.class,
-					() -> userRepository.saveAndFlush(user))
-					.getMessage()).contains(msg);
-		}
-		
 		@ParameterizedTest(name = "{0} should throw a ConstraintViolationException")
 		@NullAndEmptySource
 		@ValueSource(strings = {"   ", "AbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyz"})//26*5=130
@@ -286,5 +263,4 @@ public class UserRepositoryIT {
 		assertThat(assertThrows(InvalidDataAccessApiUsageException.class, () -> userRepository.findById(null)).getMessage())
 				.contains("The given id must not be null");
 	}
-		//InvalidDataAccessApiUsageException
 }

@@ -49,7 +49,7 @@ public class ValidPasswordValidatorTest {
 
     @ParameterizedTest(name = "{0} causes isValid should return false")
     @EmptySource
-    @ValueSource(strings = {"         ", "1=Passw", "apw1=asswd", "apw1Passwd", "apw=Passwd", "apw1=Passwdapw1=Passwd"})
+    @ValueSource(strings = {"         ", "ap 1=Passwd","1=Passw", "apw1=asswd", "apw1Passwd", "apw=Passwd", "apw1=Passwdapw1=Passwd"})
     @Tag("ValidPasswordValidatorTests")
     @DisplayName("isValid Test should return false")
     public void isValidTestShouldReturnFalse(String password) {
