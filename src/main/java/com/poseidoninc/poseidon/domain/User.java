@@ -1,6 +1,8 @@
 package com.poseidoninc.poseidon.domain;
 
 import com.poseidoninc.poseidon.annotation.ValidPassword;
+import com.poseidoninc.poseidon.annotation.ValidPasswordGroup;
+import jakarta.validation.GroupSequence;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -23,6 +25,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "users")
+@GroupSequence({User.class, ValidPasswordGroup.class})
 public class User {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -36,7 +39,7 @@ public class User {
 	
     @Column(name = "password")
     @NotNull(message = "Password is mandatory")
-    @ValidPassword
+    @ValidPassword(groups = ValidPasswordGroup.class)
     private String password;
 
 	@Column(name = "fullname")

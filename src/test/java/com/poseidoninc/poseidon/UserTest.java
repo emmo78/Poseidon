@@ -56,13 +56,17 @@ public class UserTest {
         user.setPassword(passwd);
         user.setFullname("AAA");
         user.setRole("USER");
-        //String msg = passwd==null? "Password is mandatory":"Password must have at least 8 characters in length, max 13, containing at least 1 uppercase letter, 1 digit, and 1 symbol.";
+        String msg = passwd==null? "Password is mandatory":null;
 
         //WHEN
         Set<ConstraintViolation<User>> constraintViolations = validator.validate(user);
 
         //THEN
-        assertThat(constraintViolations).hasSizeGreaterThanOrEqualTo(1);
+        assertThat(constraintViolations).isNotEmpty();
+        if (passwd == null) {
+            assertThat(constraintViolations.iterator().next().getMessage()).isEqualTo(msg);
+        }
+
         //assertThat(constraintViolations.iterator().next().getMessage()).isEqualTo("UserName already exists");
     }
 }
