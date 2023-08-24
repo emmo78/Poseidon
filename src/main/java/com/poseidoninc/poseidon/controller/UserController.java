@@ -42,7 +42,12 @@ public class UserController {
         if (result.hasErrors()) {
             return "user/add";
         }
-        userService.saveUser(user, request);
+        try {
+            userService.saveUser(user, request);
+        } catch (DataIntegrityViolationException dive) {
+            result.rejectValue("username", "error.use", dive.getMessage());
+            return "user/add";
+        }
         return "redirect:/user/list";
     }
 
@@ -58,7 +63,12 @@ public class UserController {
         if (result.hasErrors()) {
             return "user/update";
         }
-        userService.saveUser(user, request);
+        try {
+            userService.saveUser(user, request);
+        } catch (DataIntegrityViolationException dive) {
+            result.rejectValue("username", "error.use", dive.getMessage());
+            return "user/add";
+        }
         return "redirect:/user/list";
     }
 

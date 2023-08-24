@@ -142,20 +142,6 @@ public class UserServiceTest {
 		
 		@Test
 		@Tag("UserServiceTest")
-		@DisplayName("test getUserByUserName should throw UnexpectedRollbackException on InvalidDataAccessApiUsageException")
-		public void getUserByUserNameTestShouldThrowsUnexpectedRollbackExceptionOnInvalidDataAccessApiUsageException() {
-			//GIVEN
-			when(userRepository.findByUsername(anyString())).thenThrow(new InvalidDataAccessApiUsageException("The given id must not be null"));
-			
-			//WHEN
-			//THEN
-			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> userService.getUserByUserName("aaa@aaa.com", request))
-				.getMessage()).isEqualTo("Error while getting user profile");
-		}
-
-		@Test
-		@Tag("UserServiceTest")
 		@DisplayName("test getUserByUserName should throw UnexpectedRollbackException on any RuntimeException")
 		public void getUserByUserNameTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
 			//GIVEN
@@ -229,30 +215,30 @@ public class UserServiceTest {
 		
 		@Test
 		@Tag("UserServiceTest")
-		@DisplayName("test getUserById should throw InvalidDataAccessApiUsageException")
+		@DisplayName("test getUserById should throw UnexpectedRollbackException on InvalidDataAccessApiUsageException")
 		public void getUserByIdTestShouldThrowsUnexpectedRollbackExceptionOnInvalidDataAccessApiUsageException() {
 			//GIVEN
 			when(userRepository.findById(nullable(Integer.class))).thenThrow(new InvalidDataAccessApiUsageException("The given id must not be null"));
 			
 			//WHEN
 			//THEN
-			assertThat(assertThrows(InvalidDataAccessApiUsageException.class,
+			assertThat(assertThrows(UnexpectedRollbackException.class,
 				() -> userService.getUserById(null, request))
-				.getMessage()).isEqualTo("Id must not be null");
+				.getMessage()).isEqualTo("Error while getting user");
 		}
 
 		@Test
 		@Tag("UserServiceTest")
-		@DisplayName("test getUserById should throw ResourceNotFoundException")
-		public void getUserByIdTestShouldThrowsResourceNotFoundException() {
+		@DisplayName("test getUserById should throw UnexpectedRollbackException on ResourceNotFoundException")
+		public void getUserByIdTestShouldThrowsUnexpectedRollbackExceptionOnResourceNotFoundException() {
 			//GIVEN
 			when(userRepository.findById(anyInt())).thenReturn(Optional.empty());
 			
 			//WHEN
 			//THEN
-			assertThat(assertThrows(ResourceNotFoundException.class,
+			assertThat(assertThrows(UnexpectedRollbackException.class,
 				() -> userService.getUserById(1, request))
-				.getMessage()).isEqualTo("User not found");
+				.getMessage()).isEqualTo("Error while getting user");
 		}
 		
 		@Test
@@ -266,7 +252,7 @@ public class UserServiceTest {
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
 				() -> userService.getUserById(1, request))
-				.getMessage()).isEqualTo("Error while getting user profile");
+				.getMessage()).isEqualTo("Error while getting user");
 		}
 	}
 	
@@ -330,30 +316,30 @@ public class UserServiceTest {
 		
 		@Test
 		@Tag("UserServiceTest")
-		@DisplayName("test getUserByIdWithBlankPasswd should throw InvalidDataAccessApiUsageException")
+		@DisplayName("test getUserByIdWithBlankPasswd should throw UnexpectedRollbackException on InvalidDataAccessApiUsageException")
 		public void getUserByIdWithBlankPasswdTestShouldThrowsUnexpectedRollbackExceptionOnInvalidDataAccessApiUsageException() {
 			//GIVEN
 			when(userRepository.findById(anyInt())).thenThrow(new InvalidDataAccessApiUsageException("The given id must not be null"));
 			
 			//WHEN
 			//THEN
-			assertThat(assertThrows(InvalidDataAccessApiUsageException.class,
+			assertThat(assertThrows(UnexpectedRollbackException.class,
 				() -> userService.getUserByIdWithBlankPasswd(1, request))
-				.getMessage()).isEqualTo("Id must not be null");
+				.getMessage()).isEqualTo("Error while getting user");
 		}
 
 		@Test
 		@Tag("UserServiceTest")
-		@DisplayName("test getUserByIdWithBlankPasswd should throw ResourceNotFoundException")
-		public void getUserByIdWithBlankPasswdTestShouldThrowsResourceNotFoundException() {
+		@DisplayName("test getUserByIdWithBlankPasswd should throw UnexpectedRollbackException on ResourceNotFoundException")
+		public void getUserByIdWithBlankPasswdTestShouldThrowUnexpectedRollbackExceptionOnResourceNotFoundException() {
 			//GIVEN
 			when(userRepository.findById(anyInt())).thenReturn(Optional.empty());
 			
 			//WHEN
 			//THEN
-			assertThat(assertThrows(ResourceNotFoundException.class,
+			assertThat(assertThrows(UnexpectedRollbackException.class,
 				() -> userService.getUserByIdWithBlankPasswd(1, request))
-				.getMessage()).isEqualTo("User not found");
+				.getMessage()).isEqualTo("Error while getting user");
 		}
 		
 		@Test
@@ -367,7 +353,7 @@ public class UserServiceTest {
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
 				() -> userService.getUserByIdWithBlankPasswd(1, request))
-				.getMessage()).isEqualTo("Error while getting user profile");
+				.getMessage()).isEqualTo("Error while getting user");
 		}
 	}
 	
@@ -621,7 +607,7 @@ public class UserServiceTest {
 		
 		@Test
 		@Tag("UserServiceTest")
-		@DisplayName("test deleteUser by Id by Id should throw ResourceNotFoundException")
+		@DisplayName("test deleteUser by Id by Id should throw UnexpectedRollbackException on ResourceNotFoundException")
 		public void deleteUserByIdTestShouldThrowUnexpectedRollbackExceptionOnResourceNotFoundException() {
 
 			//GIVEN
@@ -629,9 +615,9 @@ public class UserServiceTest {
 
 			//WHEN
 			//THEN
-			assertThat(assertThrows(ResourceNotFoundException.class,
+			assertThat(assertThrows(UnexpectedRollbackException.class,
 					() -> userService.deleteUserById(2, request))
-					.getMessage()).isEqualTo("User not found");
+					.getMessage()).isEqualTo("Error while deleting user");
 		}	
 
 		@Test
