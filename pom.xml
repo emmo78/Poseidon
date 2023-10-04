@@ -17,7 +17,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.1.2</version>
+		<version>3.1.4</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 
@@ -124,7 +124,7 @@
 		<dependency>
 			<groupId>org.passay</groupId>
 			<artifactId>passay</artifactId>
-			<version>1.6.3</version>
+			<version>1.6.4</version>
 		</dependency>
 		<!-- Support for common test dependencies, including JUnit, AssertJ, Hamcrest and Mockito -->
 		<dependency>
@@ -217,7 +217,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>
-				<version>4.0.0-M8</version>
+				<version>4.0.0-M9</version>
 			</plugin>
 		</plugins>
 	</build>
@@ -230,14 +230,12 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>3.4.5</version>
 			</plugin>
 
 			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-javadoc-plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.5.0</version>
 				<reportSets>
 					<reportSet><!-- by default, id = "default" -->
 						<reports><!-- select non-aggregate reports -->
@@ -260,7 +258,6 @@
 			<plugin>
 				<groupId>com.github.spotbugs</groupId>
 				<artifactId>spotbugs-maven-plugin</artifactId>
-				<version>4.7.3.5</version>
 			</plugin>
 			
 			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-report-plugin -->
@@ -269,7 +266,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>3.1.2</version>
 			</plugin>
 
 			<!-- https://www.eclemma.org/jacoco/trunk/doc/maven.html -->

@@ -255,12 +255,24 @@ public class UserRepositoryIT {
 	}
 	@Test
 	@Tag("UserRepositoryIT")
-	@DisplayName("find by Id null  should throw an InvalidDataAccessApiUsageException")
+	@DisplayName("find by Id null should throw an InvalidDataAccessApiUsageException")
 	public void findByIdNullShouldThrowAnInvalidDataAccessApiUsageException() {
 		//GIVEN
 		//WHEN
 		//THEN
 		assertThat(assertThrows(InvalidDataAccessApiUsageException.class, () -> userRepository.findById(null)).getMessage())
 				.contains("The given id must not be null");
+	}
+
+	@Test
+	@Tag("UserReositoyIT")
+	@DisplayName("delete null should throw an InvalidDataAccessApiUsageException")
+	public void deleteNullShouldThrowAnInvalidDataAccessApiUsageException() {
+		//GIVEN
+		User user = null;
+		//WHEN
+		//THEN
+		assertThat(assertThrows(InvalidDataAccessApiUsageException.class, () -> userRepository.delete(user)).getMessage())
+				.contains("Entity must not be null");
 	}
 }

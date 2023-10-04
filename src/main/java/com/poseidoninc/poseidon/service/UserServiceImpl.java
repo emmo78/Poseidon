@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
 	private final UserRepository userRepository;
 	private final RequestService requestService;
 	private final PasswordEncoder passwordEncoder;
-	
+
 	@Override
 	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
 	public User getUserByUserName(String userName, WebRequest request) throws UnexpectedRollbackException {
@@ -66,6 +66,7 @@ public class UserServiceImpl implements UserService {
 	}
 	
 	@Override
+	@Transactional(readOnly = true, rollbackFor = {UnexpectedRollbackException.class})
 	public User getUserByIdWithBlankPasswd(Integer userId, WebRequest request) throws UnexpectedRollbackException {
 		User user = getUserById(userId, request);
 		user.setPassword("");
@@ -118,8 +119,8 @@ public class UserServiceImpl implements UserService {
 	@Transactional(rollbackFor = {UnexpectedRollbackException.class})
 	public void deleteUserById(Integer id, WebRequest request) throws UnexpectedRollbackException {
 		try {
-			userRepository.delete(getUserById(id, request)); //getUserById throws ResourceNotFoundException, InvalidDataAccessApiUsageException, UnexpectedRollbackException
-		} catch(InvalidDataAccessApiUsageException | ResourceNotFoundException | OptimisticLockingFailureException re) {
+			userRepository.delete(getUserById(id, request)); //getUserById throws  UnexpectedRollbackException
+		} catch(UnexpectedRollbackException | InvalidDataAccessApiUsageException | OptimisticLockingFailureException re) {
 			log.error("{} : user={} : {} ", requestService.requestToString(request), id, re.toString());
 			throw new UnexpectedRollbackException("Error while deleting user");
 		} catch(Exception e) {
