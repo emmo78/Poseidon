@@ -41,6 +41,9 @@ public class UserServiceTest {
 	private UserRepository userRepository;
 
 	@Spy
+	private final RequestService requestService = new RequestServiceImpl();
+
+	@Spy
 	private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 	
 	private MockHttpServletRequest requestMock;
@@ -116,8 +119,8 @@ public class UserServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> userService.getUserByUserName("aaa@aaa.com", request))
-				.getMessage()).isEqualTo("Error while getting user profile");
+				() -> userService.getUserByUserName("Aaa", request))
+				.getMessage()).isEqualTo("Error while getting user");
 		}
 		
 		@Test
@@ -130,8 +133,8 @@ public class UserServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> userService.getUserByUserName("aaa@aaa.com", request))
-				.getMessage()).isEqualTo("Error while getting user profile");
+				() -> userService.getUserByUserName("Aaa", request))
+				.getMessage()).isEqualTo("Error while getting user");
 		}
 	}
 
@@ -299,12 +302,12 @@ public class UserServiceTest {
 		@DisplayName("test getUserByIdWithBlankPasswd should throw UnexpectedRollbackException on InvalidDataAccessApiUsageException")
 		public void getUserByIdWithBlankPasswdTestShouldThrowsUnexpectedRollbackExceptionOnInvalidDataAccessApiUsageException() {
 			//GIVEN
-			when(userRepository.findById(anyInt())).thenThrow(new InvalidDataAccessApiUsageException("The given id must not be null"));
+			when(userRepository.findById(isNull())).thenThrow(new InvalidDataAccessApiUsageException("The given id must not be null"));
 			
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> userService.getUserByIdWithBlankPasswd(1, request))
+				() -> userService.getUserByIdWithBlankPasswd(null, request))
 				.getMessage()).isEqualTo("Error while getting user");
 		}
 
@@ -523,25 +526,12 @@ public class UserServiceTest {
 	@Nested
 	@Tag("deleteUserTests")
 	@DisplayName("Tests for deleting users")
-	@TestInstance(Lifecycle.PER_CLASS)
 	class DeleteUserTests {
-		
-		@BeforeAll
-		public void setUpForAllTests() {
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/user/delete/1");
-			request = new ServletWebRequest(requestMock);
-		}
 
-		@AfterAll
-		public void unSetForAllTests() {
-			requestMock = null;
-			request = null;
-		}
-		
 		@BeforeEach
 		public void setUpForEachTest() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
 			user = new User();
 			user.setId(1);
 			user.setUsername("Aaa");
@@ -554,6 +544,8 @@ public class UserServiceTest {
 		public void unSetForEachTests() {
 			userService = null;
 			user = null;
+			requestMock = null;
+			request = null;
 		}
 
 		@Test
@@ -562,6 +554,8 @@ public class UserServiceTest {
 		public void deleteUserByIdTestShouldDeleteIt() {
 			
 			//GIVEN
+			requestMock.setRequestURI("/user/delete/1");
+			request = new ServletWebRequest(requestMock);
 			when(userRepository.findById(anyInt())).thenReturn(Optional.of(user));
 			ArgumentCaptor<User> userBeingDeleted = ArgumentCaptor.forClass(User.class);
 			doNothing().when(userRepository).delete(any(User.class));// Needed to Capture user
@@ -591,6 +585,8 @@ public class UserServiceTest {
 		public void deleteUserByIdTestShouldThrowUnexpectedRollbackExceptionOnUnexpectedRollbackException() {
 
 			//GIVEN
+			requestMock.setRequestURI("/user/delete/2");
+			request = new ServletWebRequest(requestMock);
 			when(userRepository.findById(anyInt())).thenThrow(new UnexpectedRollbackException("Error while getting user"));
 
 			//WHEN
@@ -606,6 +602,8 @@ public class UserServiceTest {
 		public void deleteUserByIdTestShouldThrowsUnexpectedRollbackExceptionOnInvalidDataAccessApiUsageException() {
 
 			//GIVEN
+			requestMock.setRequestURI("/user/delete/1");
+			request = new ServletWebRequest(requestMock);
 			when(userRepository.findById(anyInt())).thenReturn(Optional.of(user));
 			doThrow(new InvalidDataAccessApiUsageException("Entity must not be null")).when(userRepository).delete(any(User.class));
 			//WHEN
@@ -622,6 +620,8 @@ public class UserServiceTest {
 		public void deleteUserByIdTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
 
 			//GIVEN
+			requestMock.setRequestURI("/user/delete/1");
+			request = new ServletWebRequest(requestMock);
 			when(userRepository.findById(anyInt())).thenReturn(Optional.of(user));
 			doThrow(new RuntimeException()).when(userRepository).delete(any(User.class));
 			//WHEN

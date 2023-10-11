@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,7 +42,7 @@ public class UserController {
         try {
             userService.saveUser(user, request);
         } catch (DataIntegrityViolationException dive) {
-            result.rejectValue("username", "error.use", dive.getMessage());
+            result.addError(new FieldError("User", "username", dive.getMessage()));
             return "user/add";
         }
         return "redirect:/user/list";
@@ -62,7 +63,7 @@ public class UserController {
         try {
             userService.saveUser(user, request);
         } catch (DataIntegrityViolationException dive) {
-            result.rejectValue("username", "error.use", dive.getMessage());
+            result.addError(new FieldError("User", "username", dive.getMessage()));
             return "user/update";
         }
         return "redirect:/user/list";

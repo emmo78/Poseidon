@@ -1,24 +1,20 @@
 package com.poseidoninc.poseidon.service;
 
-import java.util.Optional;
-
+import com.poseidoninc.poseidon.domain.User;
+import com.poseidoninc.poseidon.repository.UserRepository;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.WebRequest;
 
-import com.poseidoninc.poseidon.domain.User;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import com.poseidoninc.poseidon.repository.UserRepository;
-
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -32,36 +28,30 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
 	public User getUserByUserName(String userName, WebRequest request) throws UnexpectedRollbackException {
-		User user = null;
+		User user;
 		try {
 			//Throws ResourceNotFoundException
 			user = Optional.ofNullable(userRepository.findByUsername(userName)).orElseThrow(() -> new ResourceNotFoundException("User not found"));
-		} catch(ResourceNotFoundException rnfe) {
-			log.error("{} : user={} : {} ", requestService.requestToString(request), userName, rnfe.toString());
-			throw new UnexpectedRollbackException("Error while getting user profile");
 		} catch (Exception e) {
-			log.error("{} : user={} : {} ", requestService.requestToString(request), userName, e.toString());
-			throw new UnexpectedRollbackException("Error while getting user profile");
+			log.error("{} : userName={} : {} ", requestService.requestToString(request), userName, e.toString());
+			throw new UnexpectedRollbackException("Error while getting user");
 		}
-		log.info("{} : user={} gotten",  requestService.requestToString(request), user.getUsername());
+		log.info("{} : user={} gotten",  requestService.requestToString(request), user.toString());
 		return user;
 	}
 
 	@Override
 	@Transactional(readOnly = true, rollbackFor = {UnexpectedRollbackException.class})
 	public User getUserById(Integer id, WebRequest request) throws UnexpectedRollbackException {
-		User user = null;
+		User user;
 		try {
 			//Throws ResourceNotFoundException | InvalidDataAccessApiUsageException
 			user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
-		} catch(InvalidDataAccessApiUsageException | ResourceNotFoundException re) {
-			log.error("{} : {} ", requestService.requestToString(request), re.toString());
-			throw new UnexpectedRollbackException("Error while getting user");
 		} catch (Exception e) {
-			log.error("{} : user={} : {} ", requestService.requestToString(request), id, e.toString());
+			log.error("{} : userId={} : {} ", requestService.requestToString(request), id, e.toString());
 			throw new UnexpectedRollbackException("Error while getting user");
 		}
-		log.info("{} : user={} gotten",  requestService.requestToString(request), user.getId());
+		log.info("{} : user={} gotten",  requestService.requestToString(request), user.toString());
 		return user;
 	}
 	
@@ -76,13 +66,10 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
 	public Page<User> getUsers(Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException {
-		Page<User> pageUsers = null;
+		Page<User> pageUsers;
 		try {
 			//throws NullPointerException if pageRequest is null
 			pageUsers = userRepository.findAll(pageRequest);
-		} catch(NullPointerException npe) {
-			log.error("{} : {} ", requestService.requestToString(request), npe.toString());
-			throw new UnexpectedRollbackException("Error while getting Users");
 		} catch(Exception e) {
 			log.error("{} : {} ", requestService.requestToString(request), e.toString());
 			throw new UnexpectedRollbackException("Error while getting Users");
@@ -101,17 +88,14 @@ public class UserServiceImpl implements UserService {
 		try {
 			//No need to test blank or null fields for update because constraint validation on each field
 			user = userRepository.save(user);
-		} catch(InvalidDataAccessApiUsageException | OptimisticLockingFailureException re) {
-			log.error("{} : user={} : {} ", requestService.requestToString(request), user.getId(), re.toString());
-			throw new UnexpectedRollbackException("Error while saving user");
 		} catch(DataIntegrityViolationException dive) {
-			log.error("{} : user={} : {} ", requestService.requestToString(request), user.getId(), dive.toString());
+			log.error("{} : user={} : {} ", requestService.requestToString(request), user.toString(), dive.toString());
 			throw new DataIntegrityViolationException("Username already exist, try another one");
 		} catch(Exception e) {
-			log.error("{} : user={} : {} ", requestService.requestToString(request), user.getId(), e.toString());
+			log.error("{} : user={} : {} ", requestService.requestToString(request), user.toString(), e.toString());
 			throw new UnexpectedRollbackException("Error while saving user");
 		}
-		log.info("{} : user={} persisted", requestService.requestToString(request), user.getId());
+		log.info("{} : user={} persisted", requestService.requestToString(request), user.toString());
 		return user;
 	}
 
@@ -120,13 +104,10 @@ public class UserServiceImpl implements UserService {
 	public void deleteUserById(Integer id, WebRequest request) throws UnexpectedRollbackException {
 		try {
 			userRepository.delete(getUserById(id, request)); //getUserById throws  UnexpectedRollbackException
-		} catch(UnexpectedRollbackException | InvalidDataAccessApiUsageException | OptimisticLockingFailureException re) {
-			log.error("{} : user={} : {} ", requestService.requestToString(request), id, re.toString());
-			throw new UnexpectedRollbackException("Error while deleting user");
 		} catch(Exception e) {
-			log.error("{} : user={} : {} ", requestService.requestToString(request), id, e.toString());
+			log.error("{} : userId={} : {} ", requestService.requestToString(request), id, e.toString());
 			throw new UnexpectedRollbackException("Error while deleting user");
 		}
-		log.info("{} : user={} deleted", requestService.requestToString(request), id);
+		log.info("{} : userId={} deleted", requestService.requestToString(request), id);
 	}
 }

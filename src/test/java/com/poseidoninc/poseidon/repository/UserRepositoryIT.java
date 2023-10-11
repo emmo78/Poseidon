@@ -247,7 +247,7 @@ public class UserRepositoryIT {
 			userRepository.saveAndFlush(user);
 	
 			//WHEN
-			User userResult = userRepository.findByUsername(null);
+			User userResult = assertDoesNotThrow(() -> userRepository.findByUsername(null));
 			
 			//THEN
 			assertThat(userResult).isNull();	
