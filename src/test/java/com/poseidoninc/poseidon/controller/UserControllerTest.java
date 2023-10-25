@@ -168,7 +168,7 @@ public class UserControllerTest {
 	@Test
 	@Tag("UserControllerTest")
 	@DisplayName("test updateUser should return \"user/update\" on DataIntegrityViolationException")
-	public void updateUserTestShouldReturnStringUserAddDataIntegrityViolationException() {
+	public void updateUserTestShouldReturnStringUserUpdateDataIntegrityViolationException() {
 
 		//GIVEN
 		User user = new User();

@@ -1,21 +1,33 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="utf-8"/>
-    <title>Internal Error</title>
-    <link rel="stylesheet" type="text/css"
-          href="../../static/css/bootstrap.min.css"
-          th:href="@{/css/bootstrap.min.css}" />
-</head>
-<body>
-    <h3>Internal Error</h3>
-    <div>
-        Logged in user: <b th:inline="text"  class="user"> [[${#httpServletRequest.remoteUser}]] </b>
-        <form th:action="@{/app-logout}" method="POST">
-            <input type="submit" value="Logout"/>
-        </form>
-    </div>
-    <p class="error" th:text="${errorMessage}">INTERNAL SERVER ERROR></p>
-</body>
+    <head>
+        <meta charset="utf-8"/>
+        <title>Internal Error</title>
+        <link rel="stylesheet" type="text/css"
+              href="../static/css/bootstrap.min.css"
+              th:href="@{/css/bootstrap.min.css}" />
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col-6">
+                    <a href="/">Home</a>
+                </div>
+                <div class="col-6 text-right" th:if="${#authorization.expression('isAuthenticated()')}">
+                    Logged in user: <b th:inline="text"  class="user"> [[${#httpServletRequest.remoteUser}]] </b>
+                    <form th:action="@{/app-logout}" method="POST">
+                        <input type="submit" value="Logout"/>
+                    </form>
+                </div>
+            </div>
+            <div class="row">
+                <h3>Internal Error</h3>
+            </div>
+            <br>
+            <div class="row">
+                <div class="error" th:text="${errorMessage}">INTERNAL SERVER ERROR></div>
+            </div>
+        </div>
+    </body>
 </html>

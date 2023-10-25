@@ -133,9 +133,9 @@ public class CurvePointServiceTest {
 			
 			//WHEN
 			//THEN
-			assertThat(assertThrows(InvalidDataAccessApiUsageException.class,
+			assertThat(assertThrows(UnexpectedRollbackException.class,
 				() -> curvePointService.getCurvePointById(null, request))
-				.getMessage()).isEqualTo("Id must not be null");
+				.getMessage()).isEqualTo("Error while getting curvePoint");
 		}
 
 		@Test
@@ -147,9 +147,9 @@ public class CurvePointServiceTest {
 			
 			//WHEN
 			//THEN
-			assertThat(assertThrows(ResourceNotFoundException.class,
+			assertThat(assertThrows(UnexpectedRollbackException.class,
 				() -> curvePointService.getCurvePointById(1, request))
-				.getMessage()).isEqualTo("Curve Point not found");
+				.getMessage()).isEqualTo("Error while getting curvePoint");
 		}
 		
 		@Test
@@ -241,7 +241,7 @@ public class CurvePointServiceTest {
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
 					() -> curvePointService.getCurvePoints(pageRequest, request))
-					.getMessage()).isEqualTo("Error while getting CurvePoints");
+					.getMessage()).isEqualTo("Error while getting curvePoints");
 		}
 		
 		@Test
@@ -254,7 +254,7 @@ public class CurvePointServiceTest {
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
 					() -> curvePointService.getCurvePoints(pageRequest, request))
-					.getMessage()).isEqualTo("Error while getting CurvePoints");
+					.getMessage()).isEqualTo("Error while getting curvePoints");
 		}
 	}
 	
@@ -437,9 +437,9 @@ public class CurvePointServiceTest {
 
 			//WHEN
 			//THEN
-			assertThat(assertThrows(ResourceNotFoundException.class,
+			assertThat(assertThrows(UnexpectedRollbackException.class,
 					() -> curvePointService.deleteCurvePointById(2, request))
-					.getMessage()).isEqualTo("CurvePoint not found");
+					.getMessage()).isEqualTo("Error while deleting curvePoint");
 		}	
 
 		@Test

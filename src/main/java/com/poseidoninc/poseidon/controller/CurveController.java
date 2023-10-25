@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,37 +35,47 @@ public class CurveController {
     }
 
     @GetMapping("/curvePoint/add")
-    public String addBCurvePoint(CurvePoint curvePoint) {
+    public String addCurvePoint(CurvePoint curvePoint) {
         return "curvePoint/add";
     }
 
     @PostMapping("/curvePoint/validate")
-    public String validate(@Valid CurvePoint curvePoint, BindingResult result, WebRequest request) throws DataIntegrityViolationException, ResourceNotFoundException, UnexpectedRollbackException {
+    public String validate(@Valid CurvePoint curvePoint, BindingResult result, WebRequest request) throws UnexpectedRollbackException {
 		if (result.hasErrors()) {
 			return "curvePoint/add";
 		}
-		curvePointService.saveCurvePoint(curvePoint, request);
+        try {
+            curvePointService.saveCurvePoint(curvePoint, request);
+        } catch (DataIntegrityViolationException dive) {
+            result.addError(new FieldError("CurvePoint", "curveId", dive.getMessage()));
+            return "curvePoint/add";
+        }
 		return "redirect:/curvePoint/list";
     }
 
     @GetMapping("/curvePoint/update/{id}")
-    public String showUpdateForm(@PathVariable("id") Integer id, Model model, WebRequest request) throws ResourceNotFoundException, InvalidDataAccessApiUsageException, UnexpectedRollbackException {
+    public String showUpdateForm(@PathVariable("id") Integer id, Model model, WebRequest request) throws UnexpectedRollbackException {
     	CurvePoint curvePoint = curvePointService.getCurvePointById(id, request);
 		model.addAttribute("curvePoint", curvePoint);
         return "curvePoint/update";
     }
 
     @PostMapping("/curvePoint/update")
-    public String updateBid(@Valid CurvePoint curvePoint, BindingResult result, WebRequest request) throws DataIntegrityViolationException, ResourceNotFoundException, UnexpectedRollbackException {
+    public String updateCurvePoint(@Valid CurvePoint curvePoint, BindingResult result, WebRequest request) throws UnexpectedRollbackException {
 		if (result.hasErrors()) {
-			return "user/update";
+			return "curvePoint/update";
 		}
-		curvePointService.saveCurvePoint(curvePoint, request);
+        try {
+            curvePointService.saveCurvePoint(curvePoint, request);
+        } catch (DataIntegrityViolationException dive) {
+            result.addError(new FieldError("CurvePoint", "curveId", dive.getMessage()));
+            return "curvePoint/update";
+        }
         return "redirect:/curvePoint/list";
     }
 
     @GetMapping("/curvePoint/delete/{id}")
-    public String deleteBid(@PathVariable("id") Integer id, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException {
+    public String deleteCurvePoint(@PathVariable("id") Integer id, WebRequest request) throws UnexpectedRollbackException {
 		curvePointService.deleteCurvePointById(id, request);
         return "redirect:/curvePoint/list";
     }

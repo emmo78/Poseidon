@@ -112,7 +112,7 @@ public class UserServiceTest {
 		@Test
 		@Tag("UserServiceTest")
 		@DisplayName("test getUserByUserName should throw UnexpectedRollbackException on ResourceNotFoundException")
-		public void getUserByUserNameTestShouldThrowsResourceNotFoundException() {
+		public void getUserByUserNameTestShouldThrowsUnexpectedRollbackExceptionOnResourceNotFoundException() {
 			//GIVEN
 			when(userRepository.findByUsername(anyString())).thenReturn(null);
 			

@@ -10,13 +10,10 @@
 	</head>
 	<body>
 		<div class="container">
-		
 			<div class="row">
 				<h2>Add New User</h2>
 			</div>
-		
 			<div class="row">
-				<!--/*@thymesVar id="user" type="User"*/-->
 				<form action="/user/validate" th:action="@{/user/validate}" th:object="${user}" method="post" class="form-horizontal" style="width: 100%">
 					<div class="form-group">
 						<label for="fullname" class="col-sm-2 control-label">Full Name</label>

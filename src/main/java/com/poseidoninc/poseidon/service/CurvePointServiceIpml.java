@@ -26,18 +26,12 @@ public class CurvePointServiceIpml implements CurvePointService {
 	private final RequestService requestService;
 
 	@Override
-	@Transactional(readOnly = true, rollbackFor = {ResourceNotFoundException.class, InvalidDataAccessApiUsageException.class, UnexpectedRollbackException.class})
-	public CurvePoint getCurvePointById(Integer id, WebRequest request) throws ResourceNotFoundException, InvalidDataAccessApiUsageException, UnexpectedRollbackException {
-		CurvePoint curvePoint = null;
+	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
+	public CurvePoint getCurvePointById(Integer id, WebRequest request) throws UnexpectedRollbackException {
+		CurvePoint curvePoint;
 		try {
 			//Throws ResourceNotFoundException | InvalidDataAccessApiUsageException
 			curvePoint = curvePointRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Curve Point not found"));
-		} catch(InvalidDataAccessApiUsageException idaaue) {
-			log.error("{} : {} ", requestService.requestToString(request), idaaue.toString());
-			throw new InvalidDataAccessApiUsageException ("Id must not be null");
-		} catch(ResourceNotFoundException  rnfe) {
-			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), id, rnfe.toString());
-			throw new ResourceNotFoundException(rnfe.getMessage());
 		} catch (Exception e) {
 			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), id, e.toString());
 			throw new UnexpectedRollbackException("Error while getting curvePoint");
@@ -49,16 +43,13 @@ public class CurvePointServiceIpml implements CurvePointService {
 	@Override
 	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
 	public Page<CurvePoint> getCurvePoints(Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException {
-		Page<CurvePoint> pageCurvePoints = null;
+		Page<CurvePoint> pageCurvePoints;
 		try {
 			//throws NullPointerException if pageRequest is null
 			pageCurvePoints = curvePointRepository.findAll(pageRequest);
-		} catch(NullPointerException npe) {
-			log.error("{} : {} ", requestService.requestToString(request), npe.toString());
-			throw new UnexpectedRollbackException("Error while getting CurvePoints");
 		} catch(Exception e) {
 			log.error("{} : {} ", requestService.requestToString(request), e.toString());
-			throw new UnexpectedRollbackException("Error while getting CurvePoints");
+			throw new UnexpectedRollbackException("Error while getting curvePoints");
 		}
 		log.info("{} : curvePoints page number : {} of {}",
 			requestService.requestToString(request),
@@ -73,31 +64,22 @@ public class CurvePointServiceIpml implements CurvePointService {
 		try {
 			//No need to test blank or null fields for update because constraint validation on each field
 			curvePoint = curvePointRepository.save(curvePoint);
-		}  catch(InvalidDataAccessApiUsageException | OptimisticLockingFailureException re) {
-			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), curvePoint.getId(), re.toString());
-			throw new UnexpectedRollbackException("Error while saving curvePoint");
 		} catch(DataIntegrityViolationException dive) {
-			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), curvePoint.getId(), dive.toString());
+			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), curvePoint.toString(), dive.toString());
 			throw new DataIntegrityViolationException("CurveId already exists");
 		} catch(Exception e) {
-			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), curvePoint.getId(), e.toString());
+			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), curvePoint.toString(), e.toString());
 			throw new UnexpectedRollbackException("Error while saving curvePoint");
 		}
-		log.info("{} : curvePoint={} persisted", requestService.requestToString(request), curvePoint.getId());
+		log.info("{} : curvePoint={} persisted", requestService.requestToString(request), curvePoint.toString());
 		return curvePoint;
 	}
 
 	@Override
-	@Transactional(rollbackFor = {ResourceNotFoundException.class, UnexpectedRollbackException.class})
-	public void deleteCurvePointById(Integer id, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException {
+	@Transactional(rollbackFor = {UnexpectedRollbackException.class})
+	public void deleteCurvePointById(Integer id, WebRequest request) throws UnexpectedRollbackException {
 		try {
 			curvePointRepository.delete(getCurvePointById(id, request)); //getCurvePointById throws ResourceNotFoundException, InvalidDataAccessApiUsageException, UnexpectedRollbackException
-		} catch(InvalidDataAccessApiUsageException | OptimisticLockingFailureException re) {
-			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), id, re.toString());
-			throw new UnexpectedRollbackException("Error while deleting curvePoint");
-		} catch(ResourceNotFoundException  rnfe) {
-			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), id, rnfe.toString());
-			throw new ResourceNotFoundException(rnfe.getMessage());
 		} catch(Exception e) {
 			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), id, e.toString());
 			throw new UnexpectedRollbackException("Error while deleting curvePoint");
