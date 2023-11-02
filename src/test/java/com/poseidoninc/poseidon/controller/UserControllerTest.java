@@ -43,7 +43,7 @@ public class UserControllerTest {
 
 	@Test
 	@Tag("UserControllerTest")
-	@DisplayName("test home should return \"user list\" ")
+	@DisplayName("test home should return \"user/list\" ")
 	public void homeTest() {
 		
 		//GIVEN

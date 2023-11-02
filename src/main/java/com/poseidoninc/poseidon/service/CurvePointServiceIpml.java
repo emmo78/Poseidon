@@ -36,7 +36,7 @@ public class CurvePointServiceIpml implements CurvePointService {
 			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), id, e.toString());
 			throw new UnexpectedRollbackException("Error while getting curvePoint");
 		}
-		log.info("{} : curvePoint={} gotten",  requestService.requestToString(request), curvePoint.getId());
+		log.info("{} : curvePoint={} gotten",  requestService.requestToString(request), curvePoint.toString());
 		return curvePoint;
 	}
 
@@ -76,10 +76,10 @@ public class CurvePointServiceIpml implements CurvePointService {
 	}
 
 	@Override
-	@Transactional(rollbackFor = {UnexpectedRollbackException.class})
+	@Transactional(rollbackFor = UnexpectedRollbackException.class)
 	public void deleteCurvePointById(Integer id, WebRequest request) throws UnexpectedRollbackException {
 		try {
-			curvePointRepository.delete(getCurvePointById(id, request)); //getCurvePointById throws ResourceNotFoundException, InvalidDataAccessApiUsageException, UnexpectedRollbackException
+			curvePointRepository.delete(getCurvePointById(id, request)); //getCurvePointById throws UnexpectedRollbackException
 		} catch(Exception e) {
 			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), id, e.toString());
 			throw new UnexpectedRollbackException("Error while deleting curvePoint");

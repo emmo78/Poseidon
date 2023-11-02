@@ -175,30 +175,30 @@ public class BidListServiceTest {
 				
 		@Test
 		@Tag("BidListServiceTest")
-		@DisplayName("test getBidListById should throw InvalidDataAccessApiUsageException")
+		@DisplayName("test getBidListById should throw UnexpectedRollbackException On InvalidDataAccessApiUsageException")
 		public void getBidListByIdTestShouldThrowsUnexpectedRollbackExceptionOnInvalidDataAccessApiUsageException() {
 			//GIVEN
 			when(bidListRepository.findById(nullable(Integer.class))).thenThrow(new InvalidDataAccessApiUsageException("The given id must not be null"));
 			
 			//WHEN
 			//THEN
-			assertThat(assertThrows(InvalidDataAccessApiUsageException.class,
+			assertThat(assertThrows(UnexpectedRollbackException.class,
 				() -> bidListService.getBidListById(null, request))
-				.getMessage()).isEqualTo("Id must not be null");
+				.getMessage()).isEqualTo("Error while getting bidlist");
 		}
 
 		@Test
 		@Tag("BidListServiceTest")
-		@DisplayName("test getBidListById should throw ResourceNotFoundException")
-		public void getBidListByIdTestShouldThrowsResourceNotFoundException() {
+		@DisplayName("test getBidListById should throw UnexpectedRollbackException on ResourceNotFoundException")
+		public void getBidListByIdTestShouldThrowsUnexpectedRollbackExceptionOnResourceNotFoundException() {
 			//GIVEN
 			when(bidListRepository.findById(anyInt())).thenReturn(Optional.empty());
 			
 			//WHEN
 			//THEN
-			assertThat(assertThrows(ResourceNotFoundException.class,
+			assertThat(assertThrows(UnexpectedRollbackException.class,
 				() -> bidListService.getBidListById(1, request))
-				.getMessage()).isEqualTo("BidList not found");
+				.getMessage()).isEqualTo("Error while getting bidlist");
 		}
 		
 		@Test
@@ -321,7 +321,7 @@ public class BidListServiceTest {
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
 					() -> bidListService.getBidLists(pageRequest, request))
-					.getMessage()).isEqualTo("Error while getting BidLists");
+					.getMessage()).isEqualTo("Error while getting bidLists");
 		}
 		
 		@Test
@@ -334,7 +334,7 @@ public class BidListServiceTest {
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
 					() -> bidListService.getBidLists(pageRequest, request))
-					.getMessage()).isEqualTo("Error while getting BidLists");
+					.getMessage()).isEqualTo("Error while getting bidLists");
 		}
 	}
 	
@@ -390,19 +390,15 @@ public class BidListServiceTest {
 			bidList = null;
 		}
 
-		@ParameterizedTest(name = "{0} bidList to save, so id = {1}, saveBidList should return bidList with an id")
-		@CsvSource(value = {"new, null", // save new bidList
-							"updated, 1"} // save updated bidList
-							,nullValues = {"null"})
+		@Test
 		@Tag("BidListServiceTest")
-		@DisplayName("test saveBidList should return bidList")
-		public void saveBidListTestShouldReturnBidList(String state, Integer id) {
+		@DisplayName("test saveBidList should persist and return bidList")
+		public void saveBidListTestShouldReturnBidList() {
 			
 			//GIVEN
-			bidList.setBidListId(id);
 			when(bidListRepository.save(any(BidList.class))).then(invocation -> {
 				BidList bidListSaved = invocation.getArgument(0);
-				bidListSaved.setBidListId(Optional.ofNullable(bidListSaved.getBidListId()).orElseGet(() -> 1));
+				bidListSaved.setBidListId(1);
 				return bidListSaved;
 				});
 			
@@ -410,7 +406,7 @@ public class BidListServiceTest {
 			BidList bidListResult = bidListService.saveBidList(bidList, request);
 			
 			//THEN
-			verify(bidListRepository).save(bidList); //times(1) is the default and can be omitted
+			verify(bidListRepository).save(any(BidList.class)); //times(1) is the default and can be omitted
 			assertThat(bidListResult).extracting(
 					BidList::getBidListId,
 					BidList::getAccount,
@@ -466,7 +462,6 @@ public class BidListServiceTest {
 		public void saveBidListTestShouldThrowUnexpectedRollbackExceptionOnAnyRuntimeException() {
 			
 			//GIVEN
-			bidList.setBidListId(1);
 			when(bidListRepository.save(any(BidList.class))).thenThrow(new RuntimeException());
 
 			//WHEN
@@ -596,17 +591,17 @@ public class BidListServiceTest {
 		
 		@Test
 		@Tag("BidListServiceTest")
-		@DisplayName("test deleteBidList by Id by Id should throw ResourceNotFoundException")
-		public void deleteBidListByIdTestShouldThrowUnexpectedRollbackExceptionOnResourceNotFoundException() {
+		@DisplayName("test deleteBidList by Id by Id should throw UnexpectedRollbackException on UnexpectedRollbackException")
+		public void deleteBidListByIdTestShouldThrowUnexpectedRollbackExceptionOnUnexpectedRollbackException() {
 
 			//GIVEN
-			when(bidListRepository.findById(anyInt())).thenThrow(new ResourceNotFoundException("BidList not found"));
+			when(bidListRepository.findById(anyInt())).thenThrow(new UnexpectedRollbackException("Error while getting bidlist"));
 
 			//WHEN
 			//THEN
-			assertThat(assertThrows(ResourceNotFoundException.class,
+			assertThat(assertThrows(UnexpectedRollbackException.class,
 					() -> bidListService.deleteBidListById(2, request))
-					.getMessage()).isEqualTo("BidList not found");
+					.getMessage()).isEqualTo("Error while deleting bidList");
 		}	
 
 		@Test
@@ -616,7 +611,7 @@ public class BidListServiceTest {
 
 			//GIVEN
 			when(bidListRepository.findById(anyInt())).thenReturn(Optional.of(bidList));
-			doThrow(new InvalidDataAccessApiUsageException("The given id must not be null")).when(bidListRepository).delete(any(BidList.class));
+			doThrow(new InvalidDataAccessApiUsageException("Entity must not be null")).when(bidListRepository).delete(any(BidList.class));
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,

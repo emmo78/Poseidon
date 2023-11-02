@@ -13,7 +13,7 @@
         <div class="row">
             <h3> HOME PAGE </h3>
         </div>
-        <div class="row">
+        <div class="row" th:unless="${#authorization.expression('isAuthenticated()')}>
             <div class="col-6">
                 <a href="/login">Login</a> or create one <a href="/user/add">Register</a>
             </div>

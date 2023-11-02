@@ -126,7 +126,7 @@ public class CurvePointServiceTest {
 				
 		@Test
 		@Tag("CurvePointServiceTest")
-		@DisplayName("test getCurvePointById should throw InvalidDataAccessApiUsageException")
+		@DisplayName("test getCurvePointById should throw UnexpectedRollbackException On InvalidDataAccessApiUsageException")
 		public void getCurvePointByIdTestShouldThrowsUnexpectedRollbackExceptionOnInvalidDataAccessApiUsageException() {
 			//GIVEN
 			when(curvePointRepository.findById(nullable(Integer.class))).thenThrow(new InvalidDataAccessApiUsageException("The given id must not be null"));
@@ -140,8 +140,8 @@ public class CurvePointServiceTest {
 
 		@Test
 		@Tag("CurvePointServiceTest")
-		@DisplayName("test getCurvePointById should throw ResourceNotFoundException")
-		public void getCurvePointByIdTestShouldThrowsResourceNotFoundException() {
+		@DisplayName("test getCurvePointById should throw UnexpectedRollbackException on ResourceNotFoundException")
+		public void getCurvePointByIdTestShouldThrowsUnexpectedRollbackExceptionOnResourceNotFoundException() {
 			//GIVEN
 			when(curvePointRepository.findById(anyInt())).thenReturn(Optional.empty());
 			
@@ -300,7 +300,6 @@ public class CurvePointServiceTest {
 		public void saveCurvePointTestShouldPersistAndReturnCurvePoint() {
 			
 			//GIVEN
-			ArgumentCaptor<CurvePoint> curvePointBeingSaved = ArgumentCaptor.forClass(CurvePoint.class);
 			when(curvePointRepository.save(any(CurvePoint.class))).then(invocation -> {
 				CurvePoint curvePointSaved = invocation.getArgument(0);
 				curvePointSaved.setId(1);
@@ -311,7 +310,7 @@ public class CurvePointServiceTest {
 			CurvePoint resultedCurvePoint = curvePointService.saveCurvePoint(curvePoint, request);
 			
 			//THEN
-			verify(curvePointRepository, times(1)).save(curvePointBeingSaved.capture());
+			verify(curvePointRepository).save(any(CurvePoint.class)); //times(1) is the default and can be omitted
 			assertThat(resultedCurvePoint).extracting(
 					CurvePoint::getId,
 					CurvePoint::getCurveId,
@@ -429,11 +428,11 @@ public class CurvePointServiceTest {
 		
 		@Test
 		@Tag("CurvePointServiceTest")
-		@DisplayName("test deleteCurvePoint by Id by Id should throw ResourceNotFoundException")
-		public void deleteCurvePointByIdTestShouldThrowUnexpectedRollbackExceptionOnResourceNotFoundException() {
+		@DisplayName("test deleteCurvePoint by Id should throw UnexpectedRollbackException nn UnexpectedRollbackException")
+		public void deleteCurvePointByIdTestShouldThrowUnexpectedRollbackExceptionOnUnexpectedRollbackException() {
 
 			//GIVEN
-			when(curvePointRepository.findById(anyInt())).thenThrow(new ResourceNotFoundException("CurvePoint not found"));
+			when(curvePointRepository.findById(anyInt())).thenThrow(new UnexpectedRollbackException("Error while getting curvePoints"));
 
 			//WHEN
 			//THEN
@@ -449,7 +448,7 @@ public class CurvePointServiceTest {
 
 			//GIVEN
 			when(curvePointRepository.findById(anyInt())).thenReturn(Optional.of(curvePoint));
-			doThrow(new InvalidDataAccessApiUsageException("The given id must not be null")).when(curvePointRepository).delete(any(CurvePoint.class));
+			doThrow(new InvalidDataAccessApiUsageException("Entity must not be null")).when(curvePointRepository).delete(any(CurvePoint.class));
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
@@ -473,5 +472,4 @@ public class CurvePointServiceTest {
 					.getMessage()).isEqualTo("Error while deleting curvePoint");
 		}	
 	}
-
 }

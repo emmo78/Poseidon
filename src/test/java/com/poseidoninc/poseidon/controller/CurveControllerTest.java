@@ -45,7 +45,7 @@ public class CurveControllerTest {
 
 	@Test
 	@Tag("CurveControllerTest")
-	@DisplayName("test home should return \"curvePoint list\" ")
+	@DisplayName("test home should return \"curvePoint/list\"")
 	public void homeTest() {
 		
 		//GIVEN
