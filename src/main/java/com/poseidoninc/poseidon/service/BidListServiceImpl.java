@@ -77,5 +77,4 @@ public class BidListServiceImpl implements BidListService {
 		}
 		log.info("{} : bidList={} deleted", requestService.requestToString(request), bidListId);
 	}
-
 }

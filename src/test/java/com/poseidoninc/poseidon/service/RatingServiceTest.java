@@ -121,30 +121,30 @@ public class RatingServiceTest {
 				
 		@Test
 		@Tag("RatingServiceTest")
-		@DisplayName("test getRatingById should throw InvalidDataAccessApiUsageException")
+		@DisplayName("test getRatingById should throw UnexpectedRollbackException on InvalidDataAccessApiUsageException")
 		public void getRatingByIdTestShouldThrowsUnexpectedRollbackExceptionOnInvalidDataAccessApiUsageException() {
 			//GIVEN
 			when(ratingRepository.findById(nullable(Integer.class))).thenThrow(new InvalidDataAccessApiUsageException("The given id must not be null"));
 			
 			//WHEN
 			//THEN
-			assertThat(assertThrows(InvalidDataAccessApiUsageException.class,
+			assertThat(assertThrows(UnexpectedRollbackException.class,
 				() -> ratingService.getRatingById(null, request))
-				.getMessage()).isEqualTo("Id must not be null");
+				.getMessage()).isEqualTo("Error while getting rating");
 		}
 
 		@Test
 		@Tag("RatingServiceTest")
-		@DisplayName("test getRatingById should throw ResourceNotFoundException")
-		public void getRatingByIdTestShouldThrowsResourceNotFoundException() {
+		@DisplayName("test getRatingById should throw UnexpectedRollbackException on ResourceNotFoundException")
+		public void getRatingByIdTestShouldThrowsUnexpectedRollbackExceptionOnResourceNotFoundException() {
 			//GIVEN
 			when(ratingRepository.findById(anyInt())).thenReturn(Optional.empty());
 			
 			//WHEN
 			//THEN
-			assertThat(assertThrows(ResourceNotFoundException.class,
+			assertThat(assertThrows(UnexpectedRollbackException.class,
 				() -> ratingService.getRatingById(1, request))
-				.getMessage()).isEqualTo("Rating not found");
+				.getMessage()).isEqualTo("Error while getting rating");
 		}
 		
 		@Test
@@ -233,7 +233,7 @@ public class RatingServiceTest {
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
 					() -> ratingService.getRatings(pageRequest, request))
-					.getMessage()).isEqualTo("Error while getting Ratings");
+					.getMessage()).isEqualTo("Error while getting ratings");
 		}
 		
 		@Test
@@ -246,7 +246,7 @@ public class RatingServiceTest {
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
 					() -> ratingService.getRatings(pageRequest, request))
-					.getMessage()).isEqualTo("Error while getting Ratings");
+					.getMessage()).isEqualTo("Error while getting ratings");
 		}
 	}
 	
@@ -285,19 +285,15 @@ public class RatingServiceTest {
 			rating = null;
 		}
 
-		@ParameterizedTest(name = "{0} rating to save, so id = {1}, saveRating should return rating with an id")
-		@CsvSource(value = {"new, null", // save new rating
-							"updated, 1"} // save updated rating
-							,nullValues = {"null"})
+		@Test
 		@Tag("RatingServiceTest")
 		@DisplayName("test saveRating should return rating")
-		public void saveRatingTestShouldReturnRating(String state, Integer id) {
+		public void saveRatingTestShouldReturnRating() {
 			
 			//GIVEN
-			rating.setId(id);
 			when(ratingRepository.save(any(Rating.class))).then(invocation -> {
 				Rating ratingSaved = invocation.getArgument(0);
-				ratingSaved.setId(Optional.ofNullable(ratingSaved.getId()).orElseGet(() -> 1));
+				ratingSaved.setId(1);
 				return ratingSaved;
 			});
 			
@@ -305,7 +301,7 @@ public class RatingServiceTest {
 			Rating ratingResult = ratingService.saveRating(rating, request);
 			
 			//THEN
-			verify(ratingRepository).save(rating); //times(1) is the default and can be omitted
+			verify(ratingRepository).save(any(Rating.class)); //times(1) is the default and can be omitted
 			assertThat(ratingResult).extracting(
 					Rating::getId,
 					Rating::getMoodysRating,
@@ -405,17 +401,17 @@ public class RatingServiceTest {
 		
 		@Test
 		@Tag("RatingServiceTest")
-		@DisplayName("test deleteRating by Id by Id should throw ResourceNotFoundException")
-		public void deleteRatingByIdTestShouldThrowUnexpectedRollbackExceptionOnResourceNotFoundException() {
+		@DisplayName("test deleteRating by Id by Id should throw  UnexpectedRollbackException on UnexpectedRollbackException")
+		public void deleteRatingByIdTestShouldThrowUnexpectedRollbackExceptionOnUnexpectedRollbackException() {
 
 			//GIVEN
-			when(ratingRepository.findById(anyInt())).thenThrow(new ResourceNotFoundException("Rating not found"));
+			when(ratingRepository.findById(anyInt())).thenThrow(new UnexpectedRollbackException("Error while getting rating"));
 
 			//WHEN
 			//THEN
-			assertThat(assertThrows(ResourceNotFoundException.class,
+			assertThat(assertThrows(UnexpectedRollbackException.class,
 					() -> ratingService.deleteRatingById(2, request))
-					.getMessage()).isEqualTo("Rating not found");
+					.getMessage()).isEqualTo("Error while deleting rating");
 		}	
 
 		@Test

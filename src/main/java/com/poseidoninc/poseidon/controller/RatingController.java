@@ -46,7 +46,7 @@ public class RatingController {
     }
 
     @GetMapping("/rating/update/{id}")
-    public String showUpdateForm(@PathVariable("id") Integer id, Model model, WebRequest request)  throws ResourceNotFoundException, InvalidDataAccessApiUsageException, UnexpectedRollbackException {
+    public String showUpdateForm(@PathVariable("id") Integer id, Model model, WebRequest request)  throws UnexpectedRollbackException {
         Rating rating = ratingService.getRatingById(id, request);
 		model.addAttribute("rating", rating);       
         return "rating/update";
@@ -62,7 +62,7 @@ public class RatingController {
     }
 
     @GetMapping("/rating/delete/{id}")
-    public String deleteRating(@PathVariable("id") Integer id, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException {
+    public String deleteRating(@PathVariable("id") Integer id, WebRequest request) throws UnexpectedRollbackException {
         ratingService.deleteRatingById(id, request);
         return "redirect:/rating/list";
     }
