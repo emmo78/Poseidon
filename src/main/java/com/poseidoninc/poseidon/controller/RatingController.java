@@ -62,7 +62,7 @@ public class RatingController {
     }
 
     @GetMapping("/rating/delete/{id}")
-    public String deleteRating(@PathVariable("id") Integer id, WebRequest request) throws UnexpectedRollbackException {
+    public String deleteRating(@PathVariable("id") Integer id, WebRequest request) throws  UnexpectedRollbackException {
         ratingService.deleteRatingById(id, request);
         return "redirect:/rating/list";
     }

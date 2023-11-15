@@ -46,7 +46,7 @@ public class RuleNameController {
     }
 
     @GetMapping("/ruleName/update/{id}")
-    public String showUpdateForm(@PathVariable("id") Integer id, Model model, WebRequest request) throws ResourceNotFoundException, InvalidDataAccessApiUsageException, UnexpectedRollbackException{
+    public String showUpdateForm(@PathVariable("id") Integer id, Model model, WebRequest request) throws UnexpectedRollbackException{
 		RuleName ruleName = ruleNameService.getRuleNameById(id, request);
 		model.addAttribute("ruleName", ruleName);
         return "ruleName/update";
@@ -62,7 +62,7 @@ public class RuleNameController {
     }
 
     @GetMapping("/ruleName/delete/{id}")
-    public String deleteRuleName(@PathVariable("id") Integer id, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException {
+    public String deleteRuleName(@PathVariable("id") Integer id, WebRequest request) throws UnexpectedRollbackException {
 		ruleNameService.deleteRuleNameById(id, request);
         return "redirect:/ruleName/list";
     }   

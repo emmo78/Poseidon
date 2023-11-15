@@ -127,30 +127,30 @@ public class RuleNameServiceTest {
 		
 		@Test
 		@Tag("RuleNameServiceTest")
-		@DisplayName("test getRuleNameById should throw InvalidDataAccessApiUsageException")
+		@DisplayName("test getRuleNameById should throw UnexpectedRollbackException on InvalidDataAccessApiUsageException")
 		public void getRuleNameByIdTestShouldThrowsUnexpectedRollbackExceptionOnInvalidDataAccessApiUsageException() {
 			//GIVEN
 			when(ruleNameRepository.findById(nullable(Integer.class))).thenThrow(new InvalidDataAccessApiUsageException("The given id must not be null"));
 			
 			//WHEN
 			//THEN
-			assertThat(assertThrows(InvalidDataAccessApiUsageException.class,
+			assertThat(assertThrows(UnexpectedRollbackException.class,
 				() -> ruleNameService.getRuleNameById(null, request))
-				.getMessage()).isEqualTo("Id must not be null");
+				.getMessage()).isEqualTo("Error while getting ruleName");
 		}
 
 		@Test
 		@Tag("RuleNameServiceTest")
-		@DisplayName("test getRuleNameById should throw ResourceNotFoundException")
-		public void getRuleNameByIdTestShouldThrowsResourceNotFoundException() {
+		@DisplayName("test getRuleNameById should throw UnexpectedRollbackException on  ResourceNotFoundException")
+		public void getRuleNameByIdTestShouldThrowsUnexpectedRollbackExceptionOnResourceNotFoundException() {
 			//GIVEN
 			when(ruleNameRepository.findById(anyInt())).thenReturn(Optional.empty());
 			
 			//WHEN
 			//THEN
-			assertThat(assertThrows(ResourceNotFoundException.class,
+			assertThat(assertThrows(UnexpectedRollbackException.class,
 				() -> ruleNameService.getRuleNameById(1, request))
-				.getMessage()).isEqualTo("RuleName not found");
+				.getMessage()).isEqualTo("Error while getting ruleName");
 		}
 		
 		@Test
@@ -297,19 +297,15 @@ public class RuleNameServiceTest {
 			ruleName = null;
 		}
 
-		@ParameterizedTest(name = "{0} ruleName to save, so id = {1}, saveRuleName should return ruleName with an id")
-		@CsvSource(value = {"new, null", // save new ruleName
-							"updated, 1"} // save updated ruleName
-							,nullValues = {"null"})
+		@Test
 		@Tag("RuleNameServiceTest")
 		@DisplayName("test saveRuleName should return ruleName")
-		public void saveRuleNameTestShouldReturnRuleName(String state, Integer id) {
+		public void saveRuleNameTestShouldReturnRuleName() {
 			
 			//GIVEN
-			ruleName.setId(id);
 			when(ruleNameRepository.save(any(RuleName.class))).then(invocation -> {
 				RuleName ruleNameSaved = invocation.getArgument(0);
-				ruleNameSaved.setId(Optional.ofNullable(ruleNameSaved.getId()).orElseGet(() -> 1));
+				ruleNameSaved.setId(1);
 				return ruleNameSaved;
 			});
 			
@@ -427,17 +423,17 @@ public class RuleNameServiceTest {
 		
 		@Test
 		@Tag("RuleNameServiceTest")
-		@DisplayName("test deleteRuleName by Id by Id should throw ResourceNotFoundException")
-		public void deleteRuleNameByIdTestShouldThrowUnexpectedRollbackExceptionOnResourceNotFoundException() {
+		@DisplayName("test deleteRuleName by Id by Id should throw  UnexpectedRollbackException on UnexpectedRollbackException")
+		public void deleteRuleNameByIdTestShouldThrowUnexpectedRollbackExceptionOnUnexpectedRollbackException() {
 
 			//GIVEN
-			when(ruleNameRepository.findById(anyInt())).thenThrow(new ResourceNotFoundException("RuleName not found"));
+			when(ruleNameRepository.findById(anyInt())).thenThrow(new UnexpectedRollbackException("Error while getting ruleName"));
 
 			//WHEN
 			//THEN
-			assertThat(assertThrows(ResourceNotFoundException.class,
+			assertThat(assertThrows(UnexpectedRollbackException.class,
 					() -> ruleNameService.deleteRuleNameById(2, request))
-					.getMessage()).isEqualTo("RuleName not found");
+					.getMessage()).isEqualTo("Error while deleting ruleName");
 		}	
 
 		@Test

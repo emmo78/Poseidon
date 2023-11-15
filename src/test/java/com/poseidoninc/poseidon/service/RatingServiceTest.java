@@ -401,7 +401,7 @@ public class RatingServiceTest {
 		
 		@Test
 		@Tag("RatingServiceTest")
-		@DisplayName("test deleteRating by Id by Id should throw  UnexpectedRollbackException on UnexpectedRollbackException")
+		@DisplayName("test deleteRating by Id by Id should throw UnexpectedRollbackException on UnexpectedRollbackException")
 		public void deleteRatingByIdTestShouldThrowUnexpectedRollbackExceptionOnUnexpectedRollbackException() {
 
 			//GIVEN

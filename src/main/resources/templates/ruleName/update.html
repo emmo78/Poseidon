@@ -4,7 +4,9 @@
 	<head>
 		<meta charset="utf-8"/>
 		<title>Update Rule</title>
-		<link rel="stylesheet" href="../../css/bootstrap.min.css" >
+		<link rel="stylesheet"  type="text/css"
+			  href="../../static/css/bootstrap.min.css"
+			  th:href="@{/css/bootstrap.min.css}" />
 	</head>
 	<body>
 		<div class="container">
@@ -18,42 +20,42 @@
 					<div class="form-group">
 						<label for="name" class="col-sm-2 control-label">Name</label>
 						<div class="col-sm-10">
-							<input type="text" th:field="*{name}" placeholder="Name" class="col-4">
+							<input type="text" th:field="*{name}" maxlength="125" placeholder="Name" class="col-4">
 							<p class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></p>
 						</div>
 					</div>
 					<div class="form-group">
 						<label for="description" class="col-sm-2 control-label">Description</label>
 						<div class="col-sm-10">
-							<input type="text" th:field="*{description}" placeholder="Description" class="col-4">
+							<input type="text" th:field="*{description}" maxlength="125" placeholder="Description" class="col-4">
 							<p class="text-danger" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></p>
 						</div>
 					</div>
 					<div class="form-group">
 						<label for="json" class="col-sm-2 control-label">Json</label>
 						<div class="col-sm-10">
-							<input type="text" th:field="*{json}" placeholder="Json" class="col-4">
+							<input type="text" th:field="*{json}" maxlength="125" placeholder="Json" class="col-4">
 							<p class="text-danger" th:if="${#fields.hasErrors('json')}" th:errors="*{json}"></p>
 						</div>
 					</div>
 					<div class="form-group">
 						<label for="template" class="col-sm-2 control-label">Template</label>
 						<div class="col-sm-10">
-							<input type="text" th:field="*{template}" placeholder="Template" class="col-4">
+							<input type="text" th:field="*{template}" maxlength="125" placeholder="Template" class="col-4">
 							<p class="text-danger" th:if="${#fields.hasErrors('template')}" th:errors="*{template}"></p>
 						</div>
 					</div>
 					<div class="form-group">
 						<label for="sqlStr" class="col-sm-2 control-label">SQL</label>
 						<div class="col-sm-10">
-							<input type="text" th:field="*{sqlStr}" placeholder="SQL" class="col-4">
+							<input type="text" th:field="*{sqlStr}" maxlength="125" placeholder="SQL" class="col-4">
 							<p class="text-danger" th:if="${#fields.hasErrors('sqlStr')}" th:errors="*{sqlStr}"></p>
 						</div>
 					</div>
 					<div class="form-group">
 						<label for="sqlPart" class="col-sm-2 control-label">SQL Part</label>
 						<div class="col-sm-10">
-							<input type="text" th:field="*{sqlPart}" placeholder="SQL Part" class="col-4">
+							<input type="text" th:field="*{sqlPart}" maxlength="125" placeholder="SQL Part" class="col-4">
 							<p class="text-danger" th:if="${#fields.hasErrors('sqlPart')}" th:errors="*{sqlPart}"></p>
 						</div>
 					</div>
