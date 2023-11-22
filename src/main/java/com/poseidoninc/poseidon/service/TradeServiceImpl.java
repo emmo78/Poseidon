@@ -26,23 +26,17 @@ public class TradeServiceImpl implements TradeService {
 
 	
 	@Override
-	@Transactional(readOnly = true, rollbackFor = {ResourceNotFoundException.class, InvalidDataAccessApiUsageException.class, UnexpectedRollbackException.class})
-	public Trade getTradeById(Integer tradeId, WebRequest request) throws ResourceNotFoundException, InvalidDataAccessApiUsageException, UnexpectedRollbackException {
+	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
+	public Trade getTradeById(Integer tradeId, WebRequest request) throws UnexpectedRollbackException {
 		Trade trade = null;
 		try {
 			//Throws ResourceNotFoundException | InvalidDataAccessApiUsageException
 			trade = tradeRepository.findById(tradeId).orElseThrow(() -> new ResourceNotFoundException("Trade not found"));
-		} catch(InvalidDataAccessApiUsageException idaaue) {
-			log.error("{} : {} ", requestService.requestToString(request), idaaue.toString());
-			throw new InvalidDataAccessApiUsageException ("Id must not be null");
-		} catch(ResourceNotFoundException  rnfe) {
-			log.error("{} : trade={} : {} ", requestService.requestToString(request), tradeId, rnfe.toString());
-			throw new ResourceNotFoundException(rnfe.getMessage());
 		} catch (Exception e) {
 			log.error("{} : trade={} : {} ", requestService.requestToString(request), tradeId, e.toString());
 			throw new UnexpectedRollbackException("Error while getting trade");
 		}
-		log.info("{} : trade={} gotten",  requestService.requestToString(request), trade.getTradeId());
+		log.info("{} : trade={} gotten",  requestService.requestToString(request), trade.toString());
 		return trade;
 	}
 
@@ -53,9 +47,6 @@ public class TradeServiceImpl implements TradeService {
 		try {
 			//throws NullPointerException if pageRequest is null
 			pageTrade = tradeRepository.findAll(pageRequest);
-		} catch(NullPointerException npe) {
-			log.error("{} : {} ", requestService.requestToString(request), npe.toString());
-			throw new UnexpectedRollbackException("Error while getting trades");
 		} catch(Exception e) {
 			log.error("{} : {} ", requestService.requestToString(request), e.toString());
 			throw new UnexpectedRollbackException("Error while getting trades");
@@ -73,28 +64,19 @@ public class TradeServiceImpl implements TradeService {
 		throws UnexpectedRollbackException {
 		try {
 			trade = tradeRepository.save(trade);
-		}  catch(InvalidDataAccessApiUsageException | OptimisticLockingFailureException re) {
-			log.error("{} : trade={} : {} ", requestService.requestToString(request), trade.getTradeId(), re.toString());
-			throw new UnexpectedRollbackException("Error while saving trade");
 		} catch(Exception e) {
-			log.error("{} : trade={} : {} ", requestService.requestToString(request), trade.getTradeId(), e.toString());
+			log.error("{} : trade={} : {} ", requestService.requestToString(request), trade.toString(), e.toString());
 			throw new UnexpectedRollbackException("Error while saving trade");
 		}
-		log.info("{} : trade={} persisted", requestService.requestToString(request), trade.getTradeId());
+		log.info("{} : trade={} persisted", requestService.requestToString(request), trade.toString());
 		return trade;
 	}
 
 	@Override
-	@Transactional(rollbackFor = {ResourceNotFoundException.class, UnexpectedRollbackException.class})
-	public void deleteTradeById(Integer tradeId, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException {
+	@Transactional(rollbackFor = UnexpectedRollbackException.class)
+	public void deleteTradeById(Integer tradeId, WebRequest request) throws UnexpectedRollbackException {
 		try {
-			tradeRepository.delete(getTradeById(tradeId, request)); //getTradeById throws ResourceNotFoundException, InvalidDataAccessApiUsageException, UnexpectedRollbackException
-		} catch(InvalidDataAccessApiUsageException | OptimisticLockingFailureException re) {
-			log.error("{} : trade={} : {} ", requestService.requestToString(request), tradeId, re.toString());
-			throw new UnexpectedRollbackException("Error while deleting trade");
-		} catch(ResourceNotFoundException  rnfe) {
-			log.error("{} : trade={} : {} ", requestService.requestToString(request), tradeId, rnfe.toString());
-			throw new ResourceNotFoundException(rnfe.getMessage());
+			tradeRepository.delete(getTradeById(tradeId, request)); //getTradeById throws UnexpectedRollbackException
 		} catch(Exception e) {
 			log.error("{} : trade={} : {} ", requestService.requestToString(request), tradeId, e.toString());
 			throw new UnexpectedRollbackException("Error while deleting trade");

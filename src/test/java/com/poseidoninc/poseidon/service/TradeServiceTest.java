@@ -172,30 +172,30 @@ public class TradeServiceTest {
 				
 		@Test
 		@Tag("TradeServiceTest")
-		@DisplayName("test getTradeById should throw InvalidDataAccessApiUsageException")
+		@DisplayName("test getTradeById should throw UnexpectedRollbackException on InvalidDataAccessApiUsageException")
 		public void getTradeByIdTestShouldThrowsUnexpectedRollbackExceptionOnInvalidDataAccessApiUsageException() {
 			//GIVEN
 			when(tradeRepository.findById(nullable(Integer.class))).thenThrow(new InvalidDataAccessApiUsageException("The given id must not be null"));
 			
 			//WHEN
 			//THEN
-			assertThat(assertThrows(InvalidDataAccessApiUsageException.class,
+			assertThat(assertThrows(UnexpectedRollbackException.class,
 				() -> tradeService.getTradeById(null, request))
-				.getMessage()).isEqualTo("Id must not be null");
+				.getMessage()).isEqualTo("Error while getting trade");
 		}
 
 		@Test
 		@Tag("TradeServiceTest")
-		@DisplayName("test getTradeById should throw ResourceNotFoundException")
-		public void getTradeByIdTestShouldThrowsResourceNotFoundException() {
+		@DisplayName("test getTradeById should throw UnexpectedRollbackException on ResourceNotFoundException")
+		public void getTradeByIdTestShouldThrowsUnexpectedRollbackExceptionOnResourceNotFoundException() {
 			//GIVEN
 			when(tradeRepository.findById(anyInt())).thenReturn(Optional.empty());
 			
 			//WHEN
 			//THEN
-			assertThat(assertThrows(ResourceNotFoundException.class,
+			assertThat(assertThrows(UnexpectedRollbackException.class,
 				() -> tradeService.getTradeById(1, request))
-				.getMessage()).isEqualTo("Trade not found");
+				.getMessage()).isEqualTo("Error while getting trade");
 		}
 		
 		@Test
@@ -385,19 +385,15 @@ public class TradeServiceTest {
 			trade = null;
 		}
 
-		@ParameterizedTest(name = "{0} trade to save, so id = {1}, saveTrade should return trade with an id")
-		@CsvSource(value = {"new, null", // save new trade
-							"updated, 1"} // save updated trade
-							,nullValues = {"null"})
+		@Test
 		@Tag("TradeServiceTest")
-		@DisplayName("test saveTrade should return trade")
-		public void saveTradeTestShouldReturnTrade(String state, Integer id) {
+		@DisplayName("test saveTrade should persist and return trade")
+		public void saveTradeTestShouldReturnTrade() {
 			
 			//GIVEN
-			trade.setTradeId(id);
 			when(tradeRepository.save(any(Trade.class))).then(invocation -> {
 				Trade tradeSaved = invocation.getArgument(0);
-				tradeSaved.setTradeId(Optional.ofNullable(tradeSaved.getTradeId()).orElseGet(() -> 1));
+				tradeSaved.setTradeId(1);
 				return tradeSaved;
 				});
 			
@@ -459,7 +455,6 @@ public class TradeServiceTest {
 		public void saveTradeTestShouldThrowUnexpectedRollbackExceptionOnAnyRuntimeException() {
 			
 			//GIVEN
-			trade.setTradeId(1);
 			when(tradeRepository.save(any(Trade.class))).thenThrow(new RuntimeException());
 
 			//WHEN
@@ -586,17 +581,17 @@ public class TradeServiceTest {
 		
 		@Test
 		@Tag("TradeServiceTest")
-		@DisplayName("test deleteTrade by Id by Id should throw ResourceNotFoundException")
-		public void deleteTradeByIdTestShouldThrowUnexpectedRollbackExceptionOnResourceNotFoundException() {
+		@DisplayName("test deleteTrade by Id by Id should throw UnexpectedRollbackException on UnexpectedRollbackException")
+		public void deleteTradeByIdTestShouldThrowUnexpectedRollbackExceptionOnUnexpectedRollbackException() {
 
 			//GIVEN
-			when(tradeRepository.findById(anyInt())).thenThrow(new ResourceNotFoundException("Trade not found"));
+			when(tradeRepository.findById(anyInt())).thenThrow(new UnexpectedRollbackException("Error while getting trade"));
 
 			//WHEN
 			//THEN
-			assertThat(assertThrows(ResourceNotFoundException.class,
+			assertThat(assertThrows(UnexpectedRollbackException.class,
 					() -> tradeService.deleteTradeById(2, request))
-					.getMessage()).isEqualTo("Trade not found");
+					.getMessage()).isEqualTo("Error while deleting trade");
 		}	
 
 		@Test

@@ -4,7 +4,9 @@
 	<head>
 		<meta charset="utf-8"/>
 		<title>Trade List</title>
-		<link rel="stylesheet" href="../../css/bootstrap.min.css" >
+		<link rel="stylesheet" type="text/css"
+			  href="../../static/css/bootstrap.min.css"
+			  th:href="@{/css/bootstrap.min.css}"/>
 	</head>
 	<body>
 		<div class="container">
@@ -19,6 +21,7 @@
 				<div class="col-6 text-right">
 					Logged in user: <b th:inline="text"  class="user"> [[${#httpServletRequest.remoteUser}]] </b>
 					<form th:action="@{/app-logout}" method="POST">
+						<a href="/">Home</a>&nbsp;|&nbsp;&nbsp;
 						<input type="submit" value="Logout"/>
 					</form>
 				</div>

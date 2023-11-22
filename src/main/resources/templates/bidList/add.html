@@ -32,7 +32,7 @@
 					<div class="form-group">
 						<label for="bidQuantity" class="col-sm-2 control-label">Bid Quantity</label>
 						<div class="col-sm-10">
-							<input type="number" th:field="*{bidQuantity}" min="0" max="1.7976931348623157E308" placeholder="Bid Quantity" class="col-4">
+							<input type="number" th:field="*{bidQuantity}" min="0" max="1.7976931348623157E308" step="0.01" placeholder="Bid Quantity" class="col-4">
 							<p class="text-danger" th:if="${#fields.hasErrors('bidQuantity')}" th:errors="*{bidQuantity}"></p>
 						</div>
 					</div>

@@ -1,6 +1,9 @@
 package com.poseidoninc.poseidon.controller;
 
-import org.springframework.dao.InvalidDataAccessApiUsageException;
+import com.poseidoninc.poseidon.domain.Trade;
+import com.poseidoninc.poseidon.service.TradeService;
+import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.UnexpectedRollbackException;
@@ -10,13 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.context.request.WebRequest;
-
-import com.poseidoninc.poseidon.domain.Trade;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import com.poseidoninc.poseidon.service.TradeService;
-
-import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 
 @Controller
 @AllArgsConstructor
@@ -46,7 +42,7 @@ public class TradeController {
     }
 
     @GetMapping("/trade/update/{id}")
-    public String showUpdateForm(@PathVariable("id") Integer id, Model model, WebRequest request) throws ResourceNotFoundException, InvalidDataAccessApiUsageException, UnexpectedRollbackException {
+    public String showUpdateForm(@PathVariable("id") Integer id, Model model, WebRequest request) throws UnexpectedRollbackException {
 		Trade trade = tradeService.getTradeById(id, request);
 		model.addAttribute("trade", trade);
         return "trade/update";
@@ -62,7 +58,7 @@ public class TradeController {
     }
 
     @GetMapping("/trade/delete/{id}")
-    public String deleteBid(@PathVariable("id") Integer id, WebRequest request) throws ResourceNotFoundException, UnexpectedRollbackException {
+    public String deleteBid(@PathVariable("id") Integer id, WebRequest request) throws UnexpectedRollbackException {
 		tradeService.deleteTradeById(id, request);
         return "redirect:/trade/list";
     }   
