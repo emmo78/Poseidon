@@ -51,7 +51,7 @@ CREATE TABLE `trade` (
 
 CREATE TABLE `curvepoint` (
   `Id` tinyint NOT NULL AUTO_INCREMENT,
-  `CurveId` tinyint DEFAULT NULL,
+  `CurveId` tinyint NOT NULL UNIQUE,
   `asOfDate` timestamp NULL DEFAULT NULL,
   `term` double DEFAULT NULL,
   `value` double DEFAULT NULL,
@@ -81,7 +81,7 @@ CREATE TABLE `rulename` (
 
 CREATE TABLE `users` (
   `Id` tinyint NOT NULL AUTO_INCREMENT,
-  `username` varchar(125) DEFAULT NULL,
+  `username` varchar_ignorecase(125)NOT NULL UNIQUE ,
   `password` varchar(125) DEFAULT NULL,
   `fullname` varchar(125) DEFAULT NULL,
   `role` varchar(125) DEFAULT NULL,

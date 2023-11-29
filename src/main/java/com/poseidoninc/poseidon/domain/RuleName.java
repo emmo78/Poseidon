@@ -1,5 +1,6 @@
 package com.poseidoninc.poseidon.domain;
 
+import lombok.ToString;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -16,22 +17,26 @@ import lombok.Setter;
 @Entity
 @DynamicInsert
 @DynamicUpdate
+@Table(name = "rulename")
 @Getter
 @Setter
-@Table(name = "rulename")
+@ToString(onlyExplicitlyIncluded = true, includeFieldNames=true)
 public class RuleName {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "Id")
+	@ToString.Include
 	Integer id;
 
 	@Column(name = "name")
 	@Size(max = 125, message = "Name must be maximum of 125 characters")
+	@ToString.Include
 	String name;
 
 	@Column(name = "description")
 	@Size(max = 125, message = "Description must be maximum of 125 characters")
+	@ToString.Include
 	String description;
 
 	@Column(name = "json")

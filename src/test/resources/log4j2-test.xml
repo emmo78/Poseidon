@@ -6,8 +6,8 @@
         </Console>
 
         <RollingFile name="RollingFile"
-            fileName="./logs/PayMyBuddy-test-log4j2.log"
-            filePattern="./logs/$${date:yyyy-MM}/PayMyBuddy-test-log4j2-%d{-dd-MMMM-yyyy}-%i.log.gz">
+            fileName="./logs/Poseidon-test-log4j2.log"
+            filePattern="./logs/$${date:yyyy-MM}/Poseidon-test-log4j2-%d{-dd-MMMM-yyyy}-%i.log.gz">
             <PatternLayout>
                 <pattern>%d %p %C{1.} [%t] %m%n</pattern>
             </PatternLayout>
@@ -33,6 +33,6 @@
         <Logger name="org.springframework.boot.web.embedded.tomcat" level="info"></Logger>
  
         <!-- LOG at DEBUG level -->
-		<Logger name="com.paymybuddy.paymybuddy.service" level="debug"></Logger>
+		<Logger name="com.poseidoninc.poseidon.service" level="debug"></Logger>
     </Loggers>
 </Configuration>

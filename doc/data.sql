@@ -57,7 +57,7 @@ CREATE TABLE Trade (
 
 CREATE TABLE CurvePoint (
   Id tinyint(4) NOT NULL AUTO_INCREMENT,
-  CurveId tinyint,
+  CurveId tinyint NOT NULL UNIQUE,
   asOfDate TIMESTAMP,
   term DOUBLE ,
   value DOUBLE ,
@@ -90,7 +90,7 @@ CREATE TABLE RuleName (
 
 CREATE TABLE Users (
   Id tinyint(4) NOT NULL AUTO_INCREMENT,
-  username VARCHAR(125),
+  username VARCHAR(125) NOT NULL UNIQUE,
   password VARCHAR(125),
   fullname VARCHAR(125),
   role VARCHAR(125),
@@ -98,5 +98,5 @@ CREATE TABLE Users (
   PRIMARY KEY (Id)
 );
 
-insert into Users(fullname, username, password, role) values("Administrator", "admin", "$2a$10$pBV8ILO/s/nao4wVnGLrh.sa/rnr5pDpbeC4E.KNzQWoy8obFZdaa", "ADMIN");
-insert into Users(fullname, username, password, role) values("User", "user", "$2a$10$pBV8ILO/s/nao4wVnGLrh.sa/rnr5pDpbeC4E.KNzQWoy8obFZdaa", "USER");
+insert into Users(fullname, username, password, role) values('Administrator', 'admin', '$2a$10$pBV8ILO/s/nao4wVnGLrh.sa/rnr5pDpbeC4E.KNzQWoy8obFZdaa', 'ADMIN');
+insert into Users(fullname, username, password, role) values('User', 'user', '$2a$10$pBV8ILO/s/nao4wVnGLrh.sa/rnr5pDpbeC4E.KNzQWoy8obFZdaa', 'USER');

@@ -1,5 +1,9 @@
 package com.poseidoninc.poseidon.domain;
 
+import com.poseidoninc.poseidon.annotation.ValidPassword;
+import com.poseidoninc.poseidon.annotation.ValidPasswordGroup;
+import jakarta.validation.GroupSequence;
+import lombok.ToString;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -19,23 +23,27 @@ import lombok.Setter;
 @Entity
 @DynamicInsert
 @DynamicUpdate
+@Table(name = "users")
+@GroupSequence({User.class, ValidPasswordGroup.class})
 @Getter
 @Setter
-@Table(name = "users")
+@ToString(onlyExplicitlyIncluded = true, includeFieldNames=true)
 public class User {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
 	@Column(name = "Id")
+    @ToString.Include
     private Integer id;
     
-	@Column(name = "username")
+	@Column(name = "username", unique = true) //@Column(unique = true)
     @NotBlank(message = "Username is mandatory")
 	@Size(max = 125, message = "Username must be maximum of 125 characters")
+    @ToString.Include
     private String username;
 	
     @Column(name = "password")
     @NotNull(message = "Password is mandatory")
-    @Pattern(regexp = "^(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*#?&=])[A-Za-z\\d@$!%*#?&=]{8,13}$", message ="Password must have at least 8 characters in length, max 13, containing at least 1 uppercase letter, 1 digit, and 1 symbol.")
+    @ValidPassword(groups = ValidPasswordGroup.class)
     private String password;
 
 	@Column(name = "fullname")

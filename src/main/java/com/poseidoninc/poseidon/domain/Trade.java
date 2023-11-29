@@ -2,6 +2,7 @@ package com.poseidoninc.poseidon.domain;
 
 import java.time.LocalDateTime;
 
+import lombok.ToString;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -24,29 +25,34 @@ import lombok.Setter;
 @Entity
 @DynamicInsert
 @DynamicUpdate
+@Table(name = "trade")
 @Getter
 @Setter
-@Table(name = "trade")
+@ToString(onlyExplicitlyIncluded = true, includeFieldNames=true)
 public class Trade {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "TradeId")
+	@ToString.Include
 	Integer tradeId;
 
 	@Column(name = "account")
 	@NotBlank(message = "Account is mandatory")
 	@Size(max = 30, message = "Account must be maximum of 30 characters")
+	@ToString.Include
 	String account;
 	
 	@Column(name = "type")
 	@NotBlank(message = "Type is mandatory")
 	@Size(max = 30, message = "Type must be maximum of 30 characters")
+	@ToString.Include
 	String type;
 	
 	@Column(name = "buyQuantity")
 	@DecimalMin(value = "0.0", message = "BuyQuantity must be a decimal number")
 	@DecimalMax(value = "1.7976931348623157E308", inclusive = true, message = "BuyQuantity must be a decimal number")
+	@ToString.Include
 	Double buyQuantity;
 	
 	@Column(name = "sellQuantity")

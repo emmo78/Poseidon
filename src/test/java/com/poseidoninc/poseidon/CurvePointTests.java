@@ -13,7 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.poseidoninc.poseidon.domain.CurvePoint;
-import com.poseidoninc.poseidon.repositories.CurvePointRepository;
+import com.poseidoninc.poseidon.repository.CurvePointRepository;
 
 @SpringBootTest
 @ActiveProfiles("mytest")

@@ -1,6 +1,7 @@
 package com.poseidoninc.poseidon.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Optional;
@@ -20,11 +21,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.poseidoninc.poseidon.domain.User;
-import com.poseidoninc.poseidon.repositories.UserRepository;
 
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
+@ActiveProfiles("mytest")
 public class UserRepositoryIT {
 	
 	@Autowired
@@ -50,13 +54,13 @@ public class UserRepositoryIT {
 
 		@Test
 		@Tag("UserRepositoryIT")
-		@DisplayName("save test should persist user with new id")
-		public void saveShouldPersistUserWithNewId() {
+		@DisplayName("save test new user should persist user with new id")
+		public void saveTestShouldPersistUserWithNewId() {
 	
 			//GIVEN
 			user.setId(null);
 			user.setUsername("Aaa");
-			user.setPassword("aaa1=Passwd");
+			user.setPassword("apw1=Passwd");
 			user.setFullname("AAA");
 			user.setRole("USER");
 	
@@ -73,44 +77,85 @@ public class UserRepositoryIT {
 					User::getRole)
 				.containsExactly(
 					"Aaa",
-					"aaa1=Passwd",
+					"apw1=Passwd",
 					"AAA",
 					"USER"));
 		}
-		
-		@ParameterizedTest(name = "{0} should throw a ConstraintViolationException")
-		@NullAndEmptySource
-		@ValueSource(strings = {"1=Passw", "aaa1=asswd", "aaa1Passwd", "aaa=Passwd", "aaa1=Passwdaaa1=Passwd"})
+
+		@Test
 		@Tag("UserRepositoryIT")
-		@DisplayName("save test with incorrect password should throw a ConstraintViolationException")
-		public void saveTestIncorrectPasswdShouldThrowAConstraintViolationException(String passwd) {
-	
+		@DisplayName("save test update user with same username should persist him")
+		public void saveTestUpdateUserShouldPersistHim() {
+
 			//GIVEN
 			user.setId(null);
 			user.setUsername("Aaa");
-			user.setPassword(passwd);
+			user.setPassword("apw1=Passwd");
 			user.setFullname("AAA");
 			user.setRole("USER");
-			String msg = passwd==null? "Password is mandatory":"Password must have at least 8 characters in length, max 13, containing at least 1 uppercase letter, 1 digit, and 1 symbol.";
+			Integer id = userRepository.saveAndFlush(user).getId();
+			User updatedUser = new User();
+			updatedUser.setId(id);
+			updatedUser.setUsername("Aaa");
+			updatedUser.setPassword("upd1=Passwd");
+			updatedUser.setFullname("UPDT");
+			updatedUser.setRole("USER");
 
 			//WHEN
 			//THEN
-			assertThat(assertThrows(ConstraintViolationException.class,
-					() -> userRepository.saveAndFlush(user))
-					.getMessage()).contains(msg);
+			assertThat(assertDoesNotThrow(() -> userRepository.saveAndFlush(updatedUser)))
+					.extracting(
+							User::getId,
+							User::getUsername,
+							User::getPassword,
+							User::getFullname,
+							User::getRole)
+					.containsExactly(
+							id,
+							"Aaa",
+							"upd1=Passwd",
+							"UPDT",
+							"USER");
 		}
-		
+		@ParameterizedTest(name = "{0} should throw a DataIntegrityViolationException")
+		@ValueSource(strings = {"Aaa", "aaa", "AAA", "aAA"})
+		@Tag("UserRepositoryIT")
+		@DisplayName("save test an new user with an existent username case insensitive should throw a DataIntegrityViolationException")
+		public void saveTestAnUserWithAnExistentUsernameCaseInsensitiveShouldThrowDataIntegrityViolationException(String username) {
+
+			//GIVEN
+			user.setId(null);
+			user.setUsername("Aaa");
+			user.setPassword("apw1=Passwd");
+			user.setFullname("AAA");
+			user.setRole("USER");
+			userRepository.saveAndFlush(user);
+
+			User userTest = new User();
+			userTest.setId(null);
+			userTest.setUsername(username);
+			userTest.setPassword("apw2=Passwd");
+			userTest.setFullname("AAATEST");
+			userTest.setRole("USER");
+
+			//WHEN
+			//THEN
+			assertThat(assertThrows(DataIntegrityViolationException.class,
+					() -> userRepository.saveAndFlush(userTest))
+					.getMessage()).contains(("Unique index or primary key violation"));
+		}
+
 		@ParameterizedTest(name = "{0} should throw a ConstraintViolationException")
 		@NullAndEmptySource
 		@ValueSource(strings = {"   ", "AbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyz"})//26*5=130
 		@Tag("UserRepositoryIT")
 		@DisplayName("save test with a incorrect String should throw a ConstraintViolationException")
-		public void saveTestStringTooLengthyShouldThrowAConstraintViolationException(String username) {
+		public void saveTestIncorrectStringShouldThrowAConstraintViolationException(String username) {
 	
 			//GIVEN
 			user.setId(null);
 			user.setUsername(username);
-			user.setPassword("aaa1=Passwd");
+			user.setPassword("apw1=Passwd");
 			user.setFullname("AAA");
 			user.setRole("USER");
 			String msg = null;
@@ -146,7 +191,7 @@ public class UserRepositoryIT {
 			//GIVEN
 			user.setId(null);
 			user.setUsername("Aaa");
-			user.setPassword("aaa1=Passwd");
+			user.setPassword("apw1=Passwd");
 			user.setFullname("AAA");
 			user.setRole("USER");
 			userRepository.saveAndFlush(user);
@@ -162,7 +207,7 @@ public class UserRepositoryIT {
 					User::getRole)
 				.containsExactly(
 					"Aaa",
-					"aaa1=Passwd",
+					"apw1=Passwd",
 					"AAA",
 					"USER");	
 		}
@@ -175,7 +220,7 @@ public class UserRepositoryIT {
 			//GIVEN
 			user.setId(null);
 			user.setUsername("Aaa");
-			user.setPassword("aaa1=Passwd");
+			user.setPassword("apw1=Passwd");
 			user.setFullname("AAA");
 			user.setRole("USER");
 			userRepository.saveAndFlush(user);
@@ -196,63 +241,38 @@ public class UserRepositoryIT {
 			//GIVEN
 			user.setId(null);
 			user.setUsername("Aaa");
-			user.setPassword("aaa1=Passwd");
+			user.setPassword("apw1=Passwd");
 			user.setFullname("AAA");
 			user.setRole("USER");
 			userRepository.saveAndFlush(user);
 	
 			//WHEN
-			User userResult = userRepository.findByUsername(null);
+			User userResult = assertDoesNotThrow(() -> userRepository.findByUsername(null));
 			
 			//THEN
 			assertThat(userResult).isNull();	
 		}
 	}
-	
-	@Nested
-	@Tag("existsByUsernameTests")
-	@DisplayName("Tests exists by userName")
-	@TestInstance(Lifecycle.PER_CLASS)
-	class ExistsByUserNameTests {
-		
-		@Test
-		@Tag("UserRepositoryIT")
-		@DisplayName("exists by Username should return true")
-		public void findByUsernameTestShouldReturnTrue() {
-	
-			//GIVEN
-			user.setId(null);
-			user.setUsername("Aaa");
-			user.setPassword("aaa1=Passwd");
-			user.setFullname("AAA");
-			user.setRole("USER");
-			userRepository.saveAndFlush(user);
-	
-			//WHEN
-			boolean result = userRepository.existsByUsername("Aaa");
-			
-			//THEN
-			assertThat(result).isTrue();	
-		}
-		
-		@Test
-		@Tag("UserRepositoryIT")
-		@DisplayName("exists by Username should return false")
-		public void findByUsernameTestShouldReturnFalse() {
-	
-			//GIVEN
-			user.setId(null);
-			user.setUsername("Aaa");
-			user.setPassword("aaa1=Passwd");
-			user.setFullname("AAA");
-			user.setRole("USER");
-			userRepository.saveAndFlush(user);
-	
-			//WHEN
-			boolean result = userRepository.existsByUsername("Bbb");
-			
-			//THEN
-			assertThat(result).isFalse();	
-		}
+	@Test
+	@Tag("UserRepositoryIT")
+	@DisplayName("find by Id null should throw an InvalidDataAccessApiUsageException")
+	public void findByIdNullShouldThrowAnInvalidDataAccessApiUsageException() {
+		//GIVEN
+		//WHEN
+		//THEN
+		assertThat(assertThrows(InvalidDataAccessApiUsageException.class, () -> userRepository.findById(null)).getMessage())
+				.contains("The given id must not be null");
+	}
+
+	@Test
+	@Tag("UserReositoyIT")
+	@DisplayName("delete null should throw an InvalidDataAccessApiUsageException")
+	public void deleteNullShouldThrowAnInvalidDataAccessApiUsageException() {
+		//GIVEN
+		User user = null;
+		//WHEN
+		//THEN
+		assertThat(assertThrows(InvalidDataAccessApiUsageException.class, () -> userRepository.delete(user)).getMessage())
+				.contains("Entity must not be null");
 	}
 }

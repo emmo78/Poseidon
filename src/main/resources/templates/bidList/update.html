@@ -4,35 +4,36 @@
 	<head>
 		<meta charset="utf-8"/>
 		<title>Update Bid List</title>
-		<link rel="stylesheet" href="../../css/bootstrap.min.css" >
+		<link rel="stylesheet"  type="text/css"
+			  href="../../static/css/bootstrap.min.css"
+			  th:href="@{/css/bootstrap.min.css}" />
 	</head>
 	<body>
 		<div class="container">
 			<div class="row">
 				<h2>Update Bid</h2>
 			</div>
-		
 			<div class="row">
 				<form action="#" th:action="@{/bidList/update}" th:object="${bidList}" method="post" class="form-horizontal" style="width: 100%">
 					<div class="form-group">
-					<label for="account​" class="col-sm-2 control-label">Account</label>
+					<label for="account" class="col-sm-2 control-label">Account</label>
 					<div class="col-sm-10">
-						<input type="text" th:field="*{account​}" placeholder="Account" class="col-4">
-						<p class="text-danger" th:if="${#fields.hasErrors('account​')}" th:errors="*{account​}"></p>
+						<input type="text" th:field="*{account}" required maxlength="30" placeholder="Account" class="col-4">
+						<p class="text-danger" th:if="${#fields.hasErrors('account')}" th:errors="*{account}"></p>
 					</div>
 					</div>
 					<div class="form-group">
-						<label for="type​" class="col-sm-2 control-label">Type</label>
+						<label for="type" class="col-sm-2 control-label">Type</label>
 						<div class="col-sm-10">
-							<input type="text" th:field="*{type​}" placeholder="Type" class="col-4">
-							<p class="text-danger" th:if="${#fields.hasErrors('type​')}" th:errors="*{type​}"></p>
+							<input type="text" th:field="*{type}" required maxlength="30" placeholder="Type" class="col-4">
+							<p class="text-danger" th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></p>
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="​bidQuantity​​" class="col-sm-2 control-label">Bid Quantity</label>
+						<label for="bidQuantity" class="col-sm-2 control-label">Bid Quantity</label>
 						<div class="col-sm-10">
-							<input type="number" min="0.00" step="0.01" th:field="*{​bidQuantity​​}" placeholder="Bid Quantity" class="col-4">
-							<p class="text-danger" th:if="${#fields.hasErrors('​bidQuantity​​')}" th:errors="*{​bidQuantity​​}"></p>
+							<input type="number" th:field="*{bidQuantity}" min="0" max="1.7976931348623157E308" step="0.01" placeholder="Bid Quantity" class="col-4">
+							<p class="text-danger" th:if="${#fields.hasErrors('bidQuantity')}" th:errors="*{bidQuantity}"></p>
 						</div>
 					</div>
 					<div class="form-group">
@@ -41,7 +42,7 @@
 							<input type="hidden" th:field="*{bidListId}">
 							
 							<a class="btn btn-danger btn-sm" href="/bidList/list">Cancel</a>
-							<input class="btn btn-primary btn-sm" type="submit" value="Update Bid List">
+							<input class="btn btn-primary btn-sm" type="submit" value="Update BidList">
 						</div>
 					</div>
 				</form>

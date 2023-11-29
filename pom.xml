@@ -17,7 +17,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.0.4</version>
+		<version>3.1.4</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 
@@ -30,6 +30,7 @@
 	</properties>
 
 	<dependencies>
+		<!-- https://docs.spring.io/spring-boot/docs/1.2.3.RELEASE/reference/html/using-boot-build-systems.html#using-boot-starter-poms -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-oauth2-client</artifactId>
@@ -82,6 +83,11 @@
         		</exclusion>
     		</exclusions>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.thymeleaf.extras/thymeleaf-extras-springsecurity6 -->
+		<dependency>
+			<groupId>org.thymeleaf.extras</groupId>
+			<artifactId>thymeleaf-extras-springsecurity6</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -92,6 +98,11 @@
             		<artifactId>spring-boot-starter-logging</artifactId>
         		</exclusion>
     		</exclusions>
+		</dependency>
+		<dependency>
+			<!-- Support for exposing Spring Data repositories over REST via spring-data-rest-webmvc -->
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-rest</artifactId>
 		</dependency>
 		<!-- Include Log4j2 for logging, needs log4j2.xml in main/resources-->
 		<dependency>
@@ -114,11 +125,11 @@
 			<scope>provided</scope>
 			<optional>true</optional>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.modelmapper/modelmapper -->
+		<!-- https://mvnrepository.com/artifact/org.passay/passay -->
 		<dependency>
-			<groupId>org.modelmapper</groupId>
-			<artifactId>modelmapper</artifactId>
-			<version>3.1.1</version>
+			<groupId>org.passay</groupId>
+			<artifactId>passay</artifactId>
+			<version>1.6.4</version>
 		</dependency>
 		<!-- Support for common test dependencies, including JUnit, AssertJ, Hamcrest and Mockito -->
 		<dependency>
@@ -175,7 +186,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.8</version>
+				<version>0.8.10</version>
 				<executions>
 					<execution>
 						<id>default-prepare-agent</id>
@@ -211,7 +222,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>
-				<version>4.0.0-M5</version>
+				<version>4.0.0-M9</version>
 			</plugin>
 		</plugins>
 	</build>
@@ -224,14 +235,12 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>3.4.2</version>
 			</plugin>
 
 			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-javadoc-plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.5.0</version>
 				<reportSets>
 					<reportSet><!-- by default, id = "default" -->
 						<reports><!-- select non-aggregate reports -->
@@ -254,7 +263,6 @@
 			<plugin>
 				<groupId>com.github.spotbugs</groupId>
 				<artifactId>spotbugs-maven-plugin</artifactId>
-				<version>4.7.3.2</version>
 			</plugin>
 			
 			<!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-report-plugin -->
@@ -263,7 +271,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>3.0.0-M9</version>
 			</plugin>
 
 			<!-- https://www.eclemma.org/jacoco/trunk/doc/maven.html -->

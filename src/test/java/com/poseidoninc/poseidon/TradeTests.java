@@ -13,9 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.poseidoninc.poseidon.domain.Trade;
-import com.poseidoninc.poseidon.repositories.TradeRepository;
+import com.poseidoninc.poseidon.repository.TradeRepository;
+import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
+@ActiveProfiles("mytest")
 public class TradeTests {
 
 	@Autowired
