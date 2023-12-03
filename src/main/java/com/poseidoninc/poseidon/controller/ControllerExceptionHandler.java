@@ -39,6 +39,4 @@ public class ControllerExceptionHandler {
 		model.addAttribute("errorMessage", "Internal Error");
 		return "error";
 	}
-
-
 }

@@ -35,7 +35,7 @@ public class User {
     @ToString.Include
     private Integer id;
     
-	@Column(name = "username", unique = true) //@Column(unique = true)
+	@Column(name = "username", unique = true)
     @NotBlank(message = "Username is mandatory")
 	@Size(max = 125, message = "Username must be maximum of 125 characters")
     @ToString.Include

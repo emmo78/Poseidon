@@ -66,7 +66,5 @@ public class UserTest {
         if (passwd == null) {
             assertThat(constraintViolations.iterator().next().getMessage()).isEqualTo(msg);
         }
-
-        //assertThat(constraintViolations.iterator().next().getMessage()).isEqualTo("UserName already exists");
     }
 }
