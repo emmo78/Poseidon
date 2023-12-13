@@ -8,8 +8,19 @@ import org.passay.*;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * The ValidPasswordValidator class is an implementation of the ConstraintValidator interface that validates a password
+ * based on specified rules.
+ */
 public class ValidPasswordValidator implements ConstraintValidator<ValidPassword, String> {
 
+    /**
+     * Determines whether a given password is valid based on specified rules.
+     *
+     * @param password The password to validate.
+     * @param context  The constraint validator context.
+     * @return True if the password is valid, false otherwise.
+     */
     @Override
     public boolean isValid(String password, ConstraintValidatorContext context) {
         PasswordValidator passwordValidator = new PasswordValidator(Arrays.asList(
