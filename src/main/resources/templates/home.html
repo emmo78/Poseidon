@@ -13,13 +13,13 @@
         <div class="row">
             <h3> HOME PAGE </h3>
         </div>
-        <div class="row" th:unless="${#authorization.expression('isAuthenticated()')}>
+        <div class="row" th:unless="${user.getName()}!=null}">
             <div class="col-6">
                 <a href="/login">Login</a> or create one <a href="/user/add">Register</a>
             </div>
         </div>
         <br>
-        <div class="row" th:if="${#authorization.expression('isAuthenticated()')}">
+        <div class="row" th:if="${user.getName()}!=null">
             <div class="col-6">
                 <a href="/user/list">User List</a>&nbsp;|&nbsp;
                 <a href="/bidList/list">Bid List</a>&nbsp;|&nbsp;
@@ -30,7 +30,7 @@
             </div>
             <br>
             <div class="col-6 text-right">
-                Logged in user: <b th:inline="text"  class="user"> [[${#httpServletRequest.remoteUser}]] </b>
+                Logged in user: <b th:text="${user.getName()}">  </b>
                 <form th:action="@{/app-logout}" method="POST">
                     <input type="submit" value="Logout"/>
                 </form>

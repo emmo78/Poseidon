@@ -38,32 +38,12 @@ public class BidListServiceTest {
 	@Mock
 	private BidListRepository bidListRepository;
 	
-	@Spy
-	private final RequestService requestService = new RequestServiceImpl();
-	
-	private MockHttpServletRequest requestMock;
-	private WebRequest request;
 	private BidList bidList;
 
 	@Nested
 	@Tag("getBidListByIdTests")
 	@DisplayName("Tests for getting bidList by bidListId")
-	@TestInstance(Lifecycle.PER_CLASS)
 	class GetBidListByIdTests {
-		
-		@BeforeAll
-		public void setUpForAllTests() {
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/bidList/getById/1");
-			request = new ServletWebRequest(requestMock);
-		}
-
-		@AfterAll
-		public void unSetForAllTests() {
-			requestMock = null;
-			request = null;
-		}
 		
 		@AfterEach
 		public void unSetForEachTests() {
@@ -103,7 +83,7 @@ public class BidListServiceTest {
 			when(bidListRepository.findById(anyInt())).thenReturn(Optional.of(bidList));
 			
 			//WHEN
-			BidList bidListResult = bidListService.getBidListById(1, request);
+			BidList bidListResult = bidListService.getBidListById(1);
 			
 			//THEN
 			assertThat(bidListResult).extracting(
@@ -165,7 +145,7 @@ public class BidListServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> bidListService.getBidListById(null, request))
+				() -> bidListService.getBidListById(null))
 				.getMessage()).isEqualTo("Error while getting bidlist");
 		}
 
@@ -179,49 +159,43 @@ public class BidListServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> bidListService.getBidListById(1, request))
+				() -> bidListService.getBidListById(1))
 				.getMessage()).isEqualTo("Error while getting bidlist");
 		}
-		
+
 		@Test
 		@Tag("BidListServiceTest")
 		@DisplayName("test getBidListById should throw UnexpectedRollbackException on any RuntimeException")
 		public void getBidListByIdTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
 			//GIVEN
 			when(bidListRepository.findById(anyInt())).thenThrow(new RuntimeException());
-			
+
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> bidListService.getBidListById(1, request))
+				() -> bidListService.getBidListById(1))
 				.getMessage()).isEqualTo("Error while getting bidlist");
 		}
 	}
-	
+
 	@Nested
 	@Tag("getBidListsTests")
 	@DisplayName("Tests for getting bidLists")
 	@TestInstance(Lifecycle.PER_CLASS)
 	class GetBidListsTests {
-		
+
 		private Pageable pageRequest;
-		
+
 		@BeforeAll
 		public void setUpForAllTests() {
 			pageRequest = Pageable.unpaged();
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/bidList/getBidLists");
-			request = new ServletWebRequest(requestMock);
 		}
 
 		@AfterAll
 		public void unSetForAllTests() {
 			pageRequest = null;
-			requestMock = null;
-			request = null;
 		}
-		
+
 		@AfterEach
 		public void unSetForEachTests() {
 			bidListService = null;
@@ -232,7 +206,7 @@ public class BidListServiceTest {
 		@Tag("BidListServiceTest")
 		@DisplayName("test getBidLists should return bidLists")
 		public void getBidListsTestShouldReturnBidLists() {
-			
+
 			//GIVEN
 			List<BidList> expectedBidLists = new ArrayList<>();
 			bidList = new BidList();
@@ -257,9 +231,9 @@ public class BidListServiceTest {
 			bidList.setDealName("deal name");
 			bidList.setDealType("deal type");
 			bidList.setSourceListId("source list id");
-			bidList.setSide("side");					
+			bidList.setSide("side");
 			expectedBidLists.add(bidList);
-			
+
 			BidList bidList2 = new BidList();
 			bidList2.setBidListId(12);
 			bidList2.setAccount("account2");
@@ -282,17 +256,17 @@ public class BidListServiceTest {
 			bidList2.setDealName("deal name2");
 			bidList2.setDealType("deal type2");
 			bidList2.setSourceListId("source list id2");
-			bidList2.setSide("side2");					
+			bidList2.setSide("side2");
 			expectedBidLists.add(bidList2);
 			when(bidListRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<BidList>(expectedBidLists, pageRequest, 2));
-			
+
 			//WHEN
-			Page<BidList> resultedBidLists = bidListService.getBidLists(pageRequest, request);
-			
+			Page<BidList> resultedBidLists = bidListService.getBidLists(pageRequest);
+
 			//THEN
 			assertThat(resultedBidLists).containsExactlyElementsOf(expectedBidLists);
 		}
-		
+
 		@Test
 		@Tag("BidListServiceTest")
 		@DisplayName("test getBidLists should throw UnexpectedRollbackException on NullPointerException")
@@ -302,10 +276,10 @@ public class BidListServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> bidListService.getBidLists(pageRequest, request))
+					() -> bidListService.getBidLists(pageRequest))
 					.getMessage()).isEqualTo("Error while getting bidLists");
 		}
-		
+
 		@Test
 		@Tag("BidListServiceTest")
 		@DisplayName("test getBidLists should throw UnexpectedRollbackException on any RuntimeException")
@@ -315,31 +289,16 @@ public class BidListServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> bidListService.getBidLists(pageRequest, request))
+					() -> bidListService.getBidLists(pageRequest))
 					.getMessage()).isEqualTo("Error while getting bidLists");
 		}
 	}
-	
+
 	@Nested
 	@Tag("saveBidListTests")
 	@DisplayName("Tests for saving bidList")
-	@TestInstance(Lifecycle.PER_CLASS)
 	class SaveBidListTests {
-		
-		@BeforeAll
-		public void setUpForAllTests() {
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/bidList/saveBidList/");
-			request = new ServletWebRequest(requestMock);
-		}
 
-		@AfterAll
-		public void unSetForAllTests() {
-			requestMock = null;
-			request = null;
-		}
-		
 		@BeforeEach
 		public void setUpForEachTest() {
 			bidList = new BidList();
@@ -363,9 +322,9 @@ public class BidListServiceTest {
 			bidList.setDealName("deal name");
 			bidList.setDealType("deal type");
 			bidList.setSourceListId("source list id");
-			bidList.setSide("side");					
+			bidList.setSide("side");
 		}
-		
+
 		@AfterEach
 		public void unSetForEachTests() {
 			bidListService = null;
@@ -376,17 +335,17 @@ public class BidListServiceTest {
 		@Tag("BidListServiceTest")
 		@DisplayName("test saveBidList should persist and return bidList")
 		public void saveBidListTestShouldReturnBidList() {
-			
+
 			//GIVEN
 			when(bidListRepository.save(any(BidList.class))).then(invocation -> {
 				BidList bidListSaved = invocation.getArgument(0);
 				bidListSaved.setBidListId(1);
 				return bidListSaved;
 				});
-			
+
 			//WHEN
-			BidList bidListResult = bidListService.saveBidList(bidList, request);
-			
+			BidList bidListResult = bidListService.saveBidList(bidList);
+
 			//THEN
 			verify(bidListRepository).save(any(BidList.class)); //times(1) is the default and can be omitted
 			assertThat(bidListResult).extracting(
@@ -437,43 +396,28 @@ public class BidListServiceTest {
 					"side"
 					);
 		}
-				
+
 		@Test
 		@Tag("BidListServiceTest")
 		@DisplayName("test saveBidList should throw UnexpectedRollbackException on any RuntimeException")
 		public void saveBidListTestShouldThrowUnexpectedRollbackExceptionOnAnyRuntimeException() {
-			
+
 			//GIVEN
 			when(bidListRepository.save(any(BidList.class))).thenThrow(new RuntimeException());
 
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> bidListService.saveBidList(bidList, request))
+					() -> bidListService.saveBidList(bidList))
 					.getMessage()).isEqualTo("Error while saving bidList");
-		}	
+		}
 	}
 
 	@Nested
 	@Tag("deleteBidListTests")
 	@DisplayName("Tests for deleting bidLists")
-	@TestInstance(Lifecycle.PER_CLASS)
 	class DeleteBidListTests {
-		
-		@BeforeAll
-		public void setUpForAllTests() {
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/bidList/delete/1");
-			request = new ServletWebRequest(requestMock);
-		}
 
-		@AfterAll
-		public void unSetForAllTests() {
-			requestMock = null;
-			request = null;
-		}
-		
 		@BeforeEach
 		public void setUpForEachTest() {
 			bidList = new BidList();
@@ -498,9 +442,9 @@ public class BidListServiceTest {
 			bidList.setDealName("deal name");
 			bidList.setDealType("deal type");
 			bidList.setSourceListId("source list id");
-			bidList.setSide("side");					
+			bidList.setSide("side");
 		}
-		
+
 		@AfterEach
 		public void unSetForEachTests() {
 			bidListService = null;
@@ -511,15 +455,15 @@ public class BidListServiceTest {
 		@Tag("BidListServiceTest")
 		@DisplayName("test deleteBidList by Id should delete it")
 		public void deleteBidListByIdTestShouldDeleteIt() {
-			
+
 			//GIVEN
 			when(bidListRepository.findById(anyInt())).thenReturn(Optional.of(bidList));
 			ArgumentCaptor<BidList> bidListBeingDeleted = ArgumentCaptor.forClass(BidList.class);
 			doNothing().when(bidListRepository).delete(any(BidList.class));// Needed to Capture bidList
-			
+
 			//WHEN
-			bidListService.deleteBidListById(1, request);
-			
+			bidListService.deleteBidListById(1);
+
 			//THEN
 			verify(bidListRepository, times(1)).delete(bidListBeingDeleted.capture());
 			assertThat(bidListBeingDeleted.getValue()).extracting(
@@ -570,7 +514,7 @@ public class BidListServiceTest {
 					"side"
 					);
 		}
-		
+
 		@Test
 		@Tag("BidListServiceTest")
 		@DisplayName("test deleteBidList by Id by Id should throw UnexpectedRollbackException on UnexpectedRollbackException")
@@ -582,9 +526,9 @@ public class BidListServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> bidListService.deleteBidListById(2, request))
+					() -> bidListService.deleteBidListById(2))
 					.getMessage()).isEqualTo("Error while deleting bidList");
-		}	
+		}
 
 		@Test
 		@Tag("BidListServiceTest")
@@ -597,11 +541,11 @@ public class BidListServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> bidListService.deleteBidListById(1, request))
+					() -> bidListService.deleteBidListById(1))
 					.getMessage()).isEqualTo("Error while deleting bidList");
-		}	
+		}
 
-		
+
 		@Test
 		@Tag("BidListServiceTest")
 		@DisplayName("test deleteBidList by Id should throw UnexpectedRollbackException On Any RuntimeExpceptioin")
@@ -613,7 +557,7 @@ public class BidListServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> bidListService.deleteBidListById(1, request))
+					() -> bidListService.deleteBidListById(1))
 					.getMessage()).isEqualTo("Error while deleting bidList");
 		}	
 	}

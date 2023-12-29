@@ -98,5 +98,5 @@ CREATE TABLE Users (
   PRIMARY KEY (Id)
 );
 
-insert into Users(fullname, username, password, role) values('Administrator', 'admin', '$2a$10$pBV8ILO/s/nao4wVnGLrh.sa/rnr5pDpbeC4E.KNzQWoy8obFZdaa', 'ADMIN');
-insert into Users(fullname, username, password, role) values('User', 'user', '$2a$10$pBV8ILO/s/nao4wVnGLrh.sa/rnr5pDpbeC4E.KNzQWoy8obFZdaa', 'USER');
+insert into Users(fullname, username, password, role) values('Administrator', 'admin', '$2y$10$5FLt3kljUZSz27vXgofrCu/VPmenYaK7hq0maFE.2oMCFZ2IueqtS', 'ADMIN'); //MDPAdmin
+insert into Users(fullname, username, password, role) values('User', 'user', '$2y$10$laT3C3G5xbvOTMnWCtd91.Wfs/x.DBatimTJ4rkk4UHax5tWWMNmO', 'USER'); //MDPUser
