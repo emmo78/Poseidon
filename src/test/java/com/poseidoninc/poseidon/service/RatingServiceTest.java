@@ -54,32 +54,12 @@ public class RatingServiceTest {
 	@Mock
 	private RatingRepository ratingRepository;
 	
-	@Spy
-	private final RequestService requestService = new RequestServiceImpl();
-	
-	private MockHttpServletRequest requestMock;
-	private WebRequest request;
 	private Rating rating;
 
 	@Nested
 	@Tag("getRatingByIdTests")
 	@DisplayName("Tests for getting rating by ratingId")
-	@TestInstance(Lifecycle.PER_CLASS)
 	class GetRatingByIdTests {
-		
-		@BeforeAll
-		public void setUpForAllTests() {
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/rating/getById/1");
-			request = new ServletWebRequest(requestMock);
-		}
-
-		@AfterAll
-		public void unSetForAllTests() {
-			requestMock = null;
-			request = null;
-		}
 		
 		@AfterEach
 		public void unSetForEachTests() {
@@ -102,7 +82,7 @@ public class RatingServiceTest {
 			when(ratingRepository.findById(anyInt())).thenReturn(Optional.of(rating));
 			
 			//WHEN
-			Rating ratingResult = ratingService.getRatingById(1, request);
+			Rating ratingResult = ratingService.getRatingById(1);
 			
 			//THEN
 			assertThat(ratingResult).extracting(
@@ -129,7 +109,7 @@ public class RatingServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> ratingService.getRatingById(null, request))
+				() -> ratingService.getRatingById(null))
 				.getMessage()).isEqualTo("Error while getting rating");
 		}
 
@@ -143,7 +123,7 @@ public class RatingServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> ratingService.getRatingById(1, request))
+				() -> ratingService.getRatingById(1))
 				.getMessage()).isEqualTo("Error while getting rating");
 		}
 		
@@ -157,7 +137,7 @@ public class RatingServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> ratingService.getRatingById(1, request))
+				() -> ratingService.getRatingById(1))
 				.getMessage()).isEqualTo("Error while getting rating");
 		}
 	}
@@ -173,17 +153,11 @@ public class RatingServiceTest {
 		@BeforeAll
 		public void setUpForAllTests() {
 			pageRequest = Pageable.unpaged();
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/rating/getRatings");
-			request = new ServletWebRequest(requestMock);
 		}
 
 		@AfterAll
 		public void unSetForAllTests() {
 			pageRequest = null;
-			requestMock = null;
-			request = null;
 		}
 		
 		@AfterEach
@@ -217,7 +191,7 @@ public class RatingServiceTest {
 			when(ratingRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<Rating>(expectedRatings, pageRequest, 2));
 			
 			//WHEN
-			Page<Rating> resultedRatings = ratingService.getRatings(pageRequest, request);
+			Page<Rating> resultedRatings = ratingService.getRatings(pageRequest);
 			
 			//THEN
 			assertThat(resultedRatings).containsExactlyElementsOf(expectedRatings);
@@ -232,7 +206,7 @@ public class RatingServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> ratingService.getRatings(pageRequest, request))
+					() -> ratingService.getRatings(pageRequest))
 					.getMessage()).isEqualTo("Error while getting ratings");
 		}
 		
@@ -245,7 +219,7 @@ public class RatingServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> ratingService.getRatings(pageRequest, request))
+					() -> ratingService.getRatings(pageRequest))
 					.getMessage()).isEqualTo("Error while getting ratings");
 		}
 	}
@@ -253,23 +227,8 @@ public class RatingServiceTest {
 	@Nested
 	@Tag("saveRatingTests")
 	@DisplayName("Tests for saving rating")
-	@TestInstance(Lifecycle.PER_CLASS)
 	class SaveRatingTests {
-		
-		@BeforeAll
-		public void setUpForAllTests() {
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/rating/saveRating/");
-			request = new ServletWebRequest(requestMock);
-		}
 
-		@AfterAll
-		public void unSetForAllTests() {
-			requestMock = null;
-			request = null;
-		}
-		
 		@BeforeEach
 		public void setUpForEachTest() {
 			rating = new Rating();
@@ -298,7 +257,7 @@ public class RatingServiceTest {
 			});
 			
 			//WHEN
-			Rating ratingResult = ratingService.saveRating(rating, request);
+			Rating ratingResult = ratingService.saveRating(rating);
 			
 			//THEN
 			verify(ratingRepository).save(any(Rating.class)); //times(1) is the default and can be omitted
@@ -329,7 +288,7 @@ public class RatingServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> ratingService.saveRating(rating, request))
+					() -> ratingService.saveRating(rating))
 					.getMessage()).isEqualTo("Error while saving rating");
 		}	
 	}
@@ -337,23 +296,8 @@ public class RatingServiceTest {
 	@Nested
 	@Tag("deleteRatingTests")
 	@DisplayName("Tests for deleting ratings")
-	@TestInstance(Lifecycle.PER_CLASS)
 	class DeleteRatingTests {
-		
-		@BeforeAll
-		public void setUpForAllTests() {
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/rating/delete/1");
-			request = new ServletWebRequest(requestMock);
-		}
 
-		@AfterAll
-		public void unSetForAllTests() {
-			requestMock = null;
-			request = null;
-		}
-		
 		@BeforeEach
 		public void setUpForEachTest() {
 			rating = new Rating();
@@ -381,7 +325,7 @@ public class RatingServiceTest {
 			doNothing().when(ratingRepository).delete(any(Rating.class));// Needed to Capture rating
 			
 			//WHEN
-			ratingService.deleteRatingById(1, request);
+			ratingService.deleteRatingById(1);
 			
 			//THEN
 			verify(ratingRepository, times(1)).delete(ratingBeingDeleted.capture());
@@ -410,7 +354,7 @@ public class RatingServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> ratingService.deleteRatingById(2, request))
+					() -> ratingService.deleteRatingById(2))
 					.getMessage()).isEqualTo("Error while deleting rating");
 		}	
 
@@ -425,7 +369,7 @@ public class RatingServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> ratingService.deleteRatingById(1, request))
+					() -> ratingService.deleteRatingById(1))
 					.getMessage()).isEqualTo("Error while deleting rating");
 		}	
 
@@ -441,9 +385,8 @@ public class RatingServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> ratingService.deleteRatingById(1, request))
+					() -> ratingService.deleteRatingById(1))
 					.getMessage()).isEqualTo("Error while deleting rating");
 		}	
 	}
-
 }

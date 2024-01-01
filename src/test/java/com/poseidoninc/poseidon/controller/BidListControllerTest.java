@@ -62,6 +62,7 @@ public class BidListControllerTest {
 
 			//GIVEN
 			when(bidListService.getBidLists(any(Pageable.class))).thenReturn(new PageImpl<BidList>(new ArrayList<>()));
+
 			//WHEN
 			String html = bidListController.home(model, request);
 
@@ -76,6 +77,7 @@ public class BidListControllerTest {
 
 			//GIVEN
 			when(bidListService.getBidLists(any(Pageable.class))).thenThrow(new UnexpectedRollbackException("Error while getting bidLists"));
+
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,

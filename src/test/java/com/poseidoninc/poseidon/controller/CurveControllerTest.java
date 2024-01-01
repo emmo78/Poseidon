@@ -1,7 +1,5 @@
 package com.poseidoninc.poseidon.controller;
 
-import com.poseidoninc.poseidon.domain.BidList;
-import com.poseidoninc.poseidon.domain.CurvePoint;
 import com.poseidoninc.poseidon.domain.CurvePoint;
 import com.poseidoninc.poseidon.service.CurvePointService;
 import com.poseidoninc.poseidon.service.RequestService;
