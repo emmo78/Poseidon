@@ -23,67 +23,60 @@ import lombok.extern.slf4j.Slf4j;
 public class CurvePointServiceIpml implements CurvePointService {
 
 	private final CurvePointRepository curvePointRepository;
-	private final RequestService requestService;
 
 	@Override
 	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
-	public CurvePoint getCurvePointById(Integer id, WebRequest request) throws UnexpectedRollbackException {
+	public CurvePoint getCurvePointById(Integer id) throws UnexpectedRollbackException {
 		CurvePoint curvePoint;
 		try {
 			//Throws ResourceNotFoundException | InvalidDataAccessApiUsageException
 			curvePoint = curvePointRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Curve Point not found"));
 		} catch (Exception e) {
-			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), id, e.toString());
+			log.error("Error while getting curvePoint = {} : {} ", id, e.toString());
 			throw new UnexpectedRollbackException("Error while getting curvePoint");
 		}
-		log.info("{} : curvePoint={} gotten",  requestService.requestToString(request), curvePoint.toString());
 		return curvePoint;
 	}
 
 	@Override
 	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
-	public Page<CurvePoint> getCurvePoints(Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException {
-		Page<CurvePoint> pageCurvePoints;
+	public Page<CurvePoint> getCurvePoints(Pageable pageRequest) throws UnexpectedRollbackException {
+		Page<CurvePoint> pageCurvePoint;
 		try {
 			//throws NullPointerException if pageRequest is null
-			pageCurvePoints = curvePointRepository.findAll(pageRequest);
+			pageCurvePoint = curvePointRepository.findAll(pageRequest);
 		} catch(Exception e) {
-			log.error("{} : {} ", requestService.requestToString(request), e.toString());
+			log.error("Error while getting curvePoints : {}", e.toString());
 			throw new UnexpectedRollbackException("Error while getting curvePoints");
 		}
-		log.info("{} : curvePoints page number : {} of {}",
-			requestService.requestToString(request),
-			pageCurvePoints.getNumber()+1,
-			pageCurvePoints.getTotalPages());
-		return pageCurvePoints;
+		return pageCurvePoint;
 	}
 
 	@Override
 	@Transactional(rollbackFor = {DataIntegrityViolationException.class, UnexpectedRollbackException.class})
-	public CurvePoint saveCurvePoint(CurvePoint curvePoint, WebRequest request) throws DataIntegrityViolationException, UnexpectedRollbackException {
+	public CurvePoint saveCurvePoint(CurvePoint curvePoint) throws DataIntegrityViolationException, UnexpectedRollbackException {
+		CurvePoint curvePointSaved;
 		try {
 			//No need to test blank or null fields for update because constraint validation on each field
-			curvePoint = curvePointRepository.save(curvePoint);
+			curvePointSaved = curvePointRepository.save(curvePoint);
 		} catch(DataIntegrityViolationException dive) {
-			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), curvePoint.toString(), dive.toString());
+			log.error("Error while saving curvePoint = {} : {} ", curvePoint.toString(), dive.toString());
 			throw new DataIntegrityViolationException("CurveId already exists");
 		} catch(Exception e) {
-			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), curvePoint.toString(), e.toString());
+			log.error("Error while saving curvePoint = {} : {} ", curvePoint.toString(), e.toString());
 			throw new UnexpectedRollbackException("Error while saving curvePoint");
 		}
-		log.info("{} : curvePoint={} persisted", requestService.requestToString(request), curvePoint.toString());
-		return curvePoint;
+		return curvePointSaved;
 	}
 
 	@Override
 	@Transactional(rollbackFor = UnexpectedRollbackException.class)
-	public void deleteCurvePointById(Integer id, WebRequest request) throws UnexpectedRollbackException {
+	public void deleteCurvePointById(Integer id) throws UnexpectedRollbackException {
 		try {
-			curvePointRepository.delete(getCurvePointById(id, request)); //getCurvePointById throws UnexpectedRollbackException
+			curvePointRepository.delete(getCurvePointById(id)); //getCurvePointById throws UnexpectedRollbackException
 		} catch(Exception e) {
-			log.error("{} : curvePoint={} : {} ", requestService.requestToString(request), id, e.toString());
+			log.error("Error while deleting curvePoint = {} : {} ", id, e.toString());
 			throw new UnexpectedRollbackException("Error while deleting curvePoint");
 		}
-		log.info("{} : curvePoint={} deleted", requestService.requestToString(request), id);
 	}
 }

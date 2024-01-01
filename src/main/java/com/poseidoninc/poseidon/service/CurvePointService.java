@@ -11,8 +11,8 @@ import com.poseidoninc.poseidon.domain.CurvePoint;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 
 public interface CurvePointService {
-	CurvePoint getCurvePointById(Integer id, WebRequest request) throws UnexpectedRollbackException;
-	Page<CurvePoint> getCurvePoints(Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException;
-	CurvePoint saveCurvePoint(CurvePoint curvePoint, WebRequest request) throws DataIntegrityViolationException, UnexpectedRollbackException;
-	void deleteCurvePointById(Integer id, WebRequest request) throws UnexpectedRollbackException;
+	CurvePoint getCurvePointById(Integer id) throws UnexpectedRollbackException;
+	Page<CurvePoint> getCurvePoints(Pageable pageRequest) throws UnexpectedRollbackException;
+	CurvePoint saveCurvePoint(CurvePoint curvePoint) throws DataIntegrityViolationException, UnexpectedRollbackException;
+	void deleteCurvePointById(Integer id) throws UnexpectedRollbackException;
 }

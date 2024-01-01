@@ -55,32 +55,12 @@ public class CurvePointServiceTest {
 	@Mock
 	private CurvePointRepository curvePointRepository;
 	
-	@Spy
-	private final RequestService requestService = new RequestServiceImpl();
-	
-	private MockHttpServletRequest requestMock;
-	private WebRequest request;
 	private CurvePoint curvePoint;
 	
 	@Nested
 	@Tag("getCurvePointByIdTests")
 	@DisplayName("Tests for getting curvePoint by curvePointId")
-	@TestInstance(Lifecycle.PER_CLASS)
 	class GetCurvePointByIdTests {
-		
-		@BeforeAll
-		public void setUpForAllTests() {
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/curvePoint/getById/1");
-			request = new ServletWebRequest(requestMock);
-		}
-
-		@AfterAll
-		public void unSetForAllTests() {
-			requestMock = null;
-			request = null;
-		}
 		
 		@AfterEach
 		public void unSetForEachTests() {
@@ -104,7 +84,7 @@ public class CurvePointServiceTest {
 			when(curvePointRepository.findById(anyInt())).thenReturn(Optional.of(curvePoint));
 			
 			//WHEN
-			CurvePoint curvePointResult = curvePointService.getCurvePointById(1, request);
+			CurvePoint curvePointResult = curvePointService.getCurvePointById(1);
 			
 			//THEN
 			assertThat(curvePointResult).extracting(
@@ -134,7 +114,7 @@ public class CurvePointServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> curvePointService.getCurvePointById(null, request))
+				() -> curvePointService.getCurvePointById(null))
 				.getMessage()).isEqualTo("Error while getting curvePoint");
 		}
 
@@ -148,7 +128,7 @@ public class CurvePointServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> curvePointService.getCurvePointById(1, request))
+				() -> curvePointService.getCurvePointById(1))
 				.getMessage()).isEqualTo("Error while getting curvePoint");
 		}
 		
@@ -162,7 +142,7 @@ public class CurvePointServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> curvePointService.getCurvePointById(1, request))
+				() -> curvePointService.getCurvePointById(1))
 				.getMessage()).isEqualTo("Error while getting curvePoint");
 		}
 	}
@@ -178,17 +158,11 @@ public class CurvePointServiceTest {
 		@BeforeAll
 		public void setUpForAllTests() {
 			pageRequest = Pageable.unpaged();
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/curvePoint/getCurvePoints");
-			request = new ServletWebRequest(requestMock);
 		}
 
 		@AfterAll
 		public void unSetForAllTests() {
 			pageRequest = null;
-			requestMock = null;
-			request = null;
 		}
 		
 		@AfterEach
@@ -220,12 +194,11 @@ public class CurvePointServiceTest {
 			curvePoint2.setTerm(4.0);
 			curvePoint2.setValue(5.0);
 			curvePoint2.setCreationDate(LocalDateTime.parse("24/01/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
-
 			expectedCurvePoints.add(curvePoint2);
 			when(curvePointRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<CurvePoint>(expectedCurvePoints, pageRequest, 2));
 			
 			//WHEN
-			Page<CurvePoint> resultedCurvePoints = curvePointService.getCurvePoints(pageRequest, request);
+			Page<CurvePoint> resultedCurvePoints = curvePointService.getCurvePoints(pageRequest);
 			
 			//THEN
 			assertThat(resultedCurvePoints).containsExactlyElementsOf(expectedCurvePoints);
@@ -240,7 +213,7 @@ public class CurvePointServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> curvePointService.getCurvePoints(pageRequest, request))
+					() -> curvePointService.getCurvePoints(pageRequest))
 					.getMessage()).isEqualTo("Error while getting curvePoints");
 		}
 		
@@ -253,7 +226,7 @@ public class CurvePointServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> curvePointService.getCurvePoints(pageRequest, request))
+					() -> curvePointService.getCurvePoints(pageRequest))
 					.getMessage()).isEqualTo("Error while getting curvePoints");
 		}
 	}
@@ -261,22 +234,7 @@ public class CurvePointServiceTest {
 	@Nested
 	@Tag("saveCurvePointTests")
 	@DisplayName("Tests for saving curvePoints")
-	@TestInstance(Lifecycle.PER_CLASS)
 	class SaveCurvePointTests {
-		
-		@BeforeAll
-		public void setUpForAllTests() {
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/curvePoint/saveCurvePoint/");
-			request = new ServletWebRequest(requestMock);
-		}
-
-		@AfterAll
-		public void unSetForAllTests() {
-			requestMock = null;
-			request = null;
-		}
 		
 		@BeforeEach
 		public void setUpForEachTest() {
@@ -307,7 +265,7 @@ public class CurvePointServiceTest {
 				});
 			
 			//WHEN
-			CurvePoint resultedCurvePoint = curvePointService.saveCurvePoint(curvePoint, request);
+			CurvePoint resultedCurvePoint = curvePointService.saveCurvePoint(curvePoint);
 			
 			//THEN
 			verify(curvePointRepository).save(any(CurvePoint.class)); //times(1) is the default and can be omitted
@@ -338,7 +296,7 @@ public class CurvePointServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(DataIntegrityViolationException.class,
-					() -> curvePointService.saveCurvePoint(curvePoint, request))
+					() -> curvePointService.saveCurvePoint(curvePoint))
 					.getMessage()).isEqualTo("CurveId already exists");
 		}
 		
@@ -353,7 +311,7 @@ public class CurvePointServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> curvePointService.saveCurvePoint(curvePoint, request))
+					() -> curvePointService.saveCurvePoint(curvePoint))
 					.getMessage()).isEqualTo("Error while saving curvePoint");
 		}	
 	}
@@ -361,22 +319,7 @@ public class CurvePointServiceTest {
 	@Nested
 	@Tag("deleteCurvePointTests")
 	@DisplayName("Tests for deleting curve point")
-	@TestInstance(Lifecycle.PER_CLASS)
 	class DeleteCurvePointTests {
-		
-		@BeforeAll
-		public void setUpForAllTests() {
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/curvePoint/delete/1");
-			request = new ServletWebRequest(requestMock);
-		}
-
-		@AfterAll
-		public void unSetForAllTests() {
-			requestMock = null;
-			request = null;
-		}
 		
 		@BeforeEach
 		public void setUpForEachTest() {
@@ -406,7 +349,7 @@ public class CurvePointServiceTest {
 			doNothing().when(curvePointRepository).delete(any(CurvePoint.class));// Needed to Capture curvePoint
 			
 			//WHEN
-			curvePointService.deleteCurvePointById(1, request);
+			curvePointService.deleteCurvePointById(1);
 			
 			//THEN
 			verify(curvePointRepository, times(1)).delete(curvePointBeingDeleted.capture());
@@ -437,7 +380,7 @@ public class CurvePointServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> curvePointService.deleteCurvePointById(2, request))
+					() -> curvePointService.deleteCurvePointById(2))
 					.getMessage()).isEqualTo("Error while deleting curvePoint");
 		}	
 
@@ -452,7 +395,7 @@ public class CurvePointServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> curvePointService.deleteCurvePointById(1, request))
+					() -> curvePointService.deleteCurvePointById(1))
 					.getMessage()).isEqualTo("Error while deleting curvePoint");
 		}	
 		
@@ -468,7 +411,7 @@ public class CurvePointServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> curvePointService.deleteCurvePointById(1, request))
+					() -> curvePointService.deleteCurvePointById(1))
 					.getMessage()).isEqualTo("Error while deleting curvePoint");
 		}	
 	}
