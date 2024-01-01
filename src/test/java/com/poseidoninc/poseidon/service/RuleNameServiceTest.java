@@ -1,50 +1,28 @@
 package com.poseidoninc.poseidon.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import com.poseidoninc.poseidon.domain.RuleName;
+import com.poseidoninc.poseidon.repository.RuleNameRepository;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.transaction.UnexpectedRollbackException;
-import org.springframework.web.context.request.ServletWebRequest;
-import org.springframework.web.context.request.WebRequest;
 
-import com.poseidoninc.poseidon.domain.RuleName;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import com.poseidoninc.poseidon.repository.RuleNameRepository;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class RuleNameServiceTest {
@@ -54,32 +32,12 @@ public class RuleNameServiceTest {
 	@Mock
 	private RuleNameRepository ruleNameRepository;
 	
-	@Spy
-	private final RequestService requestService = new RequestServiceImpl();
-	
-	private MockHttpServletRequest requestMock;
-	private WebRequest request;
 	private RuleName ruleName;
 
 	@Nested
 	@Tag("getRuleNameByIdTests")
 	@DisplayName("Tests for getting ruleName by ruleNameId")
-	@TestInstance(Lifecycle.PER_CLASS)
 	class GetRuleNameByIdTests {
-		
-		@BeforeAll
-		public void setUpForAllTests() {
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/ruleName/getById/1");
-			request = new ServletWebRequest(requestMock);
-		}
-
-		@AfterAll
-		public void unSetForAllTests() {
-			requestMock = null;
-			request = null;
-		}
 		
 		@AfterEach
 		public void unSetForEachTests() {
@@ -104,7 +62,7 @@ public class RuleNameServiceTest {
 			when(ruleNameRepository.findById(anyInt())).thenReturn(Optional.of(ruleName));
 			
 			//WHEN
-			RuleName ruleNameResult = ruleNameService.getRuleNameById(1, request);
+			RuleName ruleNameResult = ruleNameService.getRuleNameById(1);
 			
 			//THEN
 			assertThat(ruleNameResult).extracting(
@@ -135,7 +93,7 @@ public class RuleNameServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> ruleNameService.getRuleNameById(null, request))
+				() -> ruleNameService.getRuleNameById(null))
 				.getMessage()).isEqualTo("Error while getting ruleName");
 		}
 
@@ -149,7 +107,7 @@ public class RuleNameServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> ruleNameService.getRuleNameById(1, request))
+				() -> ruleNameService.getRuleNameById(1))
 				.getMessage()).isEqualTo("Error while getting ruleName");
 		}
 		
@@ -163,7 +121,7 @@ public class RuleNameServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> ruleNameService.getRuleNameById(1, request))
+				() -> ruleNameService.getRuleNameById(1))
 				.getMessage()).isEqualTo("Error while getting ruleName");
 		}
 	}
@@ -179,17 +137,11 @@ public class RuleNameServiceTest {
 		@BeforeAll
 		public void setUpForAllTests() {
 			pageRequest = Pageable.unpaged();
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/ruleName/getRuleNames");
-			request = new ServletWebRequest(requestMock);
 		}
 
 		@AfterAll
 		public void unSetForAllTests() {
 			pageRequest = null;
-			requestMock = null;
-			request = null;
 		}
 		
 		@AfterEach
@@ -227,7 +179,7 @@ public class RuleNameServiceTest {
 			when(ruleNameRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<RuleName>(expectedRuleNames, pageRequest, 2));
 			
 			//WHEN
-			Page<RuleName> resultedRuleNames = ruleNameService.getRuleNames(pageRequest, request);
+			Page<RuleName> resultedRuleNames = ruleNameService.getRuleNames(pageRequest);
 			
 			//THEN
 			assertThat(resultedRuleNames).containsExactlyElementsOf(expectedRuleNames);
@@ -242,8 +194,8 @@ public class RuleNameServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> ruleNameService.getRuleNames(pageRequest, request))
-					.getMessage()).isEqualTo("Error while getting RuleNames");
+					() -> ruleNameService.getRuleNames(pageRequest))
+					.getMessage()).isEqualTo("Error while getting ruleNames");
 		}
 		
 		@Test
@@ -255,31 +207,16 @@ public class RuleNameServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> ruleNameService.getRuleNames(pageRequest, request))
-					.getMessage()).isEqualTo("Error while getting RuleNames");
+					() -> ruleNameService.getRuleNames(pageRequest))
+					.getMessage()).isEqualTo("Error while getting ruleNames");
 		}
 	}
 	
 	@Nested
 	@Tag("saveRuleNameTests")
 	@DisplayName("Tests for saving ruleName")
-	@TestInstance(Lifecycle.PER_CLASS)
 	class SaveRuleNameTests {
-		
-		@BeforeAll
-		public void setUpForAllTests() {
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/ruleName/saveRuleName/");
-			request = new ServletWebRequest(requestMock);
-		}
 
-		@AfterAll
-		public void unSetForAllTests() {
-			requestMock = null;
-			request = null;
-		}
-		
 		@BeforeEach
 		public void setUpForEachTest() {
 			ruleName = new RuleName();
@@ -310,7 +247,7 @@ public class RuleNameServiceTest {
 			});
 			
 			//WHEN
-			RuleName ruleNameResult = ruleNameService.saveRuleName(ruleName, request);
+			RuleName ruleNameResult = ruleNameService.saveRuleName(ruleName);
 			
 			//THEN
 			verify(ruleNameRepository).save(ruleName); //times(1) is the default and can be omitted
@@ -345,7 +282,7 @@ public class RuleNameServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> ruleNameService.saveRuleName(ruleName, request))
+					() -> ruleNameService.saveRuleName(ruleName))
 					.getMessage()).isEqualTo("Error while saving ruleName");
 		}	
 	}
@@ -353,23 +290,8 @@ public class RuleNameServiceTest {
 	@Nested
 	@Tag("deleteRuleNameTests")
 	@DisplayName("Tests for deleting ruleNames")
-	@TestInstance(Lifecycle.PER_CLASS)
 	class DeleteRuleNameTests {
-		
-		@BeforeAll
-		public void setUpForAllTests() {
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/ruleName/delete/1");
-			request = new ServletWebRequest(requestMock);
-		}
 
-		@AfterAll
-		public void unSetForAllTests() {
-			requestMock = null;
-			request = null;
-		}
-		
 		@BeforeEach
 		public void setUpForEachTest() {
 			ruleName = new RuleName();
@@ -399,7 +321,7 @@ public class RuleNameServiceTest {
 			doNothing().when(ruleNameRepository).delete(any(RuleName.class));// Needed to Capture ruleName
 			
 			//WHEN
-			ruleNameService.deleteRuleNameById(1, request);
+			ruleNameService.deleteRuleNameById(1);
 			
 			//THEN
 			verify(ruleNameRepository, times(1)).delete(ruleNameBeingDeleted.capture());
@@ -432,7 +354,7 @@ public class RuleNameServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> ruleNameService.deleteRuleNameById(2, request))
+					() -> ruleNameService.deleteRuleNameById(2))
 					.getMessage()).isEqualTo("Error while deleting ruleName");
 		}	
 
@@ -447,7 +369,7 @@ public class RuleNameServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> ruleNameService.deleteRuleNameById(1, request))
+					() -> ruleNameService.deleteRuleNameById(1))
 					.getMessage()).isEqualTo("Error while deleting ruleName");
 		}	
 
@@ -463,7 +385,7 @@ public class RuleNameServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> ruleNameService.deleteRuleNameById(1, request))
+					() -> ruleNameService.deleteRuleNameById(1))
 					.getMessage()).isEqualTo("Error while deleting ruleName");
 		}	
 	}

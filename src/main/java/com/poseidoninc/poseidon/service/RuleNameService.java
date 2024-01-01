@@ -7,8 +7,8 @@ import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.web.context.request.WebRequest;
 
 public interface RuleNameService {
-	RuleName getRuleNameById(Integer id, WebRequest request) throws UnexpectedRollbackException;
-	Page<RuleName> getRuleNames(Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException;
-	RuleName saveRuleName(RuleName ruleName, WebRequest request) throws UnexpectedRollbackException;
-	void deleteRuleNameById(Integer id, WebRequest request) throws UnexpectedRollbackException;
+	RuleName getRuleNameById(Integer id) throws UnexpectedRollbackException;
+	Page<RuleName> getRuleNames(Pageable pageRequest) throws UnexpectedRollbackException;
+	RuleName saveRuleName(RuleName ruleName) throws UnexpectedRollbackException;
+	void deleteRuleNameById(Integer id) throws UnexpectedRollbackException;
 }

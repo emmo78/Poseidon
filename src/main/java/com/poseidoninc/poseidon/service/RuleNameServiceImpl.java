@@ -10,7 +10,6 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.request.WebRequest;
 
 @Service
 @AllArgsConstructor
@@ -18,64 +17,56 @@ import org.springframework.web.context.request.WebRequest;
 public class RuleNameServiceImpl implements RuleNameService {
 
 	private final RuleNameRepository ruleNameRepository;
-	private final RequestService requestService;
-
 	
 	@Override
 	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
-	public RuleName getRuleNameById(Integer id, WebRequest request) throws UnexpectedRollbackException {
-		RuleName ruleName = null;
+	public RuleName getRuleNameById(Integer id) throws UnexpectedRollbackException {
+		RuleName ruleName;
 		try {
 			//Throws ResourceNotFoundException | InvalidDataAccessApiUsageException
 			ruleName = ruleNameRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("RuleName not found"));
 		} catch (Exception e) {
-			log.error("{} : ruleName={} : {} ", requestService.requestToString(request), id, e.toString());
+			log.error("Error while getting ruleName = {} : {} ", id, e.toString());
 			throw new UnexpectedRollbackException("Error while getting ruleName");
 		}
-		log.info("{} : ruleName={} gotten",  requestService.requestToString(request), ruleName.toString());
 		return ruleName;
 	}
 
 	@Override
 	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
-	public Page<RuleName> getRuleNames(Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException {
+	public Page<RuleName> getRuleNames(Pageable pageRequest) throws UnexpectedRollbackException {
 		Page<RuleName> pageRuleName = null;
 		try {
 			//throws NullPointerException if pageRequest is null
 			pageRuleName = ruleNameRepository.findAll(pageRequest);
 		} catch(Exception e) {
-			log.error("{} : {} ", requestService.requestToString(request), e.toString());
-			throw new UnexpectedRollbackException("Error while getting RuleNames");
+			log.error("Error while getting ruleNames : {} ", e.toString());
+			throw new UnexpectedRollbackException("Error while getting ruleNames");
 		}
-		log.info("{} : ruleNames page number : {} of {}",
-			requestService.requestToString(request),
-			pageRuleName.getNumber()+1,
-			pageRuleName.getTotalPages());
 		return pageRuleName;
 	}
 
 	@Override
 	@Transactional(rollbackFor = UnexpectedRollbackException.class)
-	public RuleName saveRuleName(RuleName ruleName, WebRequest request) throws UnexpectedRollbackException {
+	public RuleName saveRuleName(RuleName ruleName) throws UnexpectedRollbackException {
+		RuleName ruleNameSaved;
 		try {
-			ruleName = ruleNameRepository.save(ruleName);
+			ruleNameSaved = ruleNameRepository.save(ruleName);
 		} catch(Exception e) {
-			log.error("{} : ruleName={} : {} ", requestService.requestToString(request), ruleName.toString(), e.toString());
+			log.error("Error while saving ruleName = {} : {} ", ruleName.toString(), e.toString());
 			throw new UnexpectedRollbackException("Error while saving ruleName");
 		}
-		log.info("{} : ruleName={} persisted", requestService.requestToString(request), ruleName.toString());
 		return ruleName;
 	}
 
 	@Override
 	@Transactional(rollbackFor = UnexpectedRollbackException.class)
-	public void deleteRuleNameById(Integer id, WebRequest request) throws UnexpectedRollbackException {
+	public void deleteRuleNameById(Integer id) throws UnexpectedRollbackException {
 		try {
-			ruleNameRepository.delete(getRuleNameById(id, request)); //getRuleNameById throws UnexpectedRollbackException
+			ruleNameRepository.delete(getRuleNameById(id)); //getRuleNameById throws UnexpectedRollbackException
 		} catch(Exception e) {
-			log.error("{} : ruleName={} : {} ", requestService.requestToString(request), id, e.toString());
+			log.error("Error while deleting ruleName = {} : {} ", id, e.toString());
 			throw new UnexpectedRollbackException("Error while deleting ruleName");
 		}
-		log.info("{} : ruleName={} deleted", requestService.requestToString(request), id);
 	}
 }

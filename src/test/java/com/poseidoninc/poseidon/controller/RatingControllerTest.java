@@ -116,7 +116,6 @@ public class RatingControllerTest {
 			when(bindingResult.hasErrors()).thenReturn(false);
 			when(ratingService.saveRating(any(Rating.class))).thenReturn(rating);
 
-
 			//WHEN
 			String html = ratingController.validate(rating, bindingResult, request);
 
@@ -263,6 +262,7 @@ public class RatingControllerTest {
 			//THEN
 			assertThat(html).isEqualTo("redirect:/rating/list");
 		}
+
 		@Test
 		@Tag("RatingControllerTest")
 		@DisplayName("test delete Bid should throw UnexpectedRollbackException")
