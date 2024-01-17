@@ -26,258 +26,259 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class RuleNameControllerTest {
-	
 
-	@InjectMocks
-	private RuleNameController ruleNameController;
 
-	@Mock
-	private RuleNameService ruleNameService;
-	
-	@Mock
-	private BindingResult bindingResult;
-	
-	@Mock
-	private Model model;
+    @InjectMocks
+    private RuleNameController ruleNameController;
 
-	@Mock
-	private WebRequest request;
+    @Mock
+    private RuleNameService ruleNameService;
 
-	@Mock
-	RequestService requestService;
+    @Mock
+    private BindingResult bindingResult;
 
-	@AfterEach
-	public void unsetForEachTest() {
-		ruleNameService = null;
-		ruleNameController = null;
-	}
+    @Mock
+    private Model model;
 
-	@Nested
-	@Tag("homeRuleNameControllerTests")
-	@DisplayName("Tests for /ruleName/list")
-	class HomeRuleNameControllerTests {
-		@Test
-	@Tag("RuleNameControllerTest")
-	@DisplayName("test home should return \"ruleName/list\"")
-	public void homeTestShouldReturnRuleNameList() {
-		
-		//GIVEN
-		when(ruleNameService.getRuleNames(any(Pageable.class))).thenReturn(new PageImpl<RuleName>(new ArrayList<>()));
+    @Mock
+    private WebRequest request;
 
-		//WHEN
-		String html = ruleNameController.home(model, request);
-		
-		//THEN
-		assertThat(html).isEqualTo("ruleName/list");
-	}
+    @Mock
+    private RequestService requestService;
 
-		@Test
-		@Tag("RuleNameControllerTest")
-		@DisplayName("test home should throw UnexpectedRollbackException")
-		public void homeTestShouldThrowUnexpectedRollbackException() {
+    @AfterEach
+    public void unsetForEachTest() {
+        ruleNameService = null;
+        ruleNameController = null;
+    }
 
-			//GIVEN
-			when(ruleNameService.getRuleNames(any(Pageable.class))).thenThrow(new UnexpectedRollbackException("Error while getting ruleNamess"));
+    @Nested
+    @Tag("homeRuleNameControllerTests")
+    @DisplayName("Tests for /ruleName/list")
+    class HomeRuleNameControllerTests {
+        @Test
+        @Tag("RuleNameControllerTest")
+        @DisplayName("test home should return \"ruleName/list\"")
+        public void homeTestShouldReturnRuleNameList() {
 
-			//WHEN
-			//THEN
-			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> ruleNameController.home(model, request))
-					.getMessage()).isEqualTo("Error while getting ruleNames");
-		}
-	}
+            //GIVEN
+            when(ruleNameService.getRuleNames(any(Pageable.class))).thenReturn(new PageImpl<RuleName>(new ArrayList<>()));
 
-	@Test
-	@Tag("RuleNameControllerTest")
-	@DisplayName("test addRuleNameForm should return \"ruleName/add\"")
-	public void ruleNameAddTestShouldReturnStringRuleNameAdd() {
+            //WHEN
+            String html = ruleNameController.home(model, request);
 
-		//GIVEN
-		RuleName ruleName = new RuleName();
+            //THEN
+            assertThat(html).isEqualTo("ruleName/list");
+        }
 
-		//WHEN
-		String html = ruleNameController.addRuleNameForm(ruleName);
+        @Test
+        @Tag("RuleNameControllerTest")
+        @DisplayName("test home should throw UnexpectedRollbackException")
+        public void homeTestShouldThrowUnexpectedRollbackException() {
 
-		//THEN
-		assertThat(html).isEqualTo("ruleName/add");
-	}
-	@Nested
-	@Tag("validateRuleNameControllerTests")
-	@DisplayName("Tests for /ruleName/validate")
-	class ValidateRuleNameControllerTests {
+            //GIVEN
+            when(ruleNameService.getRuleNames(any(Pageable.class))).thenThrow(new UnexpectedRollbackException("Error while getting ruleNamess"));
 
-		@Test
-	@Tag("RuleNameControllerTest")
-	@DisplayName("test validate should return \"redirect:/ruleName/list\"")
-	public void validateTestShouldReturnStringRedirectRuleNameList() {
+            //WHEN
+            //THEN
+            assertThat(assertThrows(UnexpectedRollbackException.class,
+                    () -> ruleNameController.home(model, request))
+                    .getMessage()).isEqualTo("Error while getting ruleNames");
+        }
+    }
 
-		//GIVEN
-		RuleName ruleName = new RuleName();
-		when(bindingResult.hasErrors()).thenReturn(false);
-		when(ruleNameService.saveRuleName(any(RuleName.class))).thenReturn(ruleName);
+    @Test
+    @Tag("RuleNameControllerTest")
+    @DisplayName("test addRuleNameForm should return \"ruleName/add\"")
+    public void ruleNameAddTestShouldReturnStringRuleNameAdd() {
 
-		//WHEN
-		String html = ruleNameController.validate(ruleName, bindingResult, request);
+        //GIVEN
+        RuleName ruleName = new RuleName();
 
-		//THEN
-		assertThat(html).isEqualTo("redirect:/ruleName/list");
-	}
+        //WHEN
+        String html = ruleNameController.addRuleNameForm(ruleName);
 
-	@Test
-	@Tag("RuleNameControllerTest")
-	@DisplayName("test validate should return \"ruleName/add\" on BindingResultError")
-	public void validateTestShouldReturnStringRuleNameAddOnBindingResulError() {
+        //THEN
+        assertThat(html).isEqualTo("ruleName/add");
+    }
 
-		//GIVEN
-		RuleName ruleName = new RuleName();
-		when(bindingResult.hasErrors()).thenReturn(true);
+    @Nested
+    @Tag("validateRuleNameControllerTests")
+    @DisplayName("Tests for /ruleName/validate")
+    class ValidateRuleNameControllerTests {
 
-		//WHEN
-		String html = ruleNameController.validate(ruleName, bindingResult, request);
+        @Test
+        @Tag("RuleNameControllerTest")
+        @DisplayName("test validate should return \"redirect:/ruleName/list\"")
+        public void validateTestShouldReturnStringRedirectRuleNameList() {
 
-		//THEN
-		assertThat(html).isEqualTo("ruleName/add");
-	}
+            //GIVEN
+            RuleName ruleName = new RuleName();
+            when(bindingResult.hasErrors()).thenReturn(false);
+            when(ruleNameService.saveRuleName(any(RuleName.class))).thenReturn(ruleName);
 
-		@Test
-		@Tag("RuleNameControllerTest")
-		@DisplayName("test validate should throw UnexpectedRollbackException")
-		public void validateTestShouldThrowUnexpectedRollbackException() {
+            //WHEN
+            String html = ruleNameController.validate(ruleName, bindingResult, request);
 
-			//GIVEN
-			RuleName ruleName = new RuleName();
-			when(bindingResult.hasErrors()).thenReturn(false);
-			when(ruleNameService.saveRuleName(any(RuleName.class))).thenThrow(new UnexpectedRollbackException("Error while saving ruleName"));
-			//WHEN
-			//THEN
-			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> ruleNameController.validate(ruleName, bindingResult, request))
-					.getMessage()).isEqualTo("Error while saving ruleName");
-		}
-	}
+            //THEN
+            assertThat(html).isEqualTo("redirect:/ruleName/list");
+        }
 
-	@Nested
-	@Tag("showUpdateFormRuleNameControllerTests")
-	@DisplayName("Tests for /ruleName/update/{id}")
-	class ShowUpdateFormRuleNameControllerTests {
+        @Test
+        @Tag("RuleNameControllerTest")
+        @DisplayName("test validate should return \"ruleName/add\" on BindingResultError")
+        public void validateTestShouldReturnStringRuleNameAddOnBindingResulError() {
 
-		@Test
-	@Tag("RuleNameControllerTest")
-	@DisplayName("test showUpdateForm should return \"ruleName/update\"")
-	public void showUpdateFormTestShouldReturnStringRuleNameUpdate() {
+            //GIVEN
+            RuleName ruleName = new RuleName();
+            when(bindingResult.hasErrors()).thenReturn(true);
 
-		//GIVEN
-		RuleName  ruleName = new RuleName();
-		when(ruleNameService.getRuleNameById(anyInt())).thenReturn(ruleName);
+            //WHEN
+            String html = ruleNameController.validate(ruleName, bindingResult, request);
 
-		//WHEN
-		String html = ruleNameController.showUpdateForm(1, model, request);
+            //THEN
+            assertThat(html).isEqualTo("ruleName/add");
+        }
 
-		//THEN
-		assertThat(html).isEqualTo("ruleName/update");
-	}
+        @Test
+        @Tag("RuleNameControllerTest")
+        @DisplayName("test validate should throw UnexpectedRollbackException")
+        public void validateTestShouldThrowUnexpectedRollbackException() {
 
-		@Test
-		@Tag("RuleNameControllerTest")
-		@DisplayName("test showUpdateForm should throw UnexpectedRollbackException")
-		public void showUpdateFormTestShouldThrowUnexpectedRollbackException() {
+            //GIVEN
+            RuleName ruleName = new RuleName();
+            when(bindingResult.hasErrors()).thenReturn(false);
+            when(ruleNameService.saveRuleName(any(RuleName.class))).thenThrow(new UnexpectedRollbackException("Error while saving ruleName"));
+            //WHEN
+            //THEN
+            assertThat(assertThrows(UnexpectedRollbackException.class,
+                    () -> ruleNameController.validate(ruleName, bindingResult, request))
+                    .getMessage()).isEqualTo("Error while saving ruleName");
+        }
+    }
 
-			//GIVEN
-			when(ruleNameService.getRuleNameById(anyInt())).thenThrow(new UnexpectedRollbackException("Error while getting ruleName"));
-			//WHEN
-			//THEN
-			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> ruleNameController.showUpdateForm(1, model, request))
-					.getMessage()).isEqualTo("Error while getting ruleName");
-		}
-	}
+    @Nested
+    @Tag("showUpdateFormRuleNameControllerTests")
+    @DisplayName("Tests for /ruleName/update/{id}")
+    class ShowUpdateFormRuleNameControllerTests {
 
-	@Nested
-	@Tag("updateBidRuleNameControllerTests")
-	@DisplayName("Tests for /ruleName/update")
-	class updateBidRuleNameControllerTests {
+        @Test
+        @Tag("RuleNameControllerTest")
+        @DisplayName("test showUpdateForm should return \"ruleName/update\"")
+        public void showUpdateFormTestShouldReturnStringRuleNameUpdate() {
 
-		@Test
-	@Tag("RuleNameControllerTest")
-	@DisplayName("test update RuleName should return \"redirect:/ruleName/list\"")
-	public void updateCurveTestShouldReturnStringRedirectRuleNameList() {
+            //GIVEN
+            RuleName ruleName = new RuleName();
+            when(ruleNameService.getRuleNameById(anyInt())).thenReturn(ruleName);
 
-		//GIVEN
-		RuleName ruleName = new RuleName();
-		when(bindingResult.hasErrors()).thenReturn(false);
-		when(ruleNameService.saveRuleName(any(RuleName.class))).thenReturn(ruleName);
+            //WHEN
+            String html = ruleNameController.showUpdateForm(1, model, request);
 
-		//WHEN
-		String html = ruleNameController.updateRuleName(ruleName, bindingResult, request);
+            //THEN
+            assertThat(html).isEqualTo("ruleName/update");
+        }
 
-		//THEN
-		assertThat(html).isEqualTo("redirect:/ruleName/list");
-	}
+        @Test
+        @Tag("RuleNameControllerTest")
+        @DisplayName("test showUpdateForm should throw UnexpectedRollbackException")
+        public void showUpdateFormTestShouldThrowUnexpectedRollbackException() {
 
-	@Test
-	@Tag("RuleNameControllerTest")
-	@DisplayName("test update RuleName should return \"ruleName/update\" on BindingResultError")
-	public void updateCurveTestShouldReturnStringRuleNameUpdateOnBindingResulError() {
+            //GIVEN
+            when(ruleNameService.getRuleNameById(anyInt())).thenThrow(new UnexpectedRollbackException("Error while getting ruleName"));
+            //WHEN
+            //THEN
+            assertThat(assertThrows(UnexpectedRollbackException.class,
+                    () -> ruleNameController.showUpdateForm(1, model, request))
+                    .getMessage()).isEqualTo("Error while getting ruleName");
+        }
+    }
 
-		//GIVEN
-		RuleName ruleName = new RuleName();
-		when(bindingResult.hasErrors()).thenReturn(true);
+    @Nested
+    @Tag("updateBidRuleNameControllerTests")
+    @DisplayName("Tests for /ruleName/update")
+    class updateBidRuleNameControllerTests {
 
-		//WHEN
-		String html = ruleNameController.updateRuleName(ruleName, bindingResult, request);
+        @Test
+        @Tag("RuleNameControllerTest")
+        @DisplayName("test update RuleName should return \"redirect:/ruleName/list\"")
+        public void updateCurveTestShouldReturnStringRedirectRuleNameList() {
 
-		//THEN
-		assertThat(html).isEqualTo("ruleName/update");
-	}
-	
-		@Test
-		@Tag("RuleNameControllerTest")
-		@DisplayName("test update Bid should throw UnexpectedRollbackException")
-		public void updateBidTestShouldThrowUnexpectedRollbackException() {
+            //GIVEN
+            RuleName ruleName = new RuleName();
+            when(bindingResult.hasErrors()).thenReturn(false);
+            when(ruleNameService.saveRuleName(any(RuleName.class))).thenReturn(ruleName);
 
-			//GIVEN
-			RuleName ruleName = new RuleName();
-			when(bindingResult.hasErrors()).thenReturn(false);
-			when(ruleNameService.saveRuleName(any(RuleName.class))).thenThrow(new UnexpectedRollbackException("Error while saving ruleName"));
-			//WHEN
-			//THEN
-			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> ruleNameController.updateRuleName(ruleName, bindingResult, request))
-					.getMessage()).isEqualTo("Error while saving ruleName");
-		}
-	}
+            //WHEN
+            String html = ruleNameController.updateRuleName(ruleName, bindingResult, request);
 
-	@Nested
-	@Tag("deleteBidRuleNameControllerTests")
-	@DisplayName("Tests for /ruleName/delete/{id}")
-	class deleteBidRuleNameControllerTests {
+            //THEN
+            assertThat(html).isEqualTo("redirect:/ruleName/list");
+        }
 
-	@Test
-	@Tag("RuleNameControllerTest")
-	@DisplayName("test delete RuleName should return \"redirect:/ruleName/list\"")
-	public void deleteCurveTestShouldReturnStringRedirectCurvePointList() {
+        @Test
+        @Tag("RuleNameControllerTest")
+        @DisplayName("test update RuleName should return \"ruleName/update\" on BindingResultError")
+        public void updateCurveTestShouldReturnStringRuleNameUpdateOnBindingResulError() {
 
-		//GIVEN
-		//WHEN
-		String html = ruleNameController.deleteRuleName(1, request);
+            //GIVEN
+            RuleName ruleName = new RuleName();
+            when(bindingResult.hasErrors()).thenReturn(true);
 
-		//THEN
-		assertThat(html).isEqualTo("redirect:/ruleName/list");
-	}
+            //WHEN
+            String html = ruleNameController.updateRuleName(ruleName, bindingResult, request);
 
-		@Test
-		@Tag("RuleNameControllerTest")
-		@DisplayName("test delete Bid should throw UnexpectedRollbackException")
-		public void deleteBidTestShouldThrowUnexpectedRollbackException() {
+            //THEN
+            assertThat(html).isEqualTo("ruleName/update");
+        }
 
-			//GIVEN
-			doThrow(new UnexpectedRollbackException("Error while deleting ruleName")).when(ruleNameService).deleteRuleNameById(anyInt());
-			//WHEN
-			//THEN
-			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> ruleNameController.deleteRuleName(1, request))
-					.getMessage()).isEqualTo("Error while deleting ruleName");
-		}
-	}
+        @Test
+        @Tag("RuleNameControllerTest")
+        @DisplayName("test update Bid should throw UnexpectedRollbackException")
+        public void updateBidTestShouldThrowUnexpectedRollbackException() {
+
+            //GIVEN
+            RuleName ruleName = new RuleName();
+            when(bindingResult.hasErrors()).thenReturn(false);
+            when(ruleNameService.saveRuleName(any(RuleName.class))).thenThrow(new UnexpectedRollbackException("Error while saving ruleName"));
+            //WHEN
+            //THEN
+            assertThat(assertThrows(UnexpectedRollbackException.class,
+                    () -> ruleNameController.updateRuleName(ruleName, bindingResult, request))
+                    .getMessage()).isEqualTo("Error while saving ruleName");
+        }
+    }
+
+    @Nested
+    @Tag("deleteBidRuleNameControllerTests")
+    @DisplayName("Tests for /ruleName/delete/{id}")
+    class deleteBidRuleNameControllerTests {
+
+        @Test
+        @Tag("RuleNameControllerTest")
+        @DisplayName("test delete RuleName should return \"redirect:/ruleName/list\"")
+        public void deleteCurveTestShouldReturnStringRedirectCurvePointList() {
+
+            //GIVEN
+            //WHEN
+            String html = ruleNameController.deleteRuleName(1, request);
+
+            //THEN
+            assertThat(html).isEqualTo("redirect:/ruleName/list");
+        }
+
+        @Test
+        @Tag("RuleNameControllerTest")
+        @DisplayName("test delete Bid should throw UnexpectedRollbackException")
+        public void deleteBidTestShouldThrowUnexpectedRollbackException() {
+
+            //GIVEN
+            doThrow(new UnexpectedRollbackException("Error while deleting ruleName")).when(ruleNameService).deleteRuleNameById(anyInt());
+            //WHEN
+            //THEN
+            assertThat(assertThrows(UnexpectedRollbackException.class,
+                    () -> ruleNameController.deleteRuleName(1, request))
+                    .getMessage()).isEqualTo("Error while deleting ruleName");
+        }
+    }
 
 }

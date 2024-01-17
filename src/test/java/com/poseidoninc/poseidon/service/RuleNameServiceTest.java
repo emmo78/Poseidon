@@ -276,7 +276,6 @@ public class RuleNameServiceTest {
 		public void saveRuleNameTestShouldThrowUnexpectedRollbackExceptionOnAnyRuntimeException() {
 			
 			//GIVEN
-			ruleName.setId(1);
 			when(ruleNameRepository.save(any(RuleName.class))).thenThrow(new RuntimeException());
 
 			//WHEN

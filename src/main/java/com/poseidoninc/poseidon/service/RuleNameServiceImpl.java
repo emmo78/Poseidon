@@ -35,7 +35,7 @@ public class RuleNameServiceImpl implements RuleNameService {
 	@Override
 	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
 	public Page<RuleName> getRuleNames(Pageable pageRequest) throws UnexpectedRollbackException {
-		Page<RuleName> pageRuleName = null;
+		Page<RuleName> pageRuleName;
 		try {
 			//throws NullPointerException if pageRequest is null
 			pageRuleName = ruleNameRepository.findAll(pageRequest);
@@ -56,7 +56,7 @@ public class RuleNameServiceImpl implements RuleNameService {
 			log.error("Error while saving ruleName = {} : {} ", ruleName.toString(), e.toString());
 			throw new UnexpectedRollbackException("Error while saving ruleName");
 		}
-		return ruleName;
+		return ruleNameSaved;
 	}
 
 	@Override

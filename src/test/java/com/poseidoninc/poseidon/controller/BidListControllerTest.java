@@ -43,7 +43,7 @@ public class BidListControllerTest {
 	private WebRequest request;
 
 	@Mock
-	RequestService requestService;
+	private RequestService requestService;
 
 	@AfterEach
 	public void unsetForEachTest() {

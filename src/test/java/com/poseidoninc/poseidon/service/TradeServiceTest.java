@@ -56,32 +56,12 @@ public class TradeServiceTest {
 	@Mock
 	private TradeRepository tradeRepository;
 	
-	@Spy
-	private final RequestService requestService = new RequestServiceImpl();
-	
-	private MockHttpServletRequest requestMock;
-	private WebRequest request;
 	private Trade trade;
 
 	@Nested
 	@Tag("getTradeByIdTests")
 	@DisplayName("Tests for getting trade by tradeId")
-	@TestInstance(Lifecycle.PER_CLASS)
 	class GetTradeByIdTests {
-		
-		@BeforeAll
-		public void setUpForAllTests() {
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/trade/getById/1");
-			request = new ServletWebRequest(requestMock);
-		}
-
-		@AfterAll
-		public void unSetForAllTests() {
-			requestMock = null;
-			request = null;
-		}
 		
 		@AfterEach
 		public void unSetForEachTests() {
@@ -120,7 +100,7 @@ public class TradeServiceTest {
 			when(tradeRepository.findById(anyInt())).thenReturn(Optional.of(trade));
 			
 			//WHEN
-			Trade tradeResult = tradeService.getTradeById(1, request);
+			Trade tradeResult = tradeService.getTradeById(1);
 			
 			//THEN
 			assertThat(tradeResult).extracting(
@@ -180,7 +160,7 @@ public class TradeServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> tradeService.getTradeById(null, request))
+				() -> tradeService.getTradeById(null))
 				.getMessage()).isEqualTo("Error while getting trade");
 		}
 
@@ -194,7 +174,7 @@ public class TradeServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> tradeService.getTradeById(1, request))
+				() -> tradeService.getTradeById(1))
 				.getMessage()).isEqualTo("Error while getting trade");
 		}
 		
@@ -208,7 +188,7 @@ public class TradeServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> tradeService.getTradeById(1, request))
+				() -> tradeService.getTradeById(1))
 				.getMessage()).isEqualTo("Error while getting trade");
 		}
 	}
@@ -224,17 +204,11 @@ public class TradeServiceTest {
 		@BeforeAll
 		public void setUpForAllTests() {
 			pageRequest = Pageable.unpaged();
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/trade/getTrades");
-			request = new ServletWebRequest(requestMock);
 		}
 
 		@AfterAll
 		public void unSetForAllTests() {
 			pageRequest = null;
-			requestMock = null;
-			request = null;
 		}
 		
 		@AfterEach
@@ -301,7 +275,7 @@ public class TradeServiceTest {
 			when(tradeRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<Trade>(expectedTrades, pageRequest, 2));
 			
 			//WHEN
-			Page<Trade> resultedTrades = tradeService.getTrades(pageRequest, request);
+			Page<Trade> resultedTrades = tradeService.getTrades(pageRequest);
 			
 			//THEN
 			assertThat(resultedTrades).containsExactlyElementsOf(expectedTrades);
@@ -316,7 +290,7 @@ public class TradeServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> tradeService.getTrades(pageRequest, request))
+					() -> tradeService.getTrades(pageRequest))
 					.getMessage()).isEqualTo("Error while getting trades");
 		}
 		
@@ -329,7 +303,7 @@ public class TradeServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> tradeService.getTrades(pageRequest, request))
+					() -> tradeService.getTrades(pageRequest))
 					.getMessage()).isEqualTo("Error while getting trades");
 		}
 	}
@@ -337,22 +311,7 @@ public class TradeServiceTest {
 	@Nested
 	@Tag("saveTradeTests")
 	@DisplayName("Tests for saving trade")
-	@TestInstance(Lifecycle.PER_CLASS)
 	class SaveTradeTests {
-		
-		@BeforeAll
-		public void setUpForAllTests() {
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/trade/saveTrade/");
-			request = new ServletWebRequest(requestMock);
-		}
-
-		@AfterAll
-		public void unSetForAllTests() {
-			requestMock = null;
-			request = null;
-		}
 		
 		@BeforeEach
 		public void setUpForEachTest() {
@@ -389,16 +348,36 @@ public class TradeServiceTest {
 		@Tag("TradeServiceTest")
 		@DisplayName("test saveTrade should persist and return trade")
 		public void saveTradeTestShouldReturnTrade() {
-			
+
 			//GIVEN
-			when(tradeRepository.save(any(Trade.class))).then(invocation -> {
-				Trade tradeSaved = invocation.getArgument(0);
-				tradeSaved.setTradeId(1);
-				return tradeSaved;
-				});
+			Trade tradeExpected = new Trade();
+			tradeExpected = new Trade();
+			tradeExpected.setTradeId(1);
+			tradeExpected.setAccount("account");
+			tradeExpected.setType("type");
+			tradeExpected.setBuyQuantity(3.0);
+			tradeExpected.setSellQuantity(1.0);
+			tradeExpected.setBuyPrice(4.0);
+			tradeExpected.setSellPrice(5.0);
+			tradeExpected.setTradeDate(LocalDateTime.parse("21/01/2023 10:20:30", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			tradeExpected.setSecurity("security");
+			tradeExpected.setStatus("status");
+			tradeExpected.setTrader("trader");
+			tradeExpected.setBenchmark("benchmark");
+			tradeExpected.setBook("book");
+			tradeExpected.setCreationName("creation name");
+			tradeExpected.setCreationDate(LocalDateTime.parse("22/01/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			tradeExpected.setRevisionName("revisionName");
+			tradeExpected.setRevisionDate(LocalDateTime.parse("23/01/2023 13:23:33", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			tradeExpected.setDealName("deal name");
+			tradeExpected.setDealType("deal type");
+			tradeExpected.setSourceListId("source list id");
+			tradeExpected.setSide("side");
+
+			when(tradeRepository.save(any(Trade.class))).thenReturn(tradeExpected);
 			
 			//WHEN
-			Trade tradeResult = tradeService.saveTrade(trade, request);
+			Trade tradeResult = tradeService.saveTrade(trade);
 			
 			//THEN
 			verify(tradeRepository).save(trade); //times(1) is the default and can be omitted
@@ -460,7 +439,7 @@ public class TradeServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> tradeService.saveTrade(trade, request))
+					() -> tradeService.saveTrade(trade))
 					.getMessage()).isEqualTo("Error while saving trade");
 		}	
 	}
@@ -468,23 +447,8 @@ public class TradeServiceTest {
 	@Nested
 	@Tag("deleteTradeTests")
 	@DisplayName("Tests for deleting trades")
-	@TestInstance(Lifecycle.PER_CLASS)
 	class DeleteTradeTests {
-		
-		@BeforeAll
-		public void setUpForAllTests() {
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/trade/delete/1");
-			request = new ServletWebRequest(requestMock);
-		}
 
-		@AfterAll
-		public void unSetForAllTests() {
-			requestMock = null;
-			request = null;
-		}
-		
 		@BeforeEach
 		public void setUpForEachTest() {
 			trade = new Trade();
@@ -528,7 +492,7 @@ public class TradeServiceTest {
 			doNothing().when(tradeRepository).delete(any(Trade.class));// Needed to Capture trade
 			
 			//WHEN
-			tradeService.deleteTradeById(1, request);
+			tradeService.deleteTradeById(1);
 			
 			//THEN
 			verify(tradeRepository, times(1)).delete(tradeBeingDeleted.capture());
@@ -590,7 +554,7 @@ public class TradeServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> tradeService.deleteTradeById(2, request))
+					() -> tradeService.deleteTradeById(2))
 					.getMessage()).isEqualTo("Error while deleting trade");
 		}	
 
@@ -605,7 +569,7 @@ public class TradeServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> tradeService.deleteTradeById(1, request))
+					() -> tradeService.deleteTradeById(1))
 					.getMessage()).isEqualTo("Error while deleting trade");
 		}	
 
@@ -621,7 +585,7 @@ public class TradeServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> tradeService.deleteTradeById(1, request))
+					() -> tradeService.deleteTradeById(1))
 					.getMessage()).isEqualTo("Error while deleting trade");
 		}	
 	}

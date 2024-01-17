@@ -44,7 +44,7 @@ public class CurveControllerTest {
 	private WebRequest request;
 
 	@Mock
-	RequestService requestService;
+	private RequestService requestService;
 
 	@AfterEach
 	public void unsetForEachTest() {

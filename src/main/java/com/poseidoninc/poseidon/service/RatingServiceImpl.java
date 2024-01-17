@@ -12,6 +12,8 @@ import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.WebRequest;
 
+import java.util.Optional;
+
 @Service
 @AllArgsConstructor
 @Slf4j
@@ -36,7 +38,7 @@ public class RatingServiceImpl implements RatingService {
 	@Override
 	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
 	public Page<Rating> getRatings(Pageable pageRequest) throws UnexpectedRollbackException {
-		Page<Rating> pageRating = null;
+		Page<Rating> pageRating;
 		try {
 			//throws NullPointerException if pageRequest is null
 			pageRating = ratingRepository.findAll(pageRequest);
