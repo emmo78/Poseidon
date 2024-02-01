@@ -85,20 +85,21 @@ public class CurveControllerTest {
 					.getMessage()).isEqualTo("Error while getting curvePoints");
 		}
 	}
-		@Test
-		@Tag("CurveControllerTest")
-		@DisplayName("test addCurvePoint should return \"curvePoint/add\"")
-		public void curvePointAddTestShouldReturnStringCurvePointAdd() {
 
-			//GIVEN
-			CurvePoint curvePoint = new CurvePoint();
+	@Test
+	@Tag("CurveControllerTest")
+	@DisplayName("test addCurvePoint should return \"curvePoint/add\"")
+	public void curvePointAddTestShouldReturnStringCurvePointAdd() {
 
-			//WHEN
-			String html = curveController.addCurvePoint(curvePoint);
+		//GIVEN
+		CurvePoint curvePoint = new CurvePoint();
 
-			//THEN
-			assertThat(html).isEqualTo("curvePoint/add");
-		}
+		//WHEN
+		String html = curveController.addCurvePoint(curvePoint);
+
+		//THEN
+		assertThat(html).isEqualTo("curvePoint/add");
+	}
 
 	@Nested
 	@Tag("validateCurveControllerTests")

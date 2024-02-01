@@ -28,7 +28,7 @@ public class CurveController {
 	private final CurvePointService curvePointService;
     private final RequestService requestService;
 	
-    @RequestMapping("/curvePoint/list")
+    @GetMapping("/curvePoint/list")
     public String home(Model model, WebRequest request) throws UnexpectedRollbackException {
 		Pageable pageRequest = Pageable.unpaged();
         Page<CurvePoint> pageCurvePoint;
