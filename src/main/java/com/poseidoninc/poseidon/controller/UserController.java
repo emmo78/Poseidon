@@ -61,7 +61,7 @@ public class UserController {
             userSaved = userService.saveUser(user);
         } catch (DataIntegrityViolationException dive) {
             log.error("{} : user = {} : {} ", requestService.requestToString(request), user.toString(), dive.toString());
-            result.addError(new FieldError("User", "curveId", dive.getMessage()));
+            result.addError(new FieldError("User", "username", dive.getMessage()));
             return "user/add";
         } catch (UnexpectedRollbackException urbe) {
             log.error("{} : user = {} : {} ", requestService.requestToString(request), user.toString(), urbe.toString());
@@ -96,7 +96,7 @@ public class UserController {
             userUpdated = userService.saveUser(user);
         } catch (DataIntegrityViolationException dive) {
             log.error("{} : user = {} : {} ", requestService.requestToString(request), user.toString(), dive.toString());
-            result.addError(new FieldError("User", "curveId", dive.getMessage()));
+            result.addError(new FieldError("User", "username", dive.getMessage()));
             return "user/update";
         } catch (UnexpectedRollbackException urbe) {
             log.error("{} : user = {} : {} ", requestService.requestToString(request), user.toString(), urbe.toString());

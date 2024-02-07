@@ -100,10 +100,12 @@ public class UserControllerTest {
 		//THEN
 		assertThat(html).isEqualTo("user/add");
 	}
+
 	@Nested
 	@Tag("validateUserControllerTests")
 	@DisplayName("Tests for /user/validate")
 	class ValidateUserControllerTests {
+
 		@Test
 		@Tag("UserControllerTest")
 		@DisplayName("test validate should return \"redirect:/user/list\"")
@@ -169,13 +171,13 @@ public class UserControllerTest {
 					() -> userController.validate(user, bindingResult, request))
 					.getMessage()).isEqualTo("Error while saving user");
 		}
-
 	}
 
 	@Nested
 	@Tag("showUpdateFormUserControllerTests")
 	@DisplayName("Tests for /user/update/{id}")
 	class ShowUpdateFormUserControllerTests {
+
 		@Test
 		@Tag("UserControllerTest")
 		@DisplayName("test showUpdateForm should return \"user/update\"")
@@ -198,7 +200,7 @@ public class UserControllerTest {
 		public void showUpdateFormTestShouldThrowUnexpectedRollbackException() {
 
 			//GIVEN
-			when(userService.getUserById(anyInt())).thenThrow(new UnexpectedRollbackException("Error while getting user"));
+			when(userService.getUserByIdWithBlankPasswd(anyInt())).thenThrow(new UnexpectedRollbackException("Error while getting user"));
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
