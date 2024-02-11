@@ -60,7 +60,7 @@ public class TradeControllerTest {
         @Test
         @Tag("TradeControllerTest")
         @DisplayName("test home should return \"trade/list\"")
-        public void homeTestShouldReturnTradeList() {
+        public void homeTestShouldReturnStringTradeList() {
 
             //GIVEN
             when(tradeService.getTrades(any(Pageable.class))).thenReturn(new PageImpl<Trade>(new ArrayList<>()));

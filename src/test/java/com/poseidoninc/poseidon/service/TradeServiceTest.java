@@ -351,7 +351,6 @@ public class TradeServiceTest {
 
 			//GIVEN
 			Trade tradeExpected = new Trade();
-			tradeExpected = new Trade();
 			tradeExpected.setTradeId(1);
 			tradeExpected.setAccount("account");
 			tradeExpected.setType("type");
@@ -373,7 +372,6 @@ public class TradeServiceTest {
 			tradeExpected.setDealType("deal type");
 			tradeExpected.setSourceListId("source list id");
 			tradeExpected.setSide("side");
-
 			when(tradeRepository.save(any(Trade.class))).thenReturn(tradeExpected);
 			
 			//WHEN

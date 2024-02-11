@@ -90,6 +90,7 @@ public class UserServiceImpl implements UserService {
 			log.error("Error while saving user = {} : {} ", user.toString(), e.toString());
 			throw new UnexpectedRollbackException("Error while saving user");
 		}
+		userSaved.setPassword("");
 		return userSaved;
 	}
 

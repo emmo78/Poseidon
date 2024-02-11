@@ -59,7 +59,7 @@ public class CurveControllerTest {
 		@Test
 		@Tag("CurveControllerTest")
 		@DisplayName("test home should return \"curvePoint/list\"")
-		public void homeTestShouldReturnCurvePointList() {
+		public void homeTestShouldReturnStringCurvePointList() {
 
 			//GIVEN
 			when(curvePointService.getCurvePoints(any(Pageable.class))).thenReturn(new PageImpl<CurvePoint>(new ArrayList<>()));

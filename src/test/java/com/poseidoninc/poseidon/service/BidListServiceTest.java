@@ -337,11 +337,31 @@ public class BidListServiceTest {
 		public void saveBidListTestShouldReturnBidList() {
 
 			//GIVEN
-			when(bidListRepository.save(any(BidList.class))).then(invocation -> {
-				BidList bidListSaved = invocation.getArgument(0);
-				bidListSaved.setBidListId(1);
-				return bidListSaved;
-				});
+			BidList bidListExpected = new BidList();
+			bidListExpected.setBidListId(1);
+			bidListExpected.setAccount("account");
+			bidListExpected.setType("type");
+			bidListExpected.setBidQuantity(1.0);
+			bidListExpected.setAskQuantity(3.0);
+			bidListExpected.setBid(4.0);
+			bidListExpected.setAsk(5.0);
+			bidListExpected.setBenchmark("benchmark");
+			bidListExpected.setBidListDate(LocalDateTime.parse("21/01/2023 10:20:30", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			bidListExpected.setCommentary("commentary");
+			bidListExpected.setSecurity("security");
+			bidListExpected.setStatus("status");
+			bidListExpected.setTrader("trader");
+			bidListExpected.setBook("book");
+			bidListExpected.setCreationName("creation name");
+			bidListExpected.setCreationDate(LocalDateTime.parse("22/01/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			bidListExpected.setRevisionName("revisionName");
+			bidListExpected.setRevisionDate(LocalDateTime.parse("23/01/2023 13:23:33", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			bidListExpected.setDealName("deal name");
+			bidListExpected.setDealType("deal type");
+			bidListExpected.setSourceListId("source list id");
+			bidListExpected.setSide("side");
+
+			when(bidListRepository.save(any(BidList.class))).thenReturn(bidListExpected);
 
 			//WHEN
 			BidList bidListResult = bidListService.saveBidList(bidList);

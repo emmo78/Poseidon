@@ -59,7 +59,7 @@ public class RatingServiceImpl implements RatingService {
 			log.error("Error while saving rating = {} : {} ", rating.toString(), e.toString());
 			throw new UnexpectedRollbackException("Error while saving rating");
 		}
-		return rating;
+		return ratingSaved;
 	}
 
 	@Override

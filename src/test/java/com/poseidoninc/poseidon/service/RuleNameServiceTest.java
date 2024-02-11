@@ -240,11 +240,15 @@ public class RuleNameServiceTest {
 		public void saveRuleNameTestShouldReturnRuleName() {
 			
 			//GIVEN
-			when(ruleNameRepository.save(any(RuleName.class))).then(invocation -> {
-				RuleName ruleNameSaved = invocation.getArgument(0);
-				ruleNameSaved.setId(1);
-				return ruleNameSaved;
-			});
+			RuleName ruleNameExpected = new RuleName();
+			ruleNameExpected.setId(1);
+			ruleNameExpected.setName("Rule Name");
+			ruleNameExpected.setDescription("Rule Description");
+			ruleNameExpected.setJson("Json");
+			ruleNameExpected.setTemplate("Template");
+			ruleNameExpected.setSqlStr("SQL");
+			ruleNameExpected.setSqlPart("SQL Part");
+			when(ruleNameRepository.save(any(RuleName.class))).thenReturn(ruleNameExpected);
 			
 			//WHEN
 			RuleName ruleNameResult = ruleNameService.saveRuleName(ruleName);

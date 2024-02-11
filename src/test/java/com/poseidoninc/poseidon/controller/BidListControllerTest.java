@@ -58,7 +58,7 @@ public class BidListControllerTest {
 		@Test
 		@Tag("BidListControllerTest")
 		@DisplayName("test home should return \"bidList/list\"")
-		public void homeTestShouldReturnBidListList() {
+		public void homeTestShouldReturnStringBidListList() {
 
 			//GIVEN
 			when(bidListService.getBidLists(any(Pageable.class))).thenReturn(new PageImpl<BidList>(new ArrayList<>()));

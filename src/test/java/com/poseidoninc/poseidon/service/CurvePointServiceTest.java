@@ -239,11 +239,14 @@ public class CurvePointServiceTest {
 		public void saveCurvePointTestShouldPersistAndReturnCurvePoint() {
 			
 			//GIVEN
-			when(curvePointRepository.save(any(CurvePoint.class))).then(invocation -> {
-				CurvePoint curvePointSaved = invocation.getArgument(0);
-				curvePointSaved.setId(1);
-				return curvePointSaved;
-				});
+			CurvePoint curvePointExpected = new CurvePoint();
+			curvePointExpected.setId(1);
+			curvePointExpected.setCurveId(2);
+			curvePointExpected.setAsOfDate(LocalDateTime.parse("21/01/2023 10:20:30", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			curvePointExpected.setTerm(3.0);
+			curvePointExpected.setValue(4.0);
+			curvePointExpected.setCreationDate(LocalDateTime.parse("22/01/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			when(curvePointRepository.save(any(CurvePoint.class))).thenReturn(curvePointExpected);
 			
 			//WHEN
 			CurvePoint resultedCurvePoint = curvePointService.saveCurvePoint(curvePoint);

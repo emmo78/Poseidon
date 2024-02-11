@@ -59,7 +59,7 @@ public class UserControllerTest {
 		@Test
 		@Tag("UserControllerTest")
 		@DisplayName("test home should return \"user/list\" ")
-		public void homeTestTestShouldReturnUserList() {
+		public void homeTestTestShouldReturnStringUserList() {
 
 			//GIVEN
 			when(userService.getUsers(any(Pageable.class))).thenReturn(new PageImpl<User>(new ArrayList<>()));

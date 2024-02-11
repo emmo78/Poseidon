@@ -15,12 +15,9 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.UnexpectedRollbackException;
-import org.springframework.web.context.request.ServletWebRequest;
-import org.springframework.web.context.request.WebRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -396,12 +393,15 @@ public class UserServiceTest {
 		public void saveUserTestShouldPersistAndReturnUser() {
 			
 			//GIVEN
+			User userExpected = new User();
+			userExpected.setId(1);
+			userExpected.setUsername("Aaa");
+			userExpected.setPassword("");
+			userExpected.setFullname("AAA");
+			userExpected.setRole("USER");
+
 			ArgumentCaptor<User> userBeingSaved = ArgumentCaptor.forClass(User.class);
-			when(userRepository.save(any(User.class))).then(invocation -> {
-				User userSaved = invocation.getArgument(0);
-				userSaved.setId(1);
-				return userSaved;
-				});
+			when(userRepository.save(any(User.class))).thenReturn(userExpected);
 			
 			//WHEN
 			User resultedUser = userService.saveUser(user);
@@ -412,11 +412,13 @@ public class UserServiceTest {
 			assertThat(resultedUser).extracting(
 					User::getId,
 					User::getUsername,
+					User::getPassword,
 					User::getFullname,
 					User::getRole)
 				.containsExactly(
 					1,	
 					"Aaa",
+					"",
 					"AAA",
 					"USER");	
 		}

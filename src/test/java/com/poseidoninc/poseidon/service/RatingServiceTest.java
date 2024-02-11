@@ -250,18 +250,20 @@ public class RatingServiceTest {
 		public void saveRatingTestShouldReturnRating() {
 			
 			//GIVEN
-			when(ratingRepository.save(any(Rating.class))).then(invocation -> {
-				Rating ratingSaved = invocation.getArgument(0);
-				ratingSaved.setId(1);
-				return ratingSaved;
-			});
+			Rating ratingExpected = new Rating();
+			ratingExpected.setId(1);
+			ratingExpected.setMoodysRating("Moody's Rating");
+			ratingExpected.setSandPRating("SandP's Rating");
+			ratingExpected.setFitchRating("Fitch's Rating");
+			ratingExpected.setOrderNumber(2);
+			when(ratingRepository.save(any(Rating.class))).thenReturn(ratingExpected);
 			
 			//WHEN
 			Rating ratingResult = ratingService.saveRating(rating);
 			
 			//THEN
 			verify(ratingRepository).save(any(Rating.class)); //times(1) is the default and can be omitted
-			assertThat(rating).extracting(
+			assertThat(ratingResult).extracting(
 							Rating::getId,
 							Rating::getMoodysRating,
 							Rating::getSandPRating,

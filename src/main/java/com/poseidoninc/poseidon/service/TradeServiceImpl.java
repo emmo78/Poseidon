@@ -53,7 +53,7 @@ public class TradeServiceImpl implements TradeService {
 		try {
 			tradeSaved = tradeRepository.save(trade);
 		} catch(Exception e) {
-			log.error("{} : trade={} : {} ", trade.toString(), e.toString());
+			log.error("Error while saving trade = {} : {} ", trade.toString(), e.toString());
 			throw new UnexpectedRollbackException("Error while saving trade");
 		}
 		return tradeSaved;
@@ -65,7 +65,7 @@ public class TradeServiceImpl implements TradeService {
 		try {
 			tradeRepository.delete(getTradeById(tradeId)); //getTradeById throws UnexpectedRollbackException
 		} catch(Exception e) {
-			log.error("{} : trade={} : {} ", tradeId, e.toString());
+			log.error("Error while deleting trade = {} : {} ", tradeId, e.toString());
 			throw new UnexpectedRollbackException("Error while deleting trade");
 		}
 	}

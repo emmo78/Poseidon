@@ -58,7 +58,7 @@ public class RatingControllerTest {
 		@Test
 		@Tag("RatingControllerTest")
 		@DisplayName("test home should return \"rating/list\"")
-		public void homeTestShouldReturnRatingList() {
+		public void homeTestShouldReturnStringRatingList() {
 
 			//GIVEN
 			when(ratingService.getRatings(any(Pageable.class))).thenReturn(new PageImpl<Rating>(new ArrayList<>()));

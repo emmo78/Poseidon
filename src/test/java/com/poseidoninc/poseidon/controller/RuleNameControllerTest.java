@@ -59,7 +59,7 @@ public class RuleNameControllerTest {
         @Test
         @Tag("RuleNameControllerTest")
         @DisplayName("test home should return \"ruleName/list\"")
-        public void homeTestShouldReturnRuleNameList() {
+        public void homeTestShouldReturnStringRuleNameList() {
 
             //GIVEN
             when(ruleNameService.getRuleNames(any(Pageable.class))).thenReturn(new PageImpl<RuleName>(new ArrayList<>()));
