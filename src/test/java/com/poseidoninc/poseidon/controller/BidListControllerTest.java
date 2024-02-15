@@ -3,16 +3,20 @@ package com.poseidoninc.poseidon.controller;
 import com.poseidoninc.poseidon.domain.BidList;
 import com.poseidoninc.poseidon.service.BidListService;
 import com.poseidoninc.poseidon.service.RequestService;
+import com.poseidoninc.poseidon.service.RequestServiceImpl;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 import java.util.ArrayList;
@@ -39,11 +43,11 @@ public class BidListControllerTest {
 	@Mock
 	private Model model;
 
-	@Mock
-	private WebRequest request;
+	@Spy
+	private final RequestService requestService = new RequestServiceImpl();
 
-	@Mock
-	private RequestService requestService;
+	private MockHttpServletRequest requestMock;
+	private WebRequest request;
 
 	@AfterEach
 	public void unsetForEachTest() {
@@ -54,7 +58,23 @@ public class BidListControllerTest {
 	@Nested
 	@Tag("homeBidListControllerTests")
 	@DisplayName("Tests for /bidList/list")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	class HomeBidListControllerTests {
+
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/bidList/list");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
+
 		@Test
 		@Tag("BidListControllerTest")
 		@DisplayName("test home should return \"bidList/list\"")
@@ -104,7 +124,22 @@ public class BidListControllerTest {
 	@Nested
 	@Tag("validateBidListControllerTests")
 	@DisplayName("Tests for /bidList/validate")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	class ValidateBidListControllerTests {
+
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/bidList/validate/");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
 
 		@Test
 		@Tag("BidListControllerTest")
@@ -159,7 +194,22 @@ public class BidListControllerTest {
 	@Nested
 	@Tag("showUpdateFormBidListControllerTests")
 	@DisplayName("Tests for /bidList/update/{id}")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	class ShowUpdateFormBidListControllerTests {
+
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/bidList/update/1");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
 
 		@Test
 		@Tag("BidListControllerTest")
@@ -195,7 +245,22 @@ public class BidListControllerTest {
 	@Nested
 	@Tag("updateBidBidListControllerTests")
 	@DisplayName("Tests for /bidList/update")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	class updateBidBidListControllerTests {
+
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/bidList/update/");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
 
 		@Test
 		@Tag("BidListControllerTest")
@@ -250,7 +315,22 @@ public class BidListControllerTest {
 	@Nested
 	@Tag("deleteBidBidListControllerTests")
 	@DisplayName("Tests for /bidList/delete/{id}")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	class deleteBidBidListControllerTests {
+
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/bidList/delete/1");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
 
 		@Test
 		@Tag("BidListControllerTest")

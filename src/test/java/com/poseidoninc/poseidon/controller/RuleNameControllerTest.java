@@ -2,17 +2,21 @@ package com.poseidoninc.poseidon.controller;
 
 import com.poseidoninc.poseidon.domain.RuleName;
 import com.poseidoninc.poseidon.service.RequestService;
+import com.poseidoninc.poseidon.service.RequestServiceImpl;
 import com.poseidoninc.poseidon.service.RuleNameService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 import java.util.ArrayList;
@@ -40,11 +44,11 @@ public class RuleNameControllerTest {
     @Mock
     private Model model;
 
-    @Mock
-    private WebRequest request;
+    @Spy
+    private final RequestService requestService = new RequestServiceImpl();
 
-    @Mock
-    private RequestService requestService;
+    private MockHttpServletRequest requestMock;
+    private WebRequest request;
 
     @AfterEach
     public void unsetForEachTest() {
@@ -55,7 +59,23 @@ public class RuleNameControllerTest {
     @Nested
     @Tag("homeRuleNameControllerTests")
     @DisplayName("Tests for /ruleName/list")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class HomeRuleNameControllerTests {
+
+        @BeforeAll
+        public void setUpForAllTests() {
+            requestMock = new MockHttpServletRequest();
+            requestMock.setServerName("http://localhost:8080");
+            requestMock.setRequestURI("/ruleName/list");
+            request = new ServletWebRequest(requestMock);
+        }
+
+        @AfterAll
+        public void unSetForAllTests() {
+            requestMock = null;
+            request = null;
+        }
+        
         @Test
         @Tag("RuleNameControllerTest")
         @DisplayName("test home should return \"ruleName/list\"")
@@ -105,7 +125,22 @@ public class RuleNameControllerTest {
     @Nested
     @Tag("validateRuleNameControllerTests")
     @DisplayName("Tests for /ruleName/validate")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class ValidateRuleNameControllerTests {
+
+        @BeforeAll
+        public void setUpForAllTests() {
+            requestMock = new MockHttpServletRequest();
+            requestMock.setServerName("http://localhost:8080");
+            requestMock.setRequestURI("/ruleName/validate/");
+            request = new ServletWebRequest(requestMock);
+        }
+
+        @AfterAll
+        public void unSetForAllTests() {
+            requestMock = null;
+            request = null;
+        }
 
         @Test
         @Tag("RuleNameControllerTest")
@@ -160,7 +195,22 @@ public class RuleNameControllerTest {
     @Nested
     @Tag("showUpdateFormRuleNameControllerTests")
     @DisplayName("Tests for /ruleName/update/{id}")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class ShowUpdateFormRuleNameControllerTests {
+
+        @BeforeAll
+        public void setUpForAllTests() {
+            requestMock = new MockHttpServletRequest();
+            requestMock.setServerName("http://localhost:8080");
+            requestMock.setRequestURI("/ruleName/update/1");
+            request = new ServletWebRequest(requestMock);
+        }
+
+        @AfterAll
+        public void unSetForAllTests() {
+            requestMock = null;
+            request = null;
+        }
 
         @Test
         @Tag("RuleNameControllerTest")
@@ -196,7 +246,22 @@ public class RuleNameControllerTest {
     @Nested
     @Tag("updateBidRuleNameControllerTests")
     @DisplayName("Tests for /ruleName/update")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class updateBidRuleNameControllerTests {
+
+        @BeforeAll
+        public void setUpForAllTests() {
+            requestMock = new MockHttpServletRequest();
+            requestMock.setServerName("http://localhost:8080");
+            requestMock.setRequestURI("/ruleName/update/");
+            request = new ServletWebRequest(requestMock);
+        }
+
+        @AfterAll
+        public void unSetForAllTests() {
+            requestMock = null;
+            request = null;
+        }
 
         @Test
         @Tag("RuleNameControllerTest")
@@ -251,7 +316,22 @@ public class RuleNameControllerTest {
     @Nested
     @Tag("deleteBidRuleNameControllerTests")
     @DisplayName("Tests for /ruleName/delete/{id}")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class deleteBidRuleNameControllerTests {
+
+        @BeforeAll
+        public void setUpForAllTests() {
+            requestMock = new MockHttpServletRequest();
+            requestMock.setServerName("http://localhost:8080");
+            requestMock.setRequestURI("/ruleName/delete/1");
+            request = new ServletWebRequest(requestMock);
+        }
+
+        @AfterAll
+        public void unSetForAllTests() {
+            requestMock = null;
+            request = null;
+        }
 
         @Test
         @Tag("RuleNameControllerTest")

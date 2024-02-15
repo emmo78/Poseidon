@@ -2,17 +2,21 @@ package com.poseidoninc.poseidon.controller;
 
 import com.poseidoninc.poseidon.domain.Trade;
 import com.poseidoninc.poseidon.service.RequestService;
+import com.poseidoninc.poseidon.service.RequestServiceImpl;
 import com.poseidoninc.poseidon.service.TradeService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 import java.util.ArrayList;
@@ -40,11 +44,11 @@ public class TradeControllerTest {
     @Mock
     private Model model;
 
-    @Mock
-    private WebRequest request;
+    @Spy
+    private final RequestService requestService = new RequestServiceImpl();
 
-    @Mock
-    private RequestService requestService;
+    private MockHttpServletRequest requestMock;
+    private WebRequest request;
 
     @AfterEach
     public void unsetForEachTest() {
@@ -55,7 +59,22 @@ public class TradeControllerTest {
     @Nested
     @Tag("homeTradeControllerTests")
     @DisplayName("Tests for /trade/list")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class HomeTradeControllerTests {
+
+        @BeforeAll
+        public void setUpForAllTests() {
+            requestMock = new MockHttpServletRequest();
+            requestMock.setServerName("http://localhost:8080");
+            requestMock.setRequestURI("/trade/list");
+            request = new ServletWebRequest(requestMock);
+        }
+
+        @AfterAll
+        public void unSetForAllTests() {
+            requestMock = null;
+            request = null;
+        }
 
         @Test
         @Tag("TradeControllerTest")
@@ -88,7 +107,6 @@ public class TradeControllerTest {
         }
     }
 
-
     @Test
     @Tag("TradeControllerTest")
     @DisplayName("test addTradeForm should return \"trade/add\"")
@@ -107,7 +125,23 @@ public class TradeControllerTest {
     @Nested
     @Tag("validateTradeControllerTests")
     @DisplayName("Tests for /trade/validate")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class ValidateTradeControllerTests {
+
+        @BeforeAll
+        public void setUpForAllTests() {
+            requestMock = new MockHttpServletRequest();
+            requestMock.setServerName("http://localhost:8080");
+            requestMock.setRequestURI("/trade/validate/");
+            request = new ServletWebRequest(requestMock);
+        }
+
+        @AfterAll
+        public void unSetForAllTests() {
+            requestMock = null;
+            request = null;
+        }
+
         @Test
         @Tag("TradeControllerTest")
         @DisplayName("test validate should return \"redirect:/trade/list\"")
@@ -162,7 +196,22 @@ public class TradeControllerTest {
     @Nested
     @Tag("showUpdateFormTradeControllerTests")
     @DisplayName("Tests for /trade/update/{id}")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class ShowUpdateFormTradeControllerTests {
+
+        @BeforeAll
+        public void setUpForAllTests() {
+            requestMock = new MockHttpServletRequest();
+            requestMock.setServerName("http://localhost:8080");
+            requestMock.setRequestURI("/trade/update/1");
+            request = new ServletWebRequest(requestMock);
+        }
+
+        @AfterAll
+        public void unSetForAllTests() {
+            requestMock = null;
+            request = null;
+        }
 
         @Test
         @Tag("TradeControllerTest")
@@ -196,11 +245,26 @@ public class TradeControllerTest {
         }
     }
 
-
     @Nested
     @Tag("updateTradeTradeControllerTests")
     @DisplayName("Tests for /trade/update")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class updateTradeTradeControllerTests {
+
+        @BeforeAll
+        public void setUpForAllTests() {
+            requestMock = new MockHttpServletRequest();
+            requestMock.setServerName("http://localhost:8080");
+            requestMock.setRequestURI("/trade/update/");
+            request = new ServletWebRequest(requestMock);
+        }
+
+        @AfterAll
+        public void unSetForAllTests() {
+            requestMock = null;
+            request = null;
+        }
+
         @Test
         @Tag("TradeControllerTest")
         @DisplayName("test update Trade should return \"redirect:/trade/list\"")
@@ -256,7 +320,22 @@ public class TradeControllerTest {
     @Nested
     @Tag("deleteTradeTradeControllerTests")
     @DisplayName("Tests for /trade/delete/{id}")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class deleteTradeTradeControllerTests {
+
+        @BeforeAll
+        public void setUpForAllTests() {
+            requestMock = new MockHttpServletRequest();
+            requestMock.setServerName("http://localhost:8080");
+            requestMock.setRequestURI("/trade/delete/1");
+            request = new ServletWebRequest(requestMock);
+        }
+
+        @AfterAll
+        public void unSetForAllTests() {
+            requestMock = null;
+            request = null;
+        }
 
         @Test
         @Tag("TradeControllerTest")

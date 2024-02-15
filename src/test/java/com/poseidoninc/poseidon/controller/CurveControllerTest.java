@@ -3,17 +3,21 @@ package com.poseidoninc.poseidon.controller;
 import com.poseidoninc.poseidon.domain.CurvePoint;
 import com.poseidoninc.poseidon.service.CurvePointService;
 import com.poseidoninc.poseidon.service.RequestService;
+import com.poseidoninc.poseidon.service.RequestServiceImpl;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 import java.util.ArrayList;
@@ -40,11 +44,11 @@ public class CurveControllerTest {
 	@Mock
 	private Model model;
 
-	@Mock
-	private WebRequest request;
+	@Spy
+	private final RequestService requestService = new RequestServiceImpl();
 
-	@Mock
-	private RequestService requestService;
+	private MockHttpServletRequest requestMock;
+	private WebRequest request;
 
 	@AfterEach
 	public void unsetForEachTest() {
@@ -55,7 +59,23 @@ public class CurveControllerTest {
 	@Nested
 	@Tag("homeCurveControllerTests")
 	@DisplayName("Tests for /curvePoint/list")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	class HomeCurveControllerTests {
+
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/curvePoint/list");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
+
 		@Test
 		@Tag("CurveControllerTest")
 		@DisplayName("test home should return \"curvePoint/list\"")
@@ -104,7 +124,22 @@ public class CurveControllerTest {
 	@Nested
 	@Tag("validateCurveControllerTests")
 	@DisplayName("Tests for /curvePoint/validate")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	class ValidateCurveControllerTests {
+
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/curvePoint/validate/");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
 
 		@Test
 		@Tag("CurveControllerTest")
@@ -176,7 +211,22 @@ public class CurveControllerTest {
 	@Nested
 	@Tag("showUpdateFormCurveControllerTests")
 	@DisplayName("Tests for /curvePoint/update/{id}")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	class ShowUpdateFormCurveControllerTests {
+
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/curvePoint/update/1");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
 
 		@Test
 		@Tag("CurveControllerTest")
@@ -212,7 +262,22 @@ public class CurveControllerTest {
 	@Nested
 	@Tag("updateCurvePointCurveControllerTests")
 	@DisplayName("Tests for /curvePoint/update")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	class updateCurvePointCurveControllerTests {
+
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/curvePoint/update/");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
 
 		@Test
 		@Tag("CurveControllerTest")
@@ -284,7 +349,22 @@ public class CurveControllerTest {
 	@Nested
 	@Tag("deleteCurvePointCurveControllerTests")
 	@DisplayName("Tests for /curvePoint/delete/{id}")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	class deleteCurvePointCurveControllerTests {
+
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/curvePoint/delete/1");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
 
 		@Test
 		@Tag("CurveControllerTest")

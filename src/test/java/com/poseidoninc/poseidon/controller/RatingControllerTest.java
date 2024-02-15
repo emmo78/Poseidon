@@ -3,16 +3,20 @@ package com.poseidoninc.poseidon.controller;
 import com.poseidoninc.poseidon.domain.Rating;
 import com.poseidoninc.poseidon.service.RatingService;
 import com.poseidoninc.poseidon.service.RequestService;
+import com.poseidoninc.poseidon.service.RequestServiceImpl;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 import java.util.ArrayList;
@@ -39,11 +43,11 @@ public class RatingControllerTest {
 	@Mock
 	private Model model;
 
-	@Mock
-	private WebRequest request;
+	@Spy
+	private final RequestService requestService = new RequestServiceImpl();
 
-	@Mock
-	private RequestService requestService;
+	private MockHttpServletRequest requestMock;
+	private WebRequest request;
 
 	@AfterEach
 	public void unsetForEachTest() {
@@ -54,7 +58,22 @@ public class RatingControllerTest {
 	@Nested
 	@Tag("homeRatingControllerTests")
 	@DisplayName("Tests for /rating/list")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	class HomeRatingControllerTests {
+
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/rating/list");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
 		@Test
 		@Tag("RatingControllerTest")
 		@DisplayName("test home should return \"rating/list\"")
@@ -100,12 +119,26 @@ public class RatingControllerTest {
 		//THEN
 		assertThat(html).isEqualTo("rating/add");
 	}
-	
+
 	@Nested
 	@Tag("validateRatingControllerTests")
 	@DisplayName("Tests for /rating/validate")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	class ValidateRatingControllerTests {
 
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/rating/validate/");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
 		@Test
 		@Tag("RatingControllerTest")
 		@DisplayName("test validate should return \"redirect:/rating/list\"")
@@ -159,7 +192,22 @@ public class RatingControllerTest {
 	@Nested
 	@Tag("showUpdateFormRatingControllerTests")
 	@DisplayName("Tests for /rating/update/{id}")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	class ShowUpdateFormRatingControllerTests {
+
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/rating/update/1");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
 
 		@Test
 		@Tag("RatingControllerTest")
@@ -194,7 +242,22 @@ public class RatingControllerTest {
 	@Nested
 	@Tag("updateBidRatingControllerTests")
 	@DisplayName("Tests for /rating/update")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	class updateBidRatingControllerTests {
+
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/rating/update/");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
 
 		@Test
 		@Tag("RatingControllerTest")
@@ -249,11 +312,27 @@ public class RatingControllerTest {
 	@Nested
 	@Tag("deleteBidRatingControllerTests")
 	@DisplayName("Tests for /rating/delete/{id}")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	class deleteBidRatingControllerTests {
+
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/rating/delete/1");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
+
 		@Test
 		@Tag("RatingControllerTest")
 		@DisplayName("test delete Rating should return \"redirect:/rating/list\"")
-		public void deleteCurveTestShouldReturnStringRedirectCurvePointList() {
+		public void deleteCurveTestShouldReturnStringRedirectRatingList() {
 
 			//GIVEN
 			//WHEN

@@ -2,18 +2,22 @@ package com.poseidoninc.poseidon.controller;
 
 import com.poseidoninc.poseidon.domain.User;
 import com.poseidoninc.poseidon.service.RequestService;
+import com.poseidoninc.poseidon.service.RequestServiceImpl;
 import com.poseidoninc.poseidon.service.UserService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 import java.util.ArrayList;
@@ -40,11 +44,11 @@ public class UserControllerTest {
 	@Mock
 	private Model model;
 
-	@Mock
-	private WebRequest request;
+	@Spy
+	private final RequestService requestService = new RequestServiceImpl();
 
-	@Mock
-	private RequestService requestService;
+	private MockHttpServletRequest requestMock;
+	private WebRequest request;
 
 	@AfterEach
 	public void unsetForEachTest() {
@@ -55,7 +59,23 @@ public class UserControllerTest {
 	@Nested
 	@Tag("homeUserControllerTests")
 	@DisplayName("Tests for /user/list")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	class HomeUserControllerTests {
+
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/user/list");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
+
 		@Test
 		@Tag("UserControllerTest")
 		@DisplayName("test home should return \"user/list\" ")
@@ -88,7 +108,7 @@ public class UserControllerTest {
 
 	@Test
 	@Tag("UserControllerTest")
-	@DisplayName("test  addUser should return \"user/add\"")
+	@DisplayName("test addUser should return \"user/add\"")
 	public void userAddTestShouldReturnStringUserAdd() {
 
 		//GIVEN
@@ -104,7 +124,22 @@ public class UserControllerTest {
 	@Nested
 	@Tag("validateUserControllerTests")
 	@DisplayName("Tests for /user/validate")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	class ValidateUserControllerTests {
+
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/user/validate/");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
 
 		@Test
 		@Tag("UserControllerTest")
@@ -176,7 +211,22 @@ public class UserControllerTest {
 	@Nested
 	@Tag("showUpdateFormUserControllerTests")
 	@DisplayName("Tests for /user/update/{id}")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	class ShowUpdateFormUserControllerTests {
+
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/user/update/1");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
 
 		@Test
 		@Tag("UserControllerTest")
@@ -212,7 +262,22 @@ public class UserControllerTest {
 	@Nested
 	@Tag("updateUserUserControllerTests")
 	@DisplayName("Tests for /user/update")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	class updateUserUserControllerTests {
+
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/user/update/");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
 
 		@Test
 		@Tag("UserControllerTest")
@@ -284,8 +349,23 @@ public class UserControllerTest {
 	@Nested
 	@Tag("deleteUserUserControllerTests")
 	@DisplayName("Tests for /user/delete/{id}")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	class deleteUserUserControllerTests {
-		
+
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/user/delete/1");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
+
 		@Test
 		@Tag("UserControllerTest")
 		@DisplayName("test deleteUser should return \"redirect:/user/list\"")
