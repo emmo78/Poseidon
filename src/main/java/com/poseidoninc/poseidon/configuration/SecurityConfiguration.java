@@ -36,7 +36,7 @@ public class SecurityConfiguration  {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/","/home").permitAll()
+                        .requestMatchers("/","/home", "user/add", "user/validate").permitAll()
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .requestMatchers("/admin/home").hasAuthority("ADMIN")
                         .requestMatchers("/user/**", "/curvePoint/**", "/bidList/**", "/rating/**", "/ruleName/**", "/trade/**").hasAnyAuthority("ADMIN", "USER")

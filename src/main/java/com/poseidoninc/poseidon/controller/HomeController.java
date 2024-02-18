@@ -10,8 +10,9 @@ import java.security.Principal;
 public class HomeController
 {
 	@RequestMapping({"/", "/home"})
-	public String home(Principal user)
+	public String home(Principal user, Model model)
 	{
+		model.addAttribute("user", user);
 		return "home";
 	}
 

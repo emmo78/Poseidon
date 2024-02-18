@@ -13,13 +13,13 @@
         <div class="row">
             <h3> HOME PAGE </h3>
         </div>
-        <div class="row" th:unless="${user.getName()}!=null}">
+        <div class="row" th:unless="${user!=null}">
             <div class="col-6">
                 <a href="/login">Login</a> or create one <a href="/user/add">Register</a>
             </div>
         </div>
         <br>
-        <div class="row" th:if="${user.getName()}!=null">
+        <div class="row" th:if="${user!=null}">
             <div class="col-6">
                 <a href="/user/list">User List</a>&nbsp;|&nbsp;
                 <a href="/bidList/list">Bid List</a>&nbsp;|&nbsp;
@@ -29,7 +29,7 @@
                 <a href="/ruleName/list">Rule</a>
             </div>
             <br>
-            <div class="col-6 text-right">
+            <div class="col-6 text-right" th:if="${user!=null}">
                 Logged in user: <b th:text="${user.getName()}">  </b>
                 <form th:action="@{/app-logout}" method="POST">
                     <input type="submit" value="Logout"/>

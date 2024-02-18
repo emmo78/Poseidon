@@ -118,7 +118,7 @@ public class UserRepositoryIT {
 							"USER");
 		}
 		@ParameterizedTest(name = "{0} should throw a DataIntegrityViolationException")
-		@ValueSource(strings = {"Aaa", "aaa", "AAA", "aAA"})
+		@ValueSource(strings = {"Aaa", "aAa", "aaA", "aAA", "AaA", "AAa", "AAA", "aaa"})
 		@Tag("UserRepositoryIT")
 		@DisplayName("save test an new user with an existent username case insensitive should throw a DataIntegrityViolationException")
 		public void saveTestAnUserWithAnExistentUsernameCaseInsensitiveShouldThrowDataIntegrityViolationException(String username) {
@@ -183,10 +183,11 @@ public class UserRepositoryIT {
 	@TestInstance(Lifecycle.PER_CLASS)
 	class FindByUserNameTests {
 
-		@Test
+		@ParameterizedTest(name = "{0} should throw a DataIntegrityViolationException")
+		@ValueSource(strings = {"Aaa", "aAa", "aaA", "aAA", "AaA", "AAa", "AAA", "aaa"})
 		@Tag("UserRepositoryIT")
-		@DisplayName("find by Username should return the user by Username")
-		public void findByUsernameTestShouldReturnUserByUsername() {
+		@DisplayName("find by Username should return the user by Username case insensitive")
+		public void findByUsernameTestShouldReturnUserByUsernameCaseInsensitive(String username) {
 	
 			//GIVEN
 			user.setId(null);
@@ -197,7 +198,7 @@ public class UserRepositoryIT {
 			userRepository.saveAndFlush(user);
 	
 			//WHEN
-			User userResult = userRepository.findByUsername("Aaa");
+			User userResult = userRepository.findByUsername(username);
 			
 			//THEN
 			assertThat(userResult).extracting(
