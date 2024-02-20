@@ -7,18 +7,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.security.Principal;
 
 @Controller
-public class HomeController
-{
-	@RequestMapping({"/", "/home"})
-	public String home(Principal user, Model model)
-	{
-		model.addAttribute("user", user);
-		return "home";
-	}
+public class HomeController {
 
-	@RequestMapping("/admin/home")
-	public String adminHome()
-	{
-		return "redirect:/bidList/list";
-	}
+    @RequestMapping({"/", "/home"})
+    public String home() {
+        return "home";
+    }
+
+    @RequestMapping("/admin/home")
+    public String adminHome() {
+        return "redirect:/bidList/list";
+    }
 }

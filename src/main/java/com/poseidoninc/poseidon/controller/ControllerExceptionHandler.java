@@ -1,5 +1,6 @@
 package com.poseidoninc.poseidon.controller;
 
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.ui.Model;
@@ -30,6 +31,7 @@ public class ControllerExceptionHandler {
 		model.addAttribute("errorMessage", errorMessage);
 		return "error";
 	}
+
 	@ExceptionHandler(Exception.class)
 	public String unexpectedException(Exception e, WebRequest request, Model model) {
 		log.error("{} : {} : {}",

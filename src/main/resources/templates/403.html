@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <head>
         <meta charset="UTF-8">
         <title>Security Error</title>
@@ -14,8 +15,8 @@
                 <div class="col-6">
                     <a href="/">Home</a>
                 </div>
-                <div class="col-6 text-right" th:if="${#authorization.expression('isAuthenticated()')}">
-                    Logged in user: <b th:inline="text"  class="user"> [[${#httpServletRequest.remoteUser}]] </b>
+                <div class="col-6 text-right" sec:authorize="isAuthenticated()">
+                    Logged in user: <b  class="user" sec:authentication="name">Username</b>
                     <form th:action="@{/app-logout}" method="POST">
                         <input type="submit" value="Logout"/>
                     </form>
@@ -23,10 +24,6 @@
             </div>
             <div class="row">
                 <h3>Access Denied Exception</h3>
-            </div>
-            <br>
-            <div class="row">
-                <div  class="error" th:text="${errorMsg}">Error</div>
             </div>
         </div>
     </body>
