@@ -29,7 +29,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
     public UserDetails loadUserByUsername(String userName) throws UnexpectedRollbackException {
         User user = userService.getUserByUserName(userName);
-        List<GrantedAuthority> grantedAuthorities = Arrays.asList(new SimpleGrantedAuthority(user.getRole()));
+        List<GrantedAuthority> grantedAuthorities = Arrays.asList(new SimpleGrantedAuthority("ROLE_"+user.getRole()));
         return new org.springframework.security.core.userdetails.User(user.getUsername() , user.getPassword(), grantedAuthorities);
     }
 }

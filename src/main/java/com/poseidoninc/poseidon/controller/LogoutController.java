@@ -20,7 +20,7 @@ public class LogoutController {
 
     @RequestMapping ("/app-logout")
     public String logoff(Principal user, WebRequest request) throws ServletException {
-        log.info("{} : {} : registered={} log off",
+        log.info("{} : {} : user = {} log off",
                 requestService.requestToString(request),
                 ((ServletWebRequest) request).getHttpMethod(),
                 user.getName());

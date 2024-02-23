@@ -24,7 +24,9 @@ public class ValidPasswordValidator implements ConstraintValidator<ValidPassword
     @Override
     public boolean isValid(String password, ConstraintValidatorContext context) {
         PasswordValidator passwordValidator = new PasswordValidator(Arrays.asList(
-                // at least 8 characters
+                // at least 8 characters, max 13
+                // need spring.jpa.properties.jakarta.persistence.validation.mode=none in application.properties
+                // because once encoded length will be >  13 and will throw violation on persistence
                 new LengthRule(8, 13),
                 // at least one upper-case character
                 new CharacterRule(EnglishCharacterData.UpperCase, 1),

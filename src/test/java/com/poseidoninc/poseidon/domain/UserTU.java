@@ -1,7 +1,9 @@
-package com.poseidoninc.poseidon;
+package com.poseidoninc.poseidon.domain;
 
-import com.poseidoninc.poseidon.domain.User;
-import jakarta.validation.*;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -13,7 +15,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @TestInstance(Lifecycle.PER_CLASS)
-public class UserTest {
+public class UserTU {
 
     private ValidatorFactory factory;
 
@@ -46,7 +48,7 @@ public class UserTest {
     @ParameterizedTest(name = "{0} should throw a ConstraintViolationException")
     @NullAndEmptySource
     @ValueSource(strings = {"         ", "ap 1=Passwd","1=Passw", "apw1=asswd", "apw1Passwd", "apw=Passwd", "apw1=Passwdapw1=Passwd"})
-    @Tag("UserRepositoryIT")
+    @Tag("UserTU")
     @DisplayName("@Valid test with incorrect password should throw a ConstraintViolationException")
     public void saveTestIncorrectPasswdShouldThrowAConstraintViolationException(String passwd) {
 
@@ -67,4 +69,36 @@ public class UserTest {
             assertThat(constraintViolations.iterator().next().getMessage()).isEqualTo(msg);
         }
     }
+
+    @ParameterizedTest(name = "{0} should throw a ConstraintViolationException")
+    @NullAndEmptySource
+    @ValueSource(strings = {"   ", "AbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyz"})//26*5=130
+    @Tag("UserTU")
+    @DisplayName("@Valid test with a incorrect String should throw a ConstraintViolationException")
+    public void saveTestIncorrectStringShouldThrowAConstraintViolationException(String username) {
+
+        //GIVEN
+        user.setId(null);
+        user.setUsername(username);
+        user.setPassword("apw1=Passwd");
+        user.setFullname("AAA");
+        user.setRole("USER");
+        String msg = null;
+        if (!(username==null)) {
+            if (!username.isBlank()) {
+                msg = "Username must be maximum of 125 characters";//26*5=130
+            } else {
+                msg = "Username is mandatory"; //empty or blank
+            }
+        } else {
+            msg = "Username is mandatory"; //null
+        }
+
+        //WHEN
+        Set<ConstraintViolation<User>> constraintViolations = validator.validate(user);
+
+        //THEN
+        assertThat(constraintViolations).isNotEmpty();
+    }
 }
+

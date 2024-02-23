@@ -1,25 +1,36 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-    <link rel="stylesheet" href="../../css/bootstrap.min.css" >
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <title>Login</title>
+        <link rel="stylesheet"
+              href="../../css/bootstrap.min.css"
+              th:href="@{/css/bootstrap.min.css}"/>
+    </head>
     <body>
-        <h3>Log In</h3>
-        <form  method="post" th:action="@{/login}">
-           <div>
-              <input type="text" name="username" th:placeholder="${param.error}==null?'User Name':'Wrong user name'" id="username"/><br/>
-              <input type="password" name="password" th:placeholder="${param.error}==null?'Password':'or password'" id="password"/><br/>
-              <input type="checkbox" name="remember" id="remember"/>
-              <label for="remember">Remember me</label><br/>
-              <input type="submit" value="Log in" />
-              <a th:href="@{/user/add}"><button type="button">Register</button></a>
-           </div>
-    </form>
-    <div>
-      <span th:if="${param.logout}">You have been logged out.</span>
-    </div>
+        <div class="container">
+            <div class="row">
+                <h3>Log In</h3>
+            </div>
+            <div class="row">
+                <form  method="post" th:action="@{/login}" class="form-horizontal">
+                    <div  class="form-group">
+                      <input type="text" name="username" th:placeholder="${param.error}==null?'User Name':'Wrong user name'" id="username"/><br/>
+                    </div>
+                    <div  class="form-group">
+                      <input type="password" name="password" th:placeholder="${param.error}==null?'Password':'or password'" id="password"/><br/>
+                    </div>
+                    <div  class="form-group">
+                      <input type="checkbox" name="remember" id="remember"/>
+                      <label for="remember" class="checkbox-inline">Remember me</label><br/>
+                    </div>
+                    <div  class="form-group">
+                      <input type="submit" value="Log in" />
+                      <a th:href="@{/user/add}"><button type="button">Register</button></a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </body>
 </html>

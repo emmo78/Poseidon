@@ -56,30 +56,30 @@ public class UserRepositoryIT {
 		@Tag("UserRepositoryIT")
 		@DisplayName("save test new user should persist user with new id")
 		public void saveTestShouldPersistUserWithNewId() {
-	
+
 			//GIVEN
 			user.setId(null);
 			user.setUsername("Aaa");
 			user.setPassword("apw1=Passwd");
 			user.setFullname("AAA");
 			user.setRole("USER");
-	
+
 			//WHEN
 			User userResult = userRepository.saveAndFlush(user);
-			
+
 			//THEN
 			Optional<Integer> idOpt = Optional.ofNullable(userResult.getId());
 			assertThat(idOpt).isPresent();
 			idOpt.ifPresent(id -> assertThat(userRepository.findById(id)).get().extracting(
-					User::getUsername,
-					User::getPassword,
-					User::getFullname,
-					User::getRole)
-				.containsExactly(
-					"Aaa",
-					"apw1=Passwd",
-					"AAA",
-					"USER"));
+							User::getUsername,
+							User::getPassword,
+							User::getFullname,
+							User::getRole)
+					.containsExactly(
+							"Aaa",
+							"apw1=Passwd",
+							"AAA",
+							"USER"));
 		}
 
 		@Test
@@ -117,6 +117,7 @@ public class UserRepositoryIT {
 							"UPDT",
 							"USER");
 		}
+
 		@ParameterizedTest(name = "{0} should throw a DataIntegrityViolationException")
 		@ValueSource(strings = {"Aaa", "aAa", "aaA", "aAA", "AaA", "AAa", "AAA", "aaa"})
 		@Tag("UserRepositoryIT")
@@ -144,39 +145,8 @@ public class UserRepositoryIT {
 					() -> userRepository.saveAndFlush(userTest))
 					.getMessage()).contains(("Unique index or primary key violation"));
 		}
-
-		@ParameterizedTest(name = "{0} should throw a ConstraintViolationException")
-		@NullAndEmptySource
-		@ValueSource(strings = {"   ", "AbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyz"})//26*5=130
-		@Tag("UserRepositoryIT")
-		@DisplayName("save test with a incorrect String should throw a ConstraintViolationException")
-		public void saveTestIncorrectStringShouldThrowAConstraintViolationException(String username) {
-	
-			//GIVEN
-			user.setId(null);
-			user.setUsername(username);
-			user.setPassword("apw1=Passwd");
-			user.setFullname("AAA");
-			user.setRole("USER");
-			String msg = null;
-			if (!(username==null)) {
-				if (!username.isBlank()) {
-					msg = "Username must be maximum of 125 characters";//26*5=130
-				} else {
-					msg = "Username is mandatory"; //empty or blank
-				}
-			} else {
-				msg = "Username is mandatory"; //null
-			}
-	
-			//WHEN
-			//THEN
-			assertThat(assertThrows(ConstraintViolationException.class,
-					() -> userRepository.saveAndFlush(user))
-					.getMessage()).contains(msg);
-		}
 	}
-	
+
 	@Nested
 	@Tag("findByUsernameTests")
 	@DisplayName("Tests finding user by username")

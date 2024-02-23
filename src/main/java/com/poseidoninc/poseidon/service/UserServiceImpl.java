@@ -78,6 +78,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional(rollbackFor = {DataIntegrityViolationException.class, UnexpectedRollbackException.class})
 	public User saveUser(User user) throws DataIntegrityViolationException, UnexpectedRollbackException {
+
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		User userSaved;
 		try {
@@ -90,7 +91,6 @@ public class UserServiceImpl implements UserService {
 			log.error("Error while saving user = {} : {} ", user.toString(), e.toString());
 			throw new UnexpectedRollbackException("Error while saving user");
 		}
-		userSaved.setPassword("");
 		return userSaved;
 	}
 
