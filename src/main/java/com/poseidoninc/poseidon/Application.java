@@ -9,7 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 @SpringBootApplication
-@PropertySource({"file:./db.properties"})
+@PropertySource({"file:./db.properties", "file:./OAuth2.properties"})
 public class Application {
 	
 	@Bean

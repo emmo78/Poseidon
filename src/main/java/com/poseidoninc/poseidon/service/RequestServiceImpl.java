@@ -10,12 +10,15 @@ public class RequestServiceImpl implements RequestService {
 	public String requestToString(WebRequest request) {
 		StringBuffer parameters = new StringBuffer(request.getDescription(false)+"?"); 
 		request.getParameterMap().forEach((p,v) -> {
-			parameters.append(p+"=");
-			int i=0;
-			while (i<(v.length-1)) {
-				parameters.append(v[i]+",");
-				i++;}
-			parameters.append(v[i]+"&");
+			if (!p.equals("password")) {
+				parameters.append(p + "=");
+				int i = 0;
+				while (i < (v.length - 1)) {
+					parameters.append(v[i] + ",");
+					i++;
+				}
+				parameters.append(v[i] + "&");
+			}
 		});
 		int length = parameters.length();
 		parameters.delete(length-1, length);

@@ -9,6 +9,8 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Set;
 
@@ -47,12 +49,14 @@ public class UserTU {
 
     @ParameterizedTest(name = "{0} should throw a ConstraintViolationException")
     @NullAndEmptySource
-    @ValueSource(strings = {"         ", "ap 1=Passwd","1=Passw", "apw1=asswd", "apw1Passwd", "apw=Passwd", "apw1=Passwdapw1=Passwd"})
+    @ValueSource(strings = {"         ", "ap 1=Passwd", "1=Passw", "apw1=asswd", "apw1Passwd", "apw=Passwd", "apw1=Passwdapw1=Passwd"})
     @Tag("UserTU")
     @DisplayName("@Valid test with incorrect password should throw a ConstraintViolationException")
     public void saveTestIncorrectPasswdShouldThrowAConstraintViolationException(String passwd) {
 
         //GIVEN
+        PasswordEncoder passwordEncoder =
+            new BCryptPasswordEncoder();
         user.setId(null);
         user.setUsername("Aaa");
         user.setPassword(passwd);
@@ -64,6 +68,9 @@ public class UserTU {
         Set<ConstraintViolation<User>> constraintViolations = validator.validate(user);
 
         //THEN
+        if (passwd != null) {
+            assertThat(passwordEncoder.matches(passwd, null)).isFalse();
+        }
         assertThat(constraintViolations).isNotEmpty();
         if (passwd == null) {
             assertThat(constraintViolations.iterator().next().getMessage()).isEqualTo(msg);
@@ -74,8 +81,8 @@ public class UserTU {
     @NullAndEmptySource
     @ValueSource(strings = {"   ", "AbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyz"})//26*5=130
     @Tag("UserTU")
-    @DisplayName("@Valid test with a incorrect String should throw a ConstraintViolationException")
-    public void saveTestIncorrectStringShouldThrowAConstraintViolationException(String username) {
+    @DisplayName("@Valid test with a incorrect username should throw a ConstraintViolationException")
+    public void saveTestIncorrectUsernameShouldThrowAConstraintViolationException(String username) {
 
         //GIVEN
         user.setId(null);
@@ -84,7 +91,7 @@ public class UserTU {
         user.setFullname("AAA");
         user.setRole("USER");
         String msg = null;
-        if (!(username==null)) {
+        if (username!=null) {
             if (!username.isBlank()) {
                 msg = "Username must be maximum of 125 characters";//26*5=130
             } else {

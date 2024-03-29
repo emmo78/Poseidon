@@ -12,7 +12,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.request.WebRequest;
 
 import java.util.Optional;
 
@@ -22,7 +21,6 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 	
 	private final UserRepository userRepository;
-	private final RequestService requestService;
 	private final PasswordEncoder passwordEncoder;
 
 	@Override

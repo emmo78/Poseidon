@@ -6,14 +6,14 @@
         <meta charset="UTF-8">
         <title>Security Error</title>
         <link rel="stylesheet" type="text/css"
-              href="../../static/css/bootstrap.min.css"
+              href="../static/css/bootstrap.min.css"
               th:href="@{/css/bootstrap.min.css}"/>
     </head>
     <body>
         <div class="container">
             <div class="row">
                 <div class="col-6">
-                    <a href="/">Home</a>
+                    <a href="/static">Home</a>
                 </div>
                 <div class="col-6 text-right" sec:authorize="isAuthenticated()">
                     Logged in user: <b  class="user" sec:authentication="name">Username</b>

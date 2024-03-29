@@ -1,6 +1,7 @@
 package com.poseidoninc.poseidon.controller;
 
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -11,8 +12,8 @@ import java.security.Principal;
 public class LoginController {
 
     @GetMapping("/login")
-    public String loginPage(Principal user) {
-        if (isAuthenticated(user)) {
+    public String loginPage(Authentication authentication) {
+        if (authentication!=null && authentication.isAuthenticated()) {
             return "redirect:/home";
         }
         return "login";
@@ -25,15 +26,5 @@ public class LoginController {
         mav.addObject("errorMsg", errorMessage);
         mav.setViewName("403");
         return mav;
-    }
-
-    private boolean isAuthenticated(Principal user) {
-        UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) user;
-        if (token != null) {
-            if (token.isAuthenticated()) {
-                return true;
-            }
-        }
-        return false;
     }
 }
