@@ -1,15 +1,20 @@
 package com.poseidoninc.poseidon.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import com.poseidoninc.poseidon.domain.CurvePoint;
+import com.poseidoninc.poseidon.repository.CurvePointRepository;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.UnexpectedRollbackException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -17,70 +22,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.transaction.UnexpectedRollbackException;
-import org.springframework.web.context.request.ServletWebRequest;
-import org.springframework.web.context.request.WebRequest;
-
-import com.poseidoninc.poseidon.domain.CurvePoint;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import com.poseidoninc.poseidon.repository.CurvePointRepository;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CurvePointServiceTest {
+
 	@InjectMocks
 	private CurvePointServiceIpml curvePointService;
 	
 	@Mock
 	private CurvePointRepository curvePointRepository;
 	
-	@Spy
-	private final RequestService requestService = new RequestServiceImpl();
-	
-	private MockHttpServletRequest requestMock;
-	private WebRequest request;
 	private CurvePoint curvePoint;
 	
 	@Nested
 	@Tag("getCurvePointByIdTests")
 	@DisplayName("Tests for getting curvePoint by curvePointId")
-	@TestInstance(Lifecycle.PER_CLASS)
 	class GetCurvePointByIdTests {
-		
-		@BeforeAll
-		public void setUpForAllTests() {
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/curvePoint/getById/1");
-			request = new ServletWebRequest(requestMock);
-		}
-
-		@AfterAll
-		public void unSetForAllTests() {
-			requestMock = null;
-			request = null;
-		}
 		
 		@AfterEach
 		public void unSetForEachTests() {
@@ -104,7 +65,7 @@ public class CurvePointServiceTest {
 			when(curvePointRepository.findById(anyInt())).thenReturn(Optional.of(curvePoint));
 			
 			//WHEN
-			CurvePoint curvePointResult = curvePointService.getCurvePointById(1, request);
+			CurvePoint curvePointResult = curvePointService.getCurvePointById(1);
 			
 			//THEN
 			assertThat(curvePointResult).extracting(
@@ -134,7 +95,7 @@ public class CurvePointServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> curvePointService.getCurvePointById(null, request))
+				() -> curvePointService.getCurvePointById(null))
 				.getMessage()).isEqualTo("Error while getting curvePoint");
 		}
 
@@ -148,7 +109,7 @@ public class CurvePointServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> curvePointService.getCurvePointById(1, request))
+				() -> curvePointService.getCurvePointById(1))
 				.getMessage()).isEqualTo("Error while getting curvePoint");
 		}
 		
@@ -162,7 +123,7 @@ public class CurvePointServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> curvePointService.getCurvePointById(1, request))
+				() -> curvePointService.getCurvePointById(1))
 				.getMessage()).isEqualTo("Error while getting curvePoint");
 		}
 	}
@@ -178,17 +139,11 @@ public class CurvePointServiceTest {
 		@BeforeAll
 		public void setUpForAllTests() {
 			pageRequest = Pageable.unpaged();
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/curvePoint/getCurvePoints");
-			request = new ServletWebRequest(requestMock);
 		}
 
 		@AfterAll
 		public void unSetForAllTests() {
 			pageRequest = null;
-			requestMock = null;
-			request = null;
 		}
 		
 		@AfterEach
@@ -220,12 +175,11 @@ public class CurvePointServiceTest {
 			curvePoint2.setTerm(4.0);
 			curvePoint2.setValue(5.0);
 			curvePoint2.setCreationDate(LocalDateTime.parse("24/01/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
-
 			expectedCurvePoints.add(curvePoint2);
 			when(curvePointRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<CurvePoint>(expectedCurvePoints, pageRequest, 2));
 			
 			//WHEN
-			Page<CurvePoint> resultedCurvePoints = curvePointService.getCurvePoints(pageRequest, request);
+			Page<CurvePoint> resultedCurvePoints = curvePointService.getCurvePoints(pageRequest);
 			
 			//THEN
 			assertThat(resultedCurvePoints).containsExactlyElementsOf(expectedCurvePoints);
@@ -240,7 +194,7 @@ public class CurvePointServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> curvePointService.getCurvePoints(pageRequest, request))
+					() -> curvePointService.getCurvePoints(pageRequest))
 					.getMessage()).isEqualTo("Error while getting curvePoints");
 		}
 		
@@ -253,7 +207,7 @@ public class CurvePointServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> curvePointService.getCurvePoints(pageRequest, request))
+					() -> curvePointService.getCurvePoints(pageRequest))
 					.getMessage()).isEqualTo("Error while getting curvePoints");
 		}
 	}
@@ -261,22 +215,7 @@ public class CurvePointServiceTest {
 	@Nested
 	@Tag("saveCurvePointTests")
 	@DisplayName("Tests for saving curvePoints")
-	@TestInstance(Lifecycle.PER_CLASS)
 	class SaveCurvePointTests {
-		
-		@BeforeAll
-		public void setUpForAllTests() {
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/curvePoint/saveCurvePoint/");
-			request = new ServletWebRequest(requestMock);
-		}
-
-		@AfterAll
-		public void unSetForAllTests() {
-			requestMock = null;
-			request = null;
-		}
 		
 		@BeforeEach
 		public void setUpForEachTest() {
@@ -300,14 +239,17 @@ public class CurvePointServiceTest {
 		public void saveCurvePointTestShouldPersistAndReturnCurvePoint() {
 			
 			//GIVEN
-			when(curvePointRepository.save(any(CurvePoint.class))).then(invocation -> {
-				CurvePoint curvePointSaved = invocation.getArgument(0);
-				curvePointSaved.setId(1);
-				return curvePointSaved;
-				});
+			CurvePoint curvePointExpected = new CurvePoint();
+			curvePointExpected.setId(1);
+			curvePointExpected.setCurveId(2);
+			curvePointExpected.setAsOfDate(LocalDateTime.parse("21/01/2023 10:20:30", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			curvePointExpected.setTerm(3.0);
+			curvePointExpected.setValue(4.0);
+			curvePointExpected.setCreationDate(LocalDateTime.parse("22/01/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			when(curvePointRepository.save(any(CurvePoint.class))).thenReturn(curvePointExpected);
 			
 			//WHEN
-			CurvePoint resultedCurvePoint = curvePointService.saveCurvePoint(curvePoint, request);
+			CurvePoint resultedCurvePoint = curvePointService.saveCurvePoint(curvePoint);
 			
 			//THEN
 			verify(curvePointRepository).save(any(CurvePoint.class)); //times(1) is the default and can be omitted
@@ -338,7 +280,7 @@ public class CurvePointServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(DataIntegrityViolationException.class,
-					() -> curvePointService.saveCurvePoint(curvePoint, request))
+					() -> curvePointService.saveCurvePoint(curvePoint))
 					.getMessage()).isEqualTo("CurveId already exists");
 		}
 		
@@ -353,7 +295,7 @@ public class CurvePointServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> curvePointService.saveCurvePoint(curvePoint, request))
+					() -> curvePointService.saveCurvePoint(curvePoint))
 					.getMessage()).isEqualTo("Error while saving curvePoint");
 		}	
 	}
@@ -361,22 +303,7 @@ public class CurvePointServiceTest {
 	@Nested
 	@Tag("deleteCurvePointTests")
 	@DisplayName("Tests for deleting curve point")
-	@TestInstance(Lifecycle.PER_CLASS)
 	class DeleteCurvePointTests {
-		
-		@BeforeAll
-		public void setUpForAllTests() {
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/curvePoint/delete/1");
-			request = new ServletWebRequest(requestMock);
-		}
-
-		@AfterAll
-		public void unSetForAllTests() {
-			requestMock = null;
-			request = null;
-		}
 		
 		@BeforeEach
 		public void setUpForEachTest() {
@@ -406,7 +333,7 @@ public class CurvePointServiceTest {
 			doNothing().when(curvePointRepository).delete(any(CurvePoint.class));// Needed to Capture curvePoint
 			
 			//WHEN
-			curvePointService.deleteCurvePointById(1, request);
+			curvePointService.deleteCurvePointById(1);
 			
 			//THEN
 			verify(curvePointRepository, times(1)).delete(curvePointBeingDeleted.capture());
@@ -437,7 +364,7 @@ public class CurvePointServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> curvePointService.deleteCurvePointById(2, request))
+					() -> curvePointService.deleteCurvePointById(2))
 					.getMessage()).isEqualTo("Error while deleting curvePoint");
 		}	
 
@@ -452,7 +379,7 @@ public class CurvePointServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> curvePointService.deleteCurvePointById(1, request))
+					() -> curvePointService.deleteCurvePointById(1))
 					.getMessage()).isEqualTo("Error while deleting curvePoint");
 		}	
 		
@@ -468,7 +395,7 @@ public class CurvePointServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> curvePointService.deleteCurvePointById(1, request))
+					() -> curvePointService.deleteCurvePointById(1))
 					.getMessage()).isEqualTo("Error while deleting curvePoint");
 		}	
 	}

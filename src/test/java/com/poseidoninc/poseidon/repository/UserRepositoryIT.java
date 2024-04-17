@@ -56,30 +56,30 @@ public class UserRepositoryIT {
 		@Tag("UserRepositoryIT")
 		@DisplayName("save test new user should persist user with new id")
 		public void saveTestShouldPersistUserWithNewId() {
-	
+
 			//GIVEN
 			user.setId(null);
 			user.setUsername("Aaa");
 			user.setPassword("apw1=Passwd");
 			user.setFullname("AAA");
 			user.setRole("USER");
-	
+
 			//WHEN
 			User userResult = userRepository.saveAndFlush(user);
-			
+
 			//THEN
 			Optional<Integer> idOpt = Optional.ofNullable(userResult.getId());
 			assertThat(idOpt).isPresent();
 			idOpt.ifPresent(id -> assertThat(userRepository.findById(id)).get().extracting(
-					User::getUsername,
-					User::getPassword,
-					User::getFullname,
-					User::getRole)
-				.containsExactly(
-					"Aaa",
-					"apw1=Passwd",
-					"AAA",
-					"USER"));
+							User::getUsername,
+							User::getPassword,
+							User::getFullname,
+							User::getRole)
+					.containsExactly(
+							"Aaa",
+							"apw1=Passwd",
+							"AAA",
+							"USER"));
 		}
 
 		@Test
@@ -93,7 +93,9 @@ public class UserRepositoryIT {
 			user.setPassword("apw1=Passwd");
 			user.setFullname("AAA");
 			user.setRole("USER");
+
 			Integer id = userRepository.saveAndFlush(user).getId();
+
 			User updatedUser = new User();
 			updatedUser.setId(id);
 			updatedUser.setUsername("Aaa");
@@ -117,8 +119,9 @@ public class UserRepositoryIT {
 							"UPDT",
 							"USER");
 		}
+
 		@ParameterizedTest(name = "{0} should throw a DataIntegrityViolationException")
-		@ValueSource(strings = {"Aaa", "aaa", "AAA", "aAA"})
+		@ValueSource(strings = {"Aaa", "aAa", "aaA", "aAA", "AaA", "AAa", "AAA", "aaa"})
 		@Tag("UserRepositoryIT")
 		@DisplayName("save test an new user with an existent username case insensitive should throw a DataIntegrityViolationException")
 		public void saveTestAnUserWithAnExistentUsernameCaseInsensitiveShouldThrowDataIntegrityViolationException(String username) {
@@ -144,49 +147,19 @@ public class UserRepositoryIT {
 					() -> userRepository.saveAndFlush(userTest))
 					.getMessage()).contains(("Unique index or primary key violation"));
 		}
-
-		@ParameterizedTest(name = "{0} should throw a ConstraintViolationException")
-		@NullAndEmptySource
-		@ValueSource(strings = {"   ", "AbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyzAbcdefghijklmnopqrstuvwxyz"})//26*5=130
-		@Tag("UserRepositoryIT")
-		@DisplayName("save test with a incorrect String should throw a ConstraintViolationException")
-		public void saveTestIncorrectStringShouldThrowAConstraintViolationException(String username) {
-	
-			//GIVEN
-			user.setId(null);
-			user.setUsername(username);
-			user.setPassword("apw1=Passwd");
-			user.setFullname("AAA");
-			user.setRole("USER");
-			String msg = null;
-			if (!(username==null)) {
-				if (!username.isBlank()) {
-					msg = "Username must be maximum of 125 characters";//26*5=130
-				} else {
-					msg = "Username is mandatory"; //empty or blank
-				}
-			} else {
-				msg = "Username is mandatory"; //null
-			}
-	
-			//WHEN
-			//THEN
-			assertThat(assertThrows(ConstraintViolationException.class,
-					() -> userRepository.saveAndFlush(user))
-					.getMessage()).contains(msg);
-		}
 	}
-	
+
 	@Nested
 	@Tag("findByUsernameTests")
 	@DisplayName("Tests finding user by username")
 	@TestInstance(Lifecycle.PER_CLASS)
 	class FindByUserNameTests {
 
-		@Test
+		@ParameterizedTest(name = "{0} should throw a DataIntegrityViolationException")
+		@ValueSource(strings = {"Aaa", "aAa", "aaA", "aAA", "AaA", "AAa", "AAA", "aaa"})
 		@Tag("UserRepositoryIT")
-		@DisplayName("find by Username should return the user by Username")
-		public void findByUsernameTestShouldReturnUserByUsername() {
+		@DisplayName("find by Username should return the user by Username case insensitive")
+		public void findByUsernameTestShouldReturnUserByUsernameCaseInsensitive(String username) {
 	
 			//GIVEN
 			user.setId(null);
@@ -197,7 +170,7 @@ public class UserRepositoryIT {
 			userRepository.saveAndFlush(user);
 	
 			//WHEN
-			User userResult = userRepository.findByUsername("Aaa");
+			User userResult = userRepository.findByUsername(username);
 			
 			//THEN
 			assertThat(userResult).extracting(

@@ -3,7 +3,7 @@ package com.poseidoninc.poseidon.domain;
 import com.poseidoninc.poseidon.annotation.ValidPassword;
 import com.poseidoninc.poseidon.annotation.ValidPasswordGroup;
 import jakarta.validation.GroupSequence;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -17,8 +17,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
 
 @Entity
 @DynamicInsert
@@ -28,6 +26,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @ToString(onlyExplicitlyIncluded = true, includeFieldNames=true)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)

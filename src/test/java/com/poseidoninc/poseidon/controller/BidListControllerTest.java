@@ -2,24 +2,34 @@ package com.poseidoninc.poseidon.controller;
 
 import com.poseidoninc.poseidon.domain.BidList;
 import com.poseidoninc.poseidon.service.BidListService;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import com.poseidoninc.poseidon.service.RequestService;
+import com.poseidoninc.poseidon.service.RequestServiceImpl;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
+import java.util.ArrayList;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class BidListControllerTest {
-	
 
 	@InjectMocks
 	private BidListController bidListController;
@@ -33,25 +43,67 @@ public class BidListControllerTest {
 	@Mock
 	private Model model;
 
-	@Mock
+	@Spy
+	private final RequestService requestService = new RequestServiceImpl();
+
+	private MockHttpServletRequest requestMock;
 	private WebRequest request;
 
 	@AfterEach
 	public void unsetForEachTest() {
+		bidListService = null;
 		bidListController = null;
 	}
 
-	@Test
-	@Tag("BidListControllerTest")
-	@DisplayName("test home should return \"bidList/list\"")
-	public void homeTest() {
-		
-		//GIVEN
-		//WHEN
-		String html = bidListController.home(model, request);
-		
-		//THEN
-		assertThat(html).isEqualTo("bidList/list");
+	@Nested
+	@Tag("homeBidListControllerTests")
+	@DisplayName("Tests for /bidList/list")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+	class HomeBidListControllerTests {
+
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/bidList/list");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
+
+		@Test
+		@Tag("BidListControllerTest")
+		@DisplayName("test home should return \"bidList/list\"")
+		public void homeTestShouldReturnStringBidListList() {
+
+			//GIVEN
+			when(bidListService.getBidLists(any(Pageable.class))).thenReturn(new PageImpl<BidList>(new ArrayList<>()));
+
+			//WHEN
+			String html = bidListController.home(model, request);
+
+			//THEN
+			assertThat(html).isEqualTo("bidList/list");
+		}
+
+		@Test
+		@Tag("BidListControllerTest")
+		@DisplayName("test home should throw UnexpectedRollbackException")
+		public void homeTestShouldThrowUnexpectedRollbackException() {
+
+			//GIVEN
+			when(bidListService.getBidLists(any(Pageable.class))).thenThrow(new UnexpectedRollbackException("Error while getting bidLists"));
+
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> bidListController.home(model, request))
+					.getMessage()).isEqualTo("Error while getting bidLists");
+		}
 	}
 
 	@Test
@@ -68,95 +120,243 @@ public class BidListControllerTest {
 		//THEN
 		assertThat(html).isEqualTo("bidList/add");
 	}
-	@Test
-	@Tag("BidListControllerTest")
-	@DisplayName("test validate should return \"redirect:/bidList/list\"")
-	public void validateTestShouldReturnStringRedirectBidListList() {
 
-		//GIVEN
-		BidList bidList = new BidList();
-		when(bindingResult.hasErrors()).thenReturn(false);
+	@Nested
+	@Tag("validateBidListControllerTests")
+	@DisplayName("Tests for /bidList/validate")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+	class ValidateBidListControllerTests {
 
-		//WHEN
-		String html = bidListController.validate(bidList, bindingResult, request);
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/bidList/validate/");
+			request = new ServletWebRequest(requestMock);
+		}
 
-		//THEN
-		assertThat(html).isEqualTo("redirect:/bidList/list");
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
+
+		@Test
+		@Tag("BidListControllerTest")
+		@DisplayName("test validate should return \"redirect:/bidList/list\"")
+		public void validateTestShouldReturnStringRedirectBidListList() {
+
+			//GIVEN
+			BidList bidList = new BidList();
+			when(bindingResult.hasErrors()).thenReturn(false);
+			when(bidListService.saveBidList(any(BidList.class))).thenReturn(bidList);
+
+			//WHEN
+			String html = bidListController.validate(bidList, bindingResult, request);
+
+			//THEN
+			assertThat(html).isEqualTo("redirect:/bidList/list");
+		}
+
+		@Test
+		@Tag("BidListControllerTest")
+		@DisplayName("test validate should return \"bidList/add\" on BindingResultError")
+		public void validateTestShouldReturnStringBidListAddOnBindingResulError() {
+
+			//GIVEN
+			BidList bidList = new BidList();
+			when(bindingResult.hasErrors()).thenReturn(true);
+
+			//WHEN
+			String html = bidListController.validate(bidList, bindingResult, request);
+
+			//THEN
+			assertThat(html).isEqualTo("bidList/add");
+		}
+
+		@Test
+		@Tag("BidListControllerTest")
+		@DisplayName("test validate should throw UnexpectedRollbackException")
+		public void validateTestShouldThrowUnexpectedRollbackException() {
+
+			//GIVEN
+			BidList bidList = new BidList();
+			when(bindingResult.hasErrors()).thenReturn(false);
+			when(bidListService.saveBidList(any(BidList.class))).thenThrow(new UnexpectedRollbackException("Error while saving bidList"));
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> bidListController.validate(bidList, bindingResult, request))
+					.getMessage()).isEqualTo("Error while saving bidList");
+		}
 	}
 
-	@Test
-	@Tag("BidListControllerTest")
-	@DisplayName("test validate should return \"bidList/add\" on BindingResultError")
-	public void validateTestShouldReturnStringBidListAddOnBindingResulError() {
+	@Nested
+	@Tag("showUpdateFormBidListControllerTests")
+	@DisplayName("Tests for /bidList/update/{id}")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+	class ShowUpdateFormBidListControllerTests {
 
-		//GIVEN
-		BidList bidList = new BidList();
-		when(bindingResult.hasErrors()).thenReturn(true);
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/bidList/update/1");
+			request = new ServletWebRequest(requestMock);
+		}
 
-		//WHEN
-		String html = bidListController.validate(bidList, bindingResult, request);
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
 
-		//THEN
-		assertThat(html).isEqualTo("bidList/add");
+		@Test
+		@Tag("BidListControllerTest")
+		@DisplayName("test showUpdateForm should return \"bidList/update\"")
+		public void showUpdateFormTestShouldReturnStringBidListUpdate() {
+
+			//GIVEN
+			BidList  bidList = new BidList();
+			when(bidListService.getBidListById(anyInt())).thenReturn(bidList);
+
+			//WHEN
+			String html = bidListController.showUpdateForm(1, model, request);
+
+			//THEN
+			assertThat(html).isEqualTo("bidList/update");
+		}
+
+		@Test
+		@Tag("BidListControllerTest")
+		@DisplayName("test showUpdateForm should throw UnexpectedRollbackException")
+		public void showUpdateFormTestShouldThrowUnexpectedRollbackException() {
+
+			//GIVEN
+			when(bidListService.getBidListById(anyInt())).thenThrow(new UnexpectedRollbackException("Error while getting bidList"));
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> bidListController.showUpdateForm(1, model, request))
+					.getMessage()).isEqualTo("Error while getting bidList");
+		}
 	}
 
-	@Test
-	@Tag("BidListControllerTest")
-	@DisplayName("test showUpdateForm should return \"bidList/update\"")
-	public void showUpdateFormTestShouldReturnStringBidListUpdate() {
+	@Nested
+	@Tag("updateBidBidListControllerTests")
+	@DisplayName("Tests for /bidList/update")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+	class updateBidBidListControllerTests {
 
-		//GIVEN
-		BidList  bidList = new BidList();
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/bidList/update/");
+			request = new ServletWebRequest(requestMock);
+		}
 
-		//WHEN
-		String html = bidListController.showUpdateForm(1, model, request);
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
 
-		//THEN
-		assertThat(html).isEqualTo("bidList/update");
+		@Test
+		@Tag("BidListControllerTest")
+		@DisplayName("test update Bid should return \"redirect:/bidList/list\"")
+		public void updateBidTestShouldReturnStringRedirectBidListList() {
+
+			//GIVEN
+			BidList bidList = new BidList();
+			when(bindingResult.hasErrors()).thenReturn(false);
+			when(bidListService.saveBidList(any(BidList.class))).thenReturn(bidList);
+
+			//WHEN
+			String html = bidListController.updateBid(bidList, bindingResult, request);
+
+			//THEN
+			assertThat(html).isEqualTo("redirect:/bidList/list");
+		}
+
+		@Test
+		@Tag("BidListControllerTest")
+		@DisplayName("test update Bid should return \"bidList/update\" on BindingResultError")
+		public void updateBidTestShouldReturnStringBidListUpdateOnBindingResulError() {
+
+			//GIVEN
+			BidList bidList = new BidList();
+			when(bindingResult.hasErrors()).thenReturn(true);
+
+			//WHEN
+			String html = bidListController.updateBid(bidList, bindingResult, request);
+
+			//THEN
+			assertThat(html).isEqualTo("bidList/update");
+		}
+
+		@Test
+		@Tag("BidListControllerTest")
+		@DisplayName("test update Bid should throw UnexpectedRollbackException")
+		public void updateBidTestShouldThrowUnexpectedRollbackException() {
+
+			//GIVEN
+			BidList bidList = new BidList();
+			when(bindingResult.hasErrors()).thenReturn(false);
+			when(bidListService.saveBidList(any(BidList.class))).thenThrow(new UnexpectedRollbackException("Error while saving bidList"));
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> bidListController.updateBid(bidList, bindingResult, request))
+					.getMessage()).isEqualTo("Error while saving bidList");
+		}
 	}
 
-	@Test
-	@Tag("BidListControllerTest")
-	@DisplayName("test update Bid should return \"redirect:/bidList/list\"")
-	public void updateCurveTestShouldReturnStringRedirectBidListList() {
+	@Nested
+	@Tag("deleteBidBidListControllerTests")
+	@DisplayName("Tests for /bidList/delete/{id}")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+	class deleteBidBidListControllerTests {
 
-		//GIVEN
-		 BidList bidList = new BidList();
-		when(bindingResult.hasErrors()).thenReturn(false);
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/bidList/delete/1");
+			request = new ServletWebRequest(requestMock);
+		}
 
-		//WHEN
-		String html = bidListController.updateBid(bidList, bindingResult, request);
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
 
-		//THEN
-		assertThat(html).isEqualTo("redirect:/bidList/list");
-	}
+		@Test
+		@Tag("BidListControllerTest")
+		@DisplayName("test delete Bid should return \"redirect:/bidList/list\"")
+		public void deleteBidTestShouldReturnStringRedirectBidListListList() {
 
-	@Test
-	@Tag("BidListControllerTest")
-	@DisplayName("test update BidList should return \"bidList/update\" on BindingResultError")
-	public void updateCurveTestShouldReturnStringBidListUpdateOnBindingResulError() {
+			//GIVEN
+			//WHEN
+			String html = bidListController.deleteBid(1, request);
 
-		//GIVEN
-		BidList bidList = new BidList();
-		when(bindingResult.hasErrors()).thenReturn(true);
+			//THEN
+			assertThat(html).isEqualTo("redirect:/bidList/list");
+		}
 
-		//WHEN
-		String html = bidListController.updateBid(bidList, bindingResult, request);
+		@Test
+		@Tag("BidListControllerTest")
+		@DisplayName("test delete Bid should throw UnexpectedRollbackException")
+		public void deleteBidTestShouldThrowUnexpectedRollbackException() {
 
-		//THEN
-		assertThat(html).isEqualTo("bidList/update");
-	}
-
-	@Test
-	@Tag("BidListControllerTest")
-	@DisplayName("test delete BidList should return \"redirect:/bidList/list\"")
-	public void deleteCurveTestShouldReturnStringRedirectCurvePointList() {
-
-		//GIVEN
-		//WHEN
-		String html = bidListController.deleteBid(1, request);
-
-		//THEN
-		assertThat(html).isEqualTo("redirect:/bidList/list");
+			//GIVEN
+			doThrow(new UnexpectedRollbackException("Error while deleting bidList")).when(bidListService).deleteBidListById(anyInt());
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> bidListController.deleteBid(1, request))
+					.getMessage()).isEqualTo("Error while deleting bidList");
+		}
 	}
 }

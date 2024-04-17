@@ -1,162 +1,367 @@
 package com.poseidoninc.poseidon.controller;
 
 import com.poseidoninc.poseidon.domain.Trade;
+import com.poseidoninc.poseidon.service.RequestService;
+import com.poseidoninc.poseidon.service.RequestServiceImpl;
 import com.poseidoninc.poseidon.service.TradeService;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
+import java.util.ArrayList;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class TradeControllerTest {
-	
 
-	@InjectMocks
-	private TradeController tradeController;
 
-	@Mock
-	private TradeService tradeService;
-	
-	@Mock
-	private BindingResult bindingResult;
-	
-	@Mock
-	private Model model;
+    @InjectMocks
+    private TradeController tradeController;
 
-	@Mock
-	private WebRequest request;
+    @Mock
+    private TradeService tradeService;
 
-	@AfterEach
-	public void unsetForEachTest() {
-		tradeController = null;
-	}
+    @Mock
+    private BindingResult bindingResult;
 
-	@Test
-	@Tag("TradeControllerTest")
-	@DisplayName("test home should return \"trade/list\"")
-	public void homeTest() {
-		
-		//GIVEN
-		//WHEN
-		String html = tradeController.home(model, request);
-		
-		//THEN
-		assertThat(html).isEqualTo("trade/list");
-	}
+    @Mock
+    private Model model;
 
-	@Test
-	@Tag("TradeControllerTest")
-	@DisplayName("test addBidForm should return \"trade/add\"")
-	public void tradeAddTestShouldReturnStringTradeAdd() {
+    @Spy
+    private final RequestService requestService = new RequestServiceImpl();
 
-		//GIVEN
-		Trade trade = new Trade();
+    private MockHttpServletRequest requestMock;
+    private WebRequest request;
 
-		//WHEN
-		String html = tradeController.addBidForm(trade);
+    @AfterEach
+    public void unsetForEachTest() {
+        tradeService = null;
+        tradeController = null;
+    }
 
-		//THEN
-		assertThat(html).isEqualTo("trade/add");
-	}
-	@Test
-	@Tag("TradeControllerTest")
-	@DisplayName("test validate should return \"redirect:/trade/list\"")
-	public void validateTestShouldReturnStringRedirectTradeList() {
+    @Nested
+    @Tag("homeTradeControllerTests")
+    @DisplayName("Tests for /trade/list")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class HomeTradeControllerTests {
 
-		//GIVEN
-		Trade trade = new Trade();
-		when(bindingResult.hasErrors()).thenReturn(false);
+        @BeforeAll
+        public void setUpForAllTests() {
+            requestMock = new MockHttpServletRequest();
+            requestMock.setServerName("http://localhost:8080");
+            requestMock.setRequestURI("/trade/list");
+            request = new ServletWebRequest(requestMock);
+        }
 
-		//WHEN
-		String html = tradeController.validate(trade, bindingResult, request);
+        @AfterAll
+        public void unSetForAllTests() {
+            requestMock = null;
+            request = null;
+        }
 
-		//THEN
-		assertThat(html).isEqualTo("redirect:/trade/list");
-	}
+        @Test
+        @Tag("TradeControllerTest")
+        @DisplayName("test home should return \"trade/list\"")
+        public void homeTestShouldReturnStringTradeList() {
 
-	@Test
-	@Tag("TradeControllerTest")
-	@DisplayName("test validate should return \"trade/add\" on BindingResultError")
-	public void validateTestShouldReturnStringTradeAddOnBindingResulError() {
+            //GIVEN
+            when(tradeService.getTrades(any(Pageable.class))).thenReturn(new PageImpl<Trade>(new ArrayList<>()));
 
-		//GIVEN
-		Trade trade = new Trade();
-		when(bindingResult.hasErrors()).thenReturn(true);
+            //WHEN
+            String html = tradeController.home(model, request);
 
-		//WHEN
-		String html = tradeController.validate(trade, bindingResult, request);
+            //THEN
+            assertThat(html).isEqualTo("trade/list");
+        }
 
-		//THEN
-		assertThat(html).isEqualTo("trade/add");
-	}
+        @Test
+        @Tag("TradeControllerTest")
+        @DisplayName("test home should throw UnexpectedRollbackException")
+        public void homeTestShouldThrowUnexpectedRollbackException() {
 
-	@Test
-	@Tag("TradeControllerTest")
-	@DisplayName("test showUpdateForm should return \"trade/update\"")
-	public void showUpdateFormTestShouldReturnStringTradeUpdate() {
+            //GIVEN
+            when(tradeService.getTrades(any(Pageable.class))).thenThrow(new UnexpectedRollbackException("Error while getting tradess"));
 
-		//GIVEN
-		Trade  trade = new Trade();
+            //WHEN
+            //THEN
+            assertThat(assertThrows(UnexpectedRollbackException.class,
+                    () -> tradeController.home(model, request))
+                    .getMessage()).isEqualTo("Error while getting trades");
+        }
+    }
 
-		//WHEN
-		String html = tradeController.showUpdateForm(1, model, request);
+    @Test
+    @Tag("TradeControllerTest")
+    @DisplayName("test addTradeForm should return \"trade/add\"")
+    public void tradeAddTestShouldReturnStringTradeAdd() {
 
-		//THEN
-		assertThat(html).isEqualTo("trade/update");
-	}
+        //GIVEN
+        Trade trade = new Trade();
 
-	@Test
-	@Tag("TradeControllerTest")
-	@DisplayName("test update Bid should return \"redirect:/trade/list\"")
-	public void updateCurveTestShouldReturnStringRedirectTradeList() {
+        //WHEN
+        String html = tradeController.addTradeForm(trade);
 
-		//GIVEN
-		 Trade trade = new Trade();
-		when(bindingResult.hasErrors()).thenReturn(false);
+        //THEN
+        assertThat(html).isEqualTo("trade/add");
+    }
 
-		//WHEN
-		String html = tradeController.updateBid(trade, bindingResult, request);
+    @Nested
+    @Tag("validateTradeControllerTests")
+    @DisplayName("Tests for /trade/validate")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class ValidateTradeControllerTests {
 
-		//THEN
-		assertThat(html).isEqualTo("redirect:/trade/list");
-	}
+        @BeforeAll
+        public void setUpForAllTests() {
+            requestMock = new MockHttpServletRequest();
+            requestMock.setServerName("http://localhost:8080");
+            requestMock.setRequestURI("/trade/validate/");
+            request = new ServletWebRequest(requestMock);
+        }
 
-	@Test
-	@Tag("TradeControllerTest")
-	@DisplayName("test update Trade should return \"trade/update\" on BindingResultError")
-	public void updateCurveTestShouldReturnStringTradeUpdateOnBindingResulError() {
+        @AfterAll
+        public void unSetForAllTests() {
+            requestMock = null;
+            request = null;
+        }
 
-		//GIVEN
-		Trade trade = new Trade();
-		when(bindingResult.hasErrors()).thenReturn(true);
+        @Test
+        @Tag("TradeControllerTest")
+        @DisplayName("test validate should return \"redirect:/trade/list\"")
+        public void validateTestShouldReturnStringRedirectTradeList() {
 
-		//WHEN
-		String html = tradeController.updateBid(trade, bindingResult, request);
+            //GIVEN
+            Trade trade = new Trade();
+            when(bindingResult.hasErrors()).thenReturn(false);
+            when(tradeService.saveTrade(any(Trade.class))).thenReturn(trade);
 
-		//THEN
-		assertThat(html).isEqualTo("trade/update");
-	}
 
-	@Test
-	@Tag("TradeControllerTest")
-	@DisplayName("test delete Trade should return \"redirect:/trade/list\"")
-	public void deleteCurveTestShouldReturnStringRedirectCurvePointList() {
+            //WHEN
+            String html = tradeController.validate(trade, bindingResult, request);
 
-		//GIVEN
-		//WHEN
-		String html = tradeController.deleteBid(1, request);
+            //THEN
+            assertThat(html).isEqualTo("redirect:/trade/list");
+        }
 
-		//THEN
-		assertThat(html).isEqualTo("redirect:/trade/list");
-	}
+        @Test
+        @Tag("TradeControllerTest")
+        @DisplayName("test validate should return \"trade/add\" on BindingResultError")
+        public void validateTestShouldReturnStringTradeAddOnBindingResulError() {
+
+            //GIVEN
+            Trade trade = new Trade();
+            when(bindingResult.hasErrors()).thenReturn(true);
+
+            //WHEN
+            String html = tradeController.validate(trade, bindingResult, request);
+
+            //THEN
+            assertThat(html).isEqualTo("trade/add");
+        }
+
+        @Test
+        @Tag("TradeControllerTest")
+        @DisplayName("test validate should throw UnexpectedRollbackException")
+        public void validateTestShouldThrowUnexpectedRollbackException() {
+
+            //GIVEN
+            Trade trade = new Trade();
+            when(bindingResult.hasErrors()).thenReturn(false);
+            when(tradeService.saveTrade(any(Trade.class))).thenThrow(new UnexpectedRollbackException("Error while saving trade"));
+            //WHEN
+            //THEN
+            assertThat(assertThrows(UnexpectedRollbackException.class,
+                    () -> tradeController.validate(trade, bindingResult, request))
+                    .getMessage()).isEqualTo("Error while saving trade");
+        }
+    }
+
+    @Nested
+    @Tag("showUpdateFormTradeControllerTests")
+    @DisplayName("Tests for /trade/update/{id}")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class ShowUpdateFormTradeControllerTests {
+
+        @BeforeAll
+        public void setUpForAllTests() {
+            requestMock = new MockHttpServletRequest();
+            requestMock.setServerName("http://localhost:8080");
+            requestMock.setRequestURI("/trade/update/1");
+            request = new ServletWebRequest(requestMock);
+        }
+
+        @AfterAll
+        public void unSetForAllTests() {
+            requestMock = null;
+            request = null;
+        }
+
+        @Test
+        @Tag("TradeControllerTest")
+        @DisplayName("test showUpdateForm should return \"trade/update\"")
+        public void showUpdateFormTestShouldReturnStringTradeUpdate() {
+
+            //GIVEN
+            Trade trade = new Trade();
+            when(tradeService.getTradeById(anyInt())).thenReturn(trade);
+
+
+            //WHEN
+            String html = tradeController.showUpdateForm(1, model, request);
+
+            //THEN
+            assertThat(html).isEqualTo("trade/update");
+        }
+
+        @Test
+        @Tag("TradeControllerTest")
+        @DisplayName("test showUpdateForm should throw UnexpectedRollbackException")
+        public void showUpdateFormTestShouldThrowUnexpectedRollbackException() {
+
+            //GIVEN
+            when(tradeService.getTradeById(anyInt())).thenThrow(new UnexpectedRollbackException("Error while getting trade"));
+            //WHEN
+            //THEN
+            assertThat(assertThrows(UnexpectedRollbackException.class,
+                    () -> tradeController.showUpdateForm(1, model, request))
+                    .getMessage()).isEqualTo("Error while getting trade");
+        }
+    }
+
+    @Nested
+    @Tag("updateTradeTradeControllerTests")
+    @DisplayName("Tests for /trade/update")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class updateTradeTradeControllerTests {
+
+        @BeforeAll
+        public void setUpForAllTests() {
+            requestMock = new MockHttpServletRequest();
+            requestMock.setServerName("http://localhost:8080");
+            requestMock.setRequestURI("/trade/update/");
+            request = new ServletWebRequest(requestMock);
+        }
+
+        @AfterAll
+        public void unSetForAllTests() {
+            requestMock = null;
+            request = null;
+        }
+
+        @Test
+        @Tag("TradeControllerTest")
+        @DisplayName("test update Trade should return \"redirect:/trade/list\"")
+        public void updateCurveTestShouldReturnStringRedirectTradeList() {
+
+            //GIVEN
+            Trade trade = new Trade();
+            when(bindingResult.hasErrors()).thenReturn(false);
+            when(tradeService.saveTrade(any(Trade.class))).thenReturn(trade);
+
+
+            //WHEN
+            String html = tradeController.updateTrade(trade, bindingResult, request);
+
+            //THEN
+            assertThat(html).isEqualTo("redirect:/trade/list");
+        }
+
+        @Test
+        @Tag("TradeControllerTest")
+        @DisplayName("test update Trade should return \"trade/update\" on BindingResultError")
+        public void updateCurveTestShouldReturnStringTradeUpdateOnBindingResulError() {
+
+            //GIVEN
+            Trade trade = new Trade();
+            when(bindingResult.hasErrors()).thenReturn(true);
+
+            //WHEN
+            String html = tradeController.updateTrade(trade, bindingResult, request);
+
+            //THEN
+            assertThat(html).isEqualTo("trade/update");
+        }
+
+        @Test
+        @Tag("TradeControllerTest")
+        @DisplayName("test update Trade should throw UnexpectedRollbackException")
+        public void updateTradeTestShouldThrowUnexpectedRollbackException() {
+
+            //GIVEN
+            Trade trade = new Trade();
+            when(bindingResult.hasErrors()).thenReturn(false);
+            when(tradeService.saveTrade(any(Trade.class))).thenThrow(new UnexpectedRollbackException("Error while saving trade"));
+            //WHEN
+            //THEN
+            assertThat(assertThrows(UnexpectedRollbackException.class,
+                    () -> tradeController.updateTrade(trade, bindingResult, request))
+                    .getMessage()).isEqualTo("Error while saving trade");
+        }
+    }
+
+
+    @Nested
+    @Tag("deleteTradeTradeControllerTests")
+    @DisplayName("Tests for /trade/delete/{id}")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class deleteTradeTradeControllerTests {
+
+        @BeforeAll
+        public void setUpForAllTests() {
+            requestMock = new MockHttpServletRequest();
+            requestMock.setServerName("http://localhost:8080");
+            requestMock.setRequestURI("/trade/delete/1");
+            request = new ServletWebRequest(requestMock);
+        }
+
+        @AfterAll
+        public void unSetForAllTests() {
+            requestMock = null;
+            request = null;
+        }
+
+        @Test
+        @Tag("TradeControllerTest")
+        @DisplayName("test delete Trade should return \"redirect:/trade/list\"")
+        public void deleteCurveTestShouldReturnStringRedirectCurvePointList() {
+
+            //GIVEN
+            //WHEN
+            String html = tradeController.deleteTrade(1, request);
+
+            //THEN
+            assertThat(html).isEqualTo("redirect:/trade/list");
+        }
+
+        @Test
+        @Tag("TradeControllerTest")
+        @DisplayName("test delete Trade should throw UnexpectedRollbackException")
+        public void deleteTradeTestShouldThrowUnexpectedRollbackException() {
+
+            //GIVEN
+            doThrow(new UnexpectedRollbackException("Error while deleting trade")).when(tradeService).deleteTradeById(anyInt());
+            //WHEN
+            //THEN
+            assertThat(assertThrows(UnexpectedRollbackException.class,
+                    () -> tradeController.deleteTrade(1, request))
+                    .getMessage()).isEqualTo("Error while deleting trade");
+        }
+    }
 }

@@ -15,12 +15,10 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.UnexpectedRollbackException;
-import org.springframework.web.context.request.ServletWebRequest;
-import org.springframework.web.context.request.WebRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,36 +39,15 @@ public class UserServiceTest {
 	private UserRepository userRepository;
 
 	@Spy
-	private final RequestService requestService = new RequestServiceImpl();
-
-	@Spy
 	private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-	
-	private MockHttpServletRequest requestMock;
-	private WebRequest request;
-	private User user;
 
+	private User user;
 	
 	@Nested
 	@Tag("getUserByUserNameTests")
 	@DisplayName("Tests for getUserByUserName")
-	@TestInstance(Lifecycle.PER_CLASS)
 	class GetUserByUserNameTests {
-		
-		@BeforeAll
-		public void setUpForAllTests() {
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/user/getByName/Aaa");
-			request = new ServletWebRequest(requestMock);
-		}
 
-		@AfterAll
-		public void unSetForAllTests() {
-			requestMock = null;
-			request = null;
-		}
-		
 		@AfterEach
 		public void unSetForEachTests() {
 			userService = null;
@@ -79,7 +56,7 @@ public class UserServiceTest {
 
 		@Test
 		@Tag("UserServiceTest")
-		@DisplayName("test getUserByUserName should return expected user")
+		@DisplayName("test getUserByUsername should return expected user")
 		public void getUserByUserNameTestShouldReturnExpectedUser() {
 			
 			//GIVEN
@@ -92,7 +69,7 @@ public class UserServiceTest {
 			when(userRepository.findByUsername(anyString())).thenReturn(user);
 			
 			//WHEN
-			User userResult = userService.getUserByUserName("Aaa", request);
+			User userResult = userService.getUserByUserName("Aaa");
 			
 			//THEN
 			assertThat(userResult).extracting(
@@ -108,7 +85,7 @@ public class UserServiceTest {
 					"AAA",
 					"USER");	
 		}
-			
+
 		@Test
 		@Tag("UserServiceTest")
 		@DisplayName("test getUserByUserName should throw UnexpectedRollbackException on ResourceNotFoundException")
@@ -118,8 +95,8 @@ public class UserServiceTest {
 			
 			//WHEN
 			//THEN
-			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> userService.getUserByUserName("Aaa", request))
+			assertThat(assertThrows(ResourceNotFoundException.class,
+				() -> userService.getUserByUserName("Aaa"))
 				.getMessage()).isEqualTo("Error while getting user");
 		}
 		
@@ -133,7 +110,7 @@ public class UserServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> userService.getUserByUserName("Aaa", request))
+				() -> userService.getUserByUserName("Aaa"))
 				.getMessage()).isEqualTo("Error while getting user");
 		}
 	}
@@ -141,22 +118,7 @@ public class UserServiceTest {
 	@Nested
 	@Tag("getUserByIdTests")
 	@DisplayName("Tests for getting user by Id")
-	@TestInstance(Lifecycle.PER_CLASS)
 	class GetUserByIdTests {
-		
-		@BeforeAll
-		public void setUpForAllTests() {
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/user/getById/1");
-			request = new ServletWebRequest(requestMock);
-		}
-
-		@AfterAll
-		public void unSetForAllTests() {
-			requestMock = null;
-			request = null;
-		}
 		
 		@AfterEach
 		public void unSetForEachTests() {
@@ -179,7 +141,7 @@ public class UserServiceTest {
 			when(userRepository.findById(anyInt())).thenReturn(Optional.of(user));
 			
 			//WHEN
-			User userResult = userService.getUserById(1, request);
+			User userResult = userService.getUserById(1);
 			
 			//THEN
 			assertThat(userResult).extracting(
@@ -206,7 +168,7 @@ public class UserServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> userService.getUserById(null, request))
+				() -> userService.getUserById(null))
 				.getMessage()).isEqualTo("Error while getting user");
 		}
 
@@ -220,7 +182,7 @@ public class UserServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> userService.getUserById(1, request))
+				() -> userService.getUserById(1))
 				.getMessage()).isEqualTo("Error while getting user");
 		}
 		
@@ -234,7 +196,7 @@ public class UserServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> userService.getUserById(1, request))
+				() -> userService.getUserById(1))
 				.getMessage()).isEqualTo("Error while getting user");
 		}
 	}
@@ -242,23 +204,8 @@ public class UserServiceTest {
 	@Nested
 	@Tag("getUserByIdWithBlankPasswdTests")
 	@DisplayName("Tests for getting user by Id with blank passwd")
-	@TestInstance(Lifecycle.PER_CLASS)
 	class GetUserByIdWithBlankPasswdTests {
-		
-		@BeforeAll
-		public void setUpForAllTests() {
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/user/getById/1");
-			request = new ServletWebRequest(requestMock);
-		}
 
-		@AfterAll
-		public void unSetForAllTests() {
-			requestMock = null;
-			request = null;
-		}
-		
 		@AfterEach
 		public void unSetForEachTests() {
 			userService = null;
@@ -280,7 +227,7 @@ public class UserServiceTest {
 			when(userRepository.findById(anyInt())).thenReturn(Optional.of(user));
 			
 			//WHEN
-			User userResult = userService.getUserByIdWithBlankPasswd(1, request);
+			User userResult = userService.getUserByIdWithBlankPasswd(1);
 			
 			//THEN
 			assertThat(userResult).extracting(
@@ -307,7 +254,7 @@ public class UserServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> userService.getUserByIdWithBlankPasswd(null, request))
+				() -> userService.getUserByIdWithBlankPasswd(null))
 				.getMessage()).isEqualTo("Error while getting user");
 		}
 
@@ -321,7 +268,7 @@ public class UserServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> userService.getUserByIdWithBlankPasswd(1, request))
+				() -> userService.getUserByIdWithBlankPasswd(1))
 				.getMessage()).isEqualTo("Error while getting user");
 		}
 		
@@ -335,7 +282,7 @@ public class UserServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-				() -> userService.getUserByIdWithBlankPasswd(1, request))
+				() -> userService.getUserByIdWithBlankPasswd(1))
 				.getMessage()).isEqualTo("Error while getting user");
 		}
 	}
@@ -351,17 +298,11 @@ public class UserServiceTest {
 		@BeforeAll
 		public void setUpForAllTests() {
 			pageRequest = Pageable.unpaged();
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/user/getUsers");
-			request = new ServletWebRequest(requestMock);
 		}
 
 		@AfterAll
 		public void unSetForAllTests() {
 			pageRequest = null;
-			requestMock = null;
-			request = null;
 		}
 		
 		@AfterEach
@@ -384,6 +325,7 @@ public class UserServiceTest {
 			user.setFullname("AAA");
 			user.setRole("USER");
 			expectedUsers.add(user);
+
 			User user2 = new User();			
 			user2.setId(2);
 			user2.setUsername("Bbb");
@@ -393,7 +335,7 @@ public class UserServiceTest {
 			when(userRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<User>(expectedUsers, pageRequest, 2));
 			
 			//WHEN
-			Page<User> resultedUsers = userService.getUsers(pageRequest, request);
+			Page<User> resultedUsers = userService.getUsers(pageRequest);
 			
 			//THEN
 			assertThat(resultedUsers).containsExactlyElementsOf(expectedUsers);
@@ -408,7 +350,7 @@ public class UserServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> userService.getUsers(pageRequest, request))
+					() -> userService.getUsers(pageRequest))
 					.getMessage()).isEqualTo("Error while getting Users");
 		}
 		
@@ -421,7 +363,7 @@ public class UserServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> userService.getUsers(pageRequest, request))
+					() -> userService.getUsers(pageRequest))
 					.getMessage()).isEqualTo("Error while getting Users");
 		}
 	}
@@ -429,22 +371,7 @@ public class UserServiceTest {
 	@Nested
 	@Tag("saveUserTests")
 	@DisplayName("Tests for saving users")
-	@TestInstance(Lifecycle.PER_CLASS)
 	class SaveUserTests {
-		
-		@BeforeAll
-		public void setUpForAllTests() {
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
-			requestMock.setRequestURI("/user/saveUser/");
-			request = new ServletWebRequest(requestMock);
-		}
-
-		@AfterAll
-		public void unSetForAllTests() {
-			requestMock = null;
-			request = null;
-		}
 		
 		@BeforeEach
 		public void setUpForEachTest() {
@@ -467,15 +394,18 @@ public class UserServiceTest {
 		public void saveUserTestShouldPersistAndReturnUser() {
 			
 			//GIVEN
+			User userExpected = new User();
+			userExpected.setId(1);
+			userExpected.setUsername("Aaa");
+			userExpected.setPassword("");
+			userExpected.setFullname("AAA");
+			userExpected.setRole("USER");
+
 			ArgumentCaptor<User> userBeingSaved = ArgumentCaptor.forClass(User.class);
-			when(userRepository.save(any(User.class))).then(invocation -> {
-				User userSaved = invocation.getArgument(0);
-				userSaved.setId(1);
-				return userSaved;
-				});
+			when(userRepository.save(any(User.class))).thenReturn(userExpected);
 			
 			//WHEN
-			User resultedUser = userService.saveUser(user, request);
+			User resultedUser = userService.saveUser(user);
 			
 			//THEN
 			verify(userRepository, times(1)).save(userBeingSaved.capture());
@@ -483,11 +413,13 @@ public class UserServiceTest {
 			assertThat(resultedUser).extracting(
 					User::getId,
 					User::getUsername,
+					User::getPassword,
 					User::getFullname,
 					User::getRole)
 				.containsExactly(
 					1,	
 					"Aaa",
+					"",
 					"AAA",
 					"USER");	
 		}
@@ -503,8 +435,8 @@ public class UserServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(DataIntegrityViolationException.class,
-					() -> userService.saveUser(user, request))
-					.getMessage()).isEqualTo("Username already exist, try another one");
+					() -> userService.saveUser(user))
+					.getMessage()).isEqualTo("Username already exists");
 		}
 		
 		@Test
@@ -518,7 +450,7 @@ public class UserServiceTest {
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> userService.saveUser(user, request))
+					() -> userService.saveUser(user))
 					.getMessage()).isEqualTo("Error while saving user");
 		}	
 	}
@@ -530,8 +462,6 @@ public class UserServiceTest {
 
 		@BeforeEach
 		public void setUpForEachTest() {
-			requestMock = new MockHttpServletRequest();
-			requestMock.setServerName("http://localhost:8080");
 			user = new User();
 			user.setId(1);
 			user.setUsername("Aaa");
@@ -544,8 +474,6 @@ public class UserServiceTest {
 		public void unSetForEachTests() {
 			userService = null;
 			user = null;
-			requestMock = null;
-			request = null;
 		}
 
 		@Test
@@ -554,14 +482,12 @@ public class UserServiceTest {
 		public void deleteUserByIdTestShouldDeleteIt() {
 			
 			//GIVEN
-			requestMock.setRequestURI("/user/delete/1");
-			request = new ServletWebRequest(requestMock);
 			when(userRepository.findById(anyInt())).thenReturn(Optional.of(user));
 			ArgumentCaptor<User> userBeingDeleted = ArgumentCaptor.forClass(User.class);
 			doNothing().when(userRepository).delete(any(User.class));// Needed to Capture user
 			
 			//WHEN
-			userService.deleteUserById(1, request);
+			userService.deleteUserById(1);
 			
 			//THEN
 			verify(userRepository, times(1)).delete(userBeingDeleted.capture());
@@ -585,14 +511,12 @@ public class UserServiceTest {
 		public void deleteUserByIdTestShouldThrowUnexpectedRollbackExceptionOnUnexpectedRollbackException() {
 
 			//GIVEN
-			requestMock.setRequestURI("/user/delete/2");
-			request = new ServletWebRequest(requestMock);
 			when(userRepository.findById(anyInt())).thenThrow(new UnexpectedRollbackException("Error while getting user"));
 
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> userService.deleteUserById(2, request))
+					() -> userService.deleteUserById(2))
 					.getMessage()).isEqualTo("Error while deleting user");
 		}	
 
@@ -602,14 +526,12 @@ public class UserServiceTest {
 		public void deleteUserByIdTestShouldThrowsUnexpectedRollbackExceptionOnInvalidDataAccessApiUsageException() {
 
 			//GIVEN
-			requestMock.setRequestURI("/user/delete/1");
-			request = new ServletWebRequest(requestMock);
 			when(userRepository.findById(anyInt())).thenReturn(Optional.of(user));
 			doThrow(new InvalidDataAccessApiUsageException("Entity must not be null")).when(userRepository).delete(any(User.class));
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> userService.deleteUserById(1, request))
+					() -> userService.deleteUserById(1))
 					.getMessage()).isEqualTo("Error while deleting user");
 		}	
 		
@@ -620,14 +542,12 @@ public class UserServiceTest {
 		public void deleteUserByIdTestShouldThrowsUnexpectedRollbackExceptionOnAnyRuntimeException() {
 
 			//GIVEN
-			requestMock.setRequestURI("/user/delete/1");
-			request = new ServletWebRequest(requestMock);
 			when(userRepository.findById(anyInt())).thenReturn(Optional.of(user));
 			doThrow(new RuntimeException()).when(userRepository).delete(any(User.class));
 			//WHEN
 			//THEN
 			assertThat(assertThrows(UnexpectedRollbackException.class,
-					() -> userService.deleteUserById(1, request))
+					() -> userService.deleteUserById(1))
 					.getMessage()).isEqualTo("Error while deleting user");
 		}	
 	}

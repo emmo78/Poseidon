@@ -7,9 +7,9 @@ import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.web.context.request.WebRequest;
 
 public interface RatingService {
-	Rating getRatingById(Integer id, WebRequest request) throws UnexpectedRollbackException;
-	Page<Rating> getRatings(Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException;
-	Rating saveRating(Rating rating, WebRequest request) throws UnexpectedRollbackException;
-	void deleteRatingById(Integer id, WebRequest request) throws UnexpectedRollbackException;
+	Rating getRatingById(Integer id) throws UnexpectedRollbackException;
+	Page<Rating> getRatings(Pageable pageRequest) throws UnexpectedRollbackException;
+	Rating saveRating(Rating rating) throws UnexpectedRollbackException;
+	void deleteRatingById(Integer id) throws UnexpectedRollbackException;
 
 }

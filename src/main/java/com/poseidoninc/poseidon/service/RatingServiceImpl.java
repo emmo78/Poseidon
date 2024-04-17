@@ -12,70 +12,64 @@ import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.WebRequest;
 
+import java.util.Optional;
+
 @Service
 @AllArgsConstructor
 @Slf4j
 public class RatingServiceImpl implements RatingService {
 
 	private final RatingRepository ratingRepository;
-	private final RequestService requestService;
-
 	
 	@Override
 	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
-	public Rating getRatingById(Integer id, WebRequest request) throws UnexpectedRollbackException {
-		Rating rating = null;
+	public Rating getRatingById(Integer id) throws UnexpectedRollbackException {
+		Rating rating;
 		try {
 			//Throws ResourceNotFoundException | InvalidDataAccessApiUsageException
 			rating = ratingRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Rating not found"));
 		} catch (Exception e) {
-			log.error("{} : rating={} : {} ", requestService.requestToString(request), id, e.toString());
+			log.error("Error while getting rating = {} : {} ", id, e.toString());
 			throw new UnexpectedRollbackException("Error while getting rating");
 		}
-		log.info("{} : rating={} gotten",  requestService.requestToString(request), rating.toString());
 		return rating;
 	}
 
 	@Override
 	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
-	public Page<Rating> getRatings(Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException {
-		Page<Rating> pageRating = null;
+	public Page<Rating> getRatings(Pageable pageRequest) throws UnexpectedRollbackException {
+		Page<Rating> pageRating;
 		try {
 			//throws NullPointerException if pageRequest is null
 			pageRating = ratingRepository.findAll(pageRequest);
 		} catch(Exception e) {
-			log.error("{} : {} ", requestService.requestToString(request), e.toString());
+			log.error("Error while getting ratings : {} ", e.toString());
 			throw new UnexpectedRollbackException("Error while getting ratings");
 		}
-		log.info("{} : ratings page number : {} of {}",
-			requestService.requestToString(request),
-			pageRating.getNumber()+1,
-			pageRating.getTotalPages());
 		return pageRating;
 	}
 
 	@Override
 	@Transactional(rollbackFor = UnexpectedRollbackException.class)
-	public Rating saveRating(Rating rating, WebRequest request) throws UnexpectedRollbackException {
+	public Rating saveRating(Rating rating) throws UnexpectedRollbackException {
+		Rating ratingSaved;
 		try {
-			rating = ratingRepository.save(rating);
+			ratingSaved = ratingRepository.save(rating);
 		} catch(Exception e) {
-			log.error("{} : rating={} : {} ", requestService.requestToString(request), rating.toString(), e.toString());
+			log.error("Error while saving rating = {} : {} ", rating.toString(), e.toString());
 			throw new UnexpectedRollbackException("Error while saving rating");
 		}
-		log.info("{} : rating={} persisted", requestService.requestToString(request), rating.toString());
-		return rating;
+		return ratingSaved;
 	}
 
 	@Override
 	@Transactional(rollbackFor = UnexpectedRollbackException.class)
-	public void deleteRatingById(Integer id, WebRequest request) throws UnexpectedRollbackException {
+	public void deleteRatingById(Integer id) throws UnexpectedRollbackException {
 		try {
-			ratingRepository.delete(getRatingById(id, request)); //getRatingById throws UnexpectedRollbackException
+			ratingRepository.delete(getRatingById(id)); //getRatingById throws UnexpectedRollbackException
 		} catch(Exception e) {
-			log.error("{} : rating={} : {} ", requestService.requestToString(request), id, e.toString());
+			log.error("Error while deleting rating = {} : {} ", id, e.toString());
 			throw new UnexpectedRollbackException("Error while deleting rating");
 		}
-		log.info("{} : rating={} deleted", requestService.requestToString(request), id);
 	}
 }

@@ -2,26 +2,35 @@ package com.poseidoninc.poseidon.controller;
 
 import com.poseidoninc.poseidon.domain.CurvePoint;
 import com.poseidoninc.poseidon.service.CurvePointService;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import com.poseidoninc.poseidon.service.RequestService;
+import com.poseidoninc.poseidon.service.RequestServiceImpl;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
+import java.util.ArrayList;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class CurveControllerTest {
-	
 
 	@InjectMocks
 	private CurveController curveController;
@@ -35,25 +44,66 @@ public class CurveControllerTest {
 	@Mock
 	private Model model;
 
-	@Mock
+	@Spy
+	private final RequestService requestService = new RequestServiceImpl();
+
+	private MockHttpServletRequest requestMock;
 	private WebRequest request;
 
 	@AfterEach
 	public void unsetForEachTest() {
+		curvePointService = null;
 		curveController = null;
 	}
 
-	@Test
-	@Tag("CurveControllerTest")
-	@DisplayName("test home should return \"curvePoint/list\"")
-	public void homeTest() {
-		
-		//GIVEN
-		//WHEN
-		String html = curveController.home(model, request);
-		
-		//THEN
-		assertThat(html).isEqualTo("curvePoint/list");
+	@Nested
+	@Tag("homeCurveControllerTests")
+	@DisplayName("Tests for /curvePoint/list")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+	class HomeCurveControllerTests {
+
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/curvePoint/list");
+			request = new ServletWebRequest(requestMock);
+		}
+
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
+
+		@Test
+		@Tag("CurveControllerTest")
+		@DisplayName("test home should return \"curvePoint/list\"")
+		public void homeTestShouldReturnStringCurvePointList() {
+
+			//GIVEN
+			when(curvePointService.getCurvePoints(any(Pageable.class))).thenReturn(new PageImpl<CurvePoint>(new ArrayList<>()));
+
+			//WHEN
+			String html = curveController.home(model, request);
+
+			//THEN
+			assertThat(html).isEqualTo("curvePoint/list");
+		}
+
+		@Test
+		@Tag("CurveControllerTest")
+		@DisplayName("test home should throw UnexpectedRollbackException")
+		public void homeTestShouldThrowUnexpectedRollbackException() {
+
+			//GIVEN
+			when(curvePointService.getCurvePoints(any(Pageable.class))).thenThrow(new UnexpectedRollbackException("Error while getting curvePoints"));
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> curveController.home(model, request))
+					.getMessage()).isEqualTo("Error while getting curvePoints");
+		}
 	}
 
 	@Test
@@ -70,129 +120,277 @@ public class CurveControllerTest {
 		//THEN
 		assertThat(html).isEqualTo("curvePoint/add");
 	}
-	@Test
-	@Tag("CurveControllerTest")
-	@DisplayName("test validate should return \"redirect:/curvePoint/list\"")
-	public void validateTestShouldReturnStringRedirectCurvePointList() {
 
-		//GIVEN
-		CurvePoint curvePoint = new CurvePoint();
-		when(bindingResult.hasErrors()).thenReturn(false);
+	@Nested
+	@Tag("validateCurveControllerTests")
+	@DisplayName("Tests for /curvePoint/validate")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+	class ValidateCurveControllerTests {
 
-		//WHEN
-		String html = curveController.validate(curvePoint, bindingResult, request);
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/curvePoint/validate/");
+			request = new ServletWebRequest(requestMock);
+		}
 
-		//THEN
-		assertThat(html).isEqualTo("redirect:/curvePoint/list");
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
+
+		@Test
+		@Tag("CurveControllerTest")
+		@DisplayName("test validate should return \"redirect:/curvePoint/list\"")
+		public void validateTestShouldReturnStringRedirectCurvePointList() {
+
+			//GIVEN
+			CurvePoint curvePoint = new CurvePoint();
+			when(bindingResult.hasErrors()).thenReturn(false);
+			when(curvePointService.saveCurvePoint(any(CurvePoint.class))).thenReturn(curvePoint);
+
+			//WHEN
+			String html = curveController.validate(curvePoint, bindingResult, request);
+
+			//THEN
+			assertThat(html).isEqualTo("redirect:/curvePoint/list");
+		}
+
+		@Test
+		@Tag("CurveControllerTest")
+		@DisplayName("test validate should return \"curvePoint/add\" on BindingResultError")
+		public void validateTestShouldReturnStringCurvePointAddOnBindingResulError() {
+
+			//GIVEN
+			CurvePoint curvePoint = new CurvePoint();
+			when(bindingResult.hasErrors()).thenReturn(true);
+
+			//WHEN
+			String html = curveController.validate(curvePoint, bindingResult, request);
+
+			//THEN
+			assertThat(html).isEqualTo("curvePoint/add");
+		}
+
+		@Test
+		@Tag("CurveControllerTest")
+		@DisplayName("test validate should return \"curvePoint/add\" on DataIntegrityViolationException")
+		public void validateTestShouldReturnStringCurvePointAddDataIntegrityViolationException() {
+
+			//GIVEN
+			CurvePoint curvePoint = new CurvePoint();
+			when(bindingResult.hasErrors()).thenReturn(false);
+			when(curvePointService.saveCurvePoint(any(CurvePoint.class))).thenThrow(new DataIntegrityViolationException(""));
+
+			//WHEN
+			String html = curveController.validate(curvePoint, bindingResult, request);
+
+			//THEN
+			assertThat(html).isEqualTo("curvePoint/add");
+		}
+
+		@Test
+		@Tag("CurveControllerTest")
+		@DisplayName("test validate should throw UnexpectedRollbackException")
+		public void validateTestShouldThrowUnexpectedRollbackException() {
+
+			//GIVEN
+			CurvePoint curvePoint = new CurvePoint();
+			when(bindingResult.hasErrors()).thenReturn(false);
+			when(curvePointService.saveCurvePoint(any(CurvePoint.class))).thenThrow(new UnexpectedRollbackException("Error while saving curvePoint"));
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> curveController.validate(curvePoint, bindingResult, request))
+					.getMessage()).isEqualTo("Error while saving curvePoint");
+		}
 	}
 
-	@Test
-	@Tag("CurveControllerTest")
-	@DisplayName("test validate should return \"curvePoint/add\" on BindingResultError")
-	public void validateTestShouldReturnStringCurvePointAddOnBindingResulError() {
+	@Nested
+	@Tag("showUpdateFormCurveControllerTests")
+	@DisplayName("Tests for /curvePoint/update/{id}")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+	class ShowUpdateFormCurveControllerTests {
 
-		//GIVEN
-		CurvePoint curvePoint = new CurvePoint();
-		when(bindingResult.hasErrors()).thenReturn(true);
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/curvePoint/update/1");
+			request = new ServletWebRequest(requestMock);
+		}
 
-		//WHEN
-		String html = curveController.validate(curvePoint, bindingResult, request);
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
 
-		//THEN
-		assertThat(html).isEqualTo("curvePoint/add");
+		@Test
+		@Tag("CurveControllerTest")
+		@DisplayName("test showUpdateForm should return \"curvePoint/update\"")
+		public void showUpdateFormTestShouldReturnStringCurvePointUpdate() {
+
+			//GIVEN
+			CurvePoint curvePoint = new CurvePoint();
+			when(curvePointService.getCurvePointById(anyInt())).thenReturn(curvePoint);
+
+			//WHEN
+			String html = curveController.showUpdateForm(1, model, request);
+
+			//THEN
+			assertThat(html).isEqualTo("curvePoint/update");
+		}
+
+		@Test
+		@Tag("CurveControllerTest")
+		@DisplayName("test showUpdateForm should throw UnexpectedRollbackException")
+		public void showUpdateFormTestShouldThrowUnexpectedRollbackException() {
+
+			//GIVEN
+			when(curvePointService.getCurvePointById(anyInt())).thenThrow(new UnexpectedRollbackException("Error while getting curvePoint"));
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> curveController.showUpdateForm(1, model, request))
+					.getMessage()).isEqualTo("Error while getting curvePoint");
+		}
 	}
 
-	@Test
-	@Tag("CurveControllerTest")
-	@DisplayName("test validate should return \"curvePoint/add\" on DataIntegrityViolationException")
-	public void validateTestShouldReturnStringCurvePointAddDataIntegrityViolationException() {
+	@Nested
+	@Tag("updateCurvePointCurveControllerTests")
+	@DisplayName("Tests for /curvePoint/update")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+	class updateCurvePointCurveControllerTests {
 
-		//GIVEN
-		CurvePoint curvePoint = new CurvePoint();
-		when(bindingResult.hasErrors()).thenReturn(false);
-		when(curvePointService.saveCurvePoint(any(CurvePoint.class), any(WebRequest.class))).thenThrow(new DataIntegrityViolationException(""));
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/curvePoint/update/");
+			request = new ServletWebRequest(requestMock);
+		}
 
-		//WHEN
-		String html = curveController.validate(curvePoint, bindingResult, request);
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
 
-		//THEN
-		assertThat(html).isEqualTo("curvePoint/add");
+		@Test
+		@Tag("CurveControllerTest")
+		@DisplayName("test update CurvePoint should return \"redirect:/curvePoint/list\"")
+		public void updateCurvePointTestShouldReturnStringRedirectCurvePointList() {
+
+			//GIVEN
+			CurvePoint curvePoint = new CurvePoint();
+			when(bindingResult.hasErrors()).thenReturn(false);
+			when(curvePointService.saveCurvePoint(any(CurvePoint.class))).thenReturn(curvePoint);
+
+			//WHEN
+			String html = curveController.updateCurvePoint(curvePoint, bindingResult, request);
+
+			//THEN
+			assertThat(html).isEqualTo("redirect:/curvePoint/list");
+		}
+
+		@Test
+		@Tag("CurveControllerTest")
+		@DisplayName("test update CurvePoint should return \"curvePoint/update\" on BindingResultError")
+		public void updateCurvePointTestShouldReturnStringCurvePointUpdateOnBindingResulError() {
+
+			//GIVEN
+			CurvePoint curvePoint = new CurvePoint();
+			when(bindingResult.hasErrors()).thenReturn(true);
+
+			//WHEN
+			String html = curveController.updateCurvePoint(curvePoint, bindingResult, request);
+
+			//THEN
+			assertThat(html).isEqualTo("curvePoint/update");
+		}
+
+		@Test
+		@Tag("CurveControllerTest")
+		@DisplayName("test update CurvePoint should return \"curvePoint/update\" on DataIntegrityViolationException")
+		public void updateCurvePointTestShouldReturnStringCurvePointUpdateDataIntegrityViolationException() {
+
+			//GIVEN
+			CurvePoint curvePoint = new CurvePoint();
+			when(bindingResult.hasErrors()).thenReturn(false);
+			when(curvePointService.saveCurvePoint(any(CurvePoint.class))).thenThrow(new DataIntegrityViolationException(""));
+
+			//WHEN
+			String html = curveController.updateCurvePoint(curvePoint, bindingResult, request);
+
+			//THEN
+			assertThat(html).isEqualTo("curvePoint/update");
+		}
+
+		@Test
+		@Tag("CurveControllerTest")
+		@DisplayName("test update CurvePoint should throw UnexpectedRollbackException")
+		public void updateCurvePointTestShouldThrowUnexpectedRollbackException() {
+
+			//GIVEN
+			CurvePoint curvePoint = new CurvePoint();
+			when(bindingResult.hasErrors()).thenReturn(false);
+			when(curvePointService.saveCurvePoint(any(CurvePoint.class))).thenThrow(new UnexpectedRollbackException("Error while saving curvePoint"));
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> curveController.updateCurvePoint(curvePoint, bindingResult, request))
+					.getMessage()).isEqualTo("Error while saving curvePoint");
+		}
 	}
 
-	@Test
-	@Tag("CurveControllerTest")
-	@DisplayName("test showUpdateForm should return \"curvePoint/update\"")
-	public void showUpdateFormTestShouldReturnStringCurvePointUpdate() {
+	@Nested
+	@Tag("deleteCurvePointCurveControllerTests")
+	@DisplayName("Tests for /curvePoint/delete/{id}")
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+	class deleteCurvePointCurveControllerTests {
 
-		//GIVEN
-		CurvePoint  curvePoint = new CurvePoint();
+		@BeforeAll
+		public void setUpForAllTests() {
+			requestMock = new MockHttpServletRequest();
+			requestMock.setServerName("http://localhost:8080");
+			requestMock.setRequestURI("/curvePoint/delete/1");
+			request = new ServletWebRequest(requestMock);
+		}
 
-		//WHEN
-		String html = curveController.showUpdateForm(1, model, request);
+		@AfterAll
+		public void unSetForAllTests() {
+			requestMock = null;
+			request = null;
+		}
 
-		//THEN
-		assertThat(html).isEqualTo("curvePoint/update");
-	}
+		@Test
+		@Tag("CurveControllerTest")
+		@DisplayName("test delete CurvePoint should return \"redirect:/curvePoint/list\"")
+		public void deleteCurvePointTestShouldReturnStringRedirectCurvePointList() {
 
-	@Test
-	@Tag("CurveControllerTest")
-	@DisplayName("test update CurvePoint should return \"redirect:/curvePoint/list\"")
-	public void updateCurveTestShouldReturnStringRedirectCurvePointList() {
+			//GIVEN
+			//WHEN
+			String html = curveController.deleteCurvePoint(1, request);
 
-		//GIVEN
-		 CurvePoint curvePoint = new CurvePoint();
-		when(bindingResult.hasErrors()).thenReturn(false);
+			//THEN
+			assertThat(html).isEqualTo("redirect:/curvePoint/list");
+		}
 
-		//WHEN
-		String html = curveController.updateCurvePoint(curvePoint, bindingResult, request);
+		@Test
+		@Tag("CurveControllerTest")
+		@DisplayName("test delete CurvePoint should throw UnexpectedRollbackException")
+		public void deleteCurvePointTestShouldThrowUnexpectedRollbackException() {
 
-		//THEN
-		assertThat(html).isEqualTo("redirect:/curvePoint/list");
-	}
-
-	@Test
-	@Tag("CurveControllerTest")
-	@DisplayName("test update CurvePoint should return \"curvePoint/update\" on BindingResultError")
-	public void updateCurveTestShouldReturnStringCurvePointUpdateOnBindingResulError() {
-
-		//GIVEN
-		CurvePoint curvePoint = new CurvePoint();
-		when(bindingResult.hasErrors()).thenReturn(true);
-
-		//WHEN
-		String html = curveController.updateCurvePoint(curvePoint, bindingResult, request);
-
-		//THEN
-		assertThat(html).isEqualTo("curvePoint/update");
-	}
-
-	@Test
-	@Tag("CurveControllerTest")
-	@DisplayName("test update CurvePoint should return \"curvePoint/update\" on DataIntegrityViolationException")
-	public void updateCurveTestShouldReturnStringCurvePointUpdateDataIntegrityViolationException() {
-
-		//GIVEN
-		CurvePoint curvePoint = new CurvePoint();
-		when(bindingResult.hasErrors()).thenReturn(false);
-		when(curvePointService.saveCurvePoint(any(CurvePoint.class), any(WebRequest.class))).thenThrow(new DataIntegrityViolationException(""));
-
-		//WHEN
-		String html = curveController.updateCurvePoint(curvePoint, bindingResult, request);
-
-		//THEN
-		assertThat(html).isEqualTo("curvePoint/update");
-	}
-
-	@Test
-	@Tag("CurveControllerTest")
-	@DisplayName("test delete CurvePoint should return \"redirect:/curvePoint/list\"")
-	public void deleteCurveTestShouldReturnStringRedirectCurvePpointList() {
-
-		//GIVEN
-		//WHEN
-		String html = curveController.deleteCurvePoint(1, request);
-
-		//THEN
-		assertThat(html).isEqualTo("redirect:/curvePoint/list");
+			//GIVEN
+			doThrow(new UnexpectedRollbackException("Error while deleting curvePoint")).when(curvePointService).deleteCurvePointById(anyInt());
+			//WHEN
+			//THEN
+			assertThat(assertThrows(UnexpectedRollbackException.class,
+					() -> curveController.deleteCurvePoint(1, request))
+					.getMessage()).isEqualTo("Error while deleting curvePoint");
+		}
 	}
 }

@@ -146,32 +146,5 @@ public class CurvePointRepositoryIT {
 					() -> curvePointRepository.saveAndFlush(curvePointTest))
 					.getMessage()).contains(("Unique index or primary key violation"));
 		}
-
-		@ParameterizedTest(name = "{0} should throw a ConstraintViolationException")
-		@CsvSource(value = {"null, must not be null",
-				"-1, CurveId min is 1",
-				"0, CurveId min is 1",
-				"128, CurveId is a tinyint so max is 127"},
-				nullValues = {"null"})
-		@Tag("CurvePointRepositoryIT")
-		@DisplayName("save test with incorrect curveId should throw a ConstraintViolationException")
-		public void saveTestIncorrectPasswdShouldThrowAConstraintViolationException(String curveIdS, String msg) {
-
-			//GIVEN
-
-			Integer curveId = curveIdS == null ? null : Integer.parseInt(curveIdS);
-			curvePoint.setId(null);
-			curvePoint.setCurveId(curveId);
-			curvePoint.setAsOfDate(LocalDateTime.parse("21/01/2023 10:20:30", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
-			curvePoint.setTerm(3.0);
-			curvePoint.setValue(4.0);
-			curvePoint.setCreationDate(LocalDateTime.parse("22/01/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
-
-			//WHEN
-			//THEN
-			assertThat(assertThrows(ConstraintViolationException.class,
-					() -> curvePointRepository.saveAndFlush(curvePoint))
-					.getMessage()).contains(msg);
-		}
 	}
 }

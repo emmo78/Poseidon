@@ -7,8 +7,8 @@ import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.web.context.request.WebRequest;
 
 public interface TradeService {
-	Trade getTradeById(Integer tradeId, WebRequest request) throws UnexpectedRollbackException;
-	Page<Trade> getTrades(Pageable pageRequest, WebRequest request) throws UnexpectedRollbackException;
-	Trade saveTrade(Trade trade, WebRequest request) throws UnexpectedRollbackException;
-	void deleteTradeById(Integer tradeId, WebRequest request) throws UnexpectedRollbackException;
+	Trade getTradeById(Integer tradeId) throws UnexpectedRollbackException;
+	Page<Trade> getTrades(Pageable pageRequest) throws UnexpectedRollbackException;
+	Trade saveTrade(Trade trade) throws UnexpectedRollbackException;
+	void deleteTradeById(Integer tradeId) throws UnexpectedRollbackException;
 }
