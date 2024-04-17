@@ -28,7 +28,7 @@ import java.util.Objects;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class CustomOAuth2UserService extends DefaultOAuth2UserService status{
+public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final ParameterizedTypeReference<List<Map<String, String>>> PARAMETERIZED_RESPONSE_TYPE = new ParameterizedTypeReference<>() {};
 
