@@ -13,7 +13,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-6">
-                    <a href="/">Home</a>
+                    <a href="/home">Home</a>
                 </div>
                 <div class="col-6 text-right" sec:authorize="isAuthenticated()">
                     Logged in user: <b  class="user" sec:authentication="name">Username</b>                   <form th:action="@{/app-logout}" method="POST">
