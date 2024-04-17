@@ -24,12 +24,15 @@ public class UserServiceImpl implements UserService {
 	private final PasswordEncoder passwordEncoder;
 
 	@Override
-	@Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
-	public User getUserByUserName(String userName) throws UnexpectedRollbackException {
+	@Transactional(readOnly = true, rollbackFor = {ResourceNotFoundException.class, UnexpectedRollbackException.class})
+	public User getUserByUserName(String userName) throws ResourceNotFoundException, UnexpectedRollbackException {
 		User user;
 		try {
 			//Throws ResourceNotFoundException
 			user = Optional.ofNullable(userRepository.findByUsername(userName)).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+		} catch(ResourceNotFoundException rnfe) {
+			log.error("Error while getting user = {} : {} ", userName, rnfe.toString());
+			throw new ResourceNotFoundException("Error while getting user");
 		} catch (Exception e) {
 			log.error("Error while getting user = {} : {} ", userName, e.toString());
 			throw new UnexpectedRollbackException("Error while getting user");
@@ -76,7 +79,6 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional(rollbackFor = {DataIntegrityViolationException.class, UnexpectedRollbackException.class})
 	public User saveUser(User user) throws DataIntegrityViolationException, UnexpectedRollbackException {
-
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		User userSaved;
 		try {

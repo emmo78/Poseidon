@@ -1,5 +1,6 @@
 package com.poseidoninc.poseidon.configuration;
 
+import com.poseidoninc.poseidon.service.CustomOAuth2UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -8,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.GrantedAuthority;
@@ -38,6 +40,8 @@ public class SecurityConfiguration  {
 
     private final UserDetailsService userDetailsService;
 
+    private final CustomOAuth2UserService customOAuth2UserService;
+
     @Bean
     public AuthenticationManager authenticationManager() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -63,6 +67,7 @@ public class SecurityConfiguration  {
                         .loginPage("/login")
                         .defaultSuccessUrl("/home", true)
                         .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService)
                                 .oidcUserService(this.oidcUserService()))
                         .permitAll())
                 .rememberMe(conf -> conf

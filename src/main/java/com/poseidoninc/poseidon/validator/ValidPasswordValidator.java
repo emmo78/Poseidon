@@ -8,6 +8,7 @@ import org.passay.*;
 import java.util.Arrays;
 import java.util.List;
 
+
 /**
  * The ValidPasswordValidator class is an implementation of the ConstraintValidator interface that validates a password
  * based on specified rules.
@@ -45,6 +46,7 @@ public class ValidPasswordValidator implements ConstraintValidator<ValidPassword
                 // rejects passwords that contain a sequence of >= 5 characters numerical   (e.g. 12345)
                 new IllegalSequenceRule(EnglishSequenceData.Numerical, 5, false)
         ));
+
         RuleResult result = passwordValidator.validate(new PasswordData(password));
         if (result.isValid()) {
             return true;

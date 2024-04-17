@@ -15,6 +15,7 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.UnexpectedRollbackException;
@@ -94,7 +95,7 @@ public class UserServiceTest {
 			
 			//WHEN
 			//THEN
-			assertThat(assertThrows(UnexpectedRollbackException.class,
+			assertThat(assertThrows(ResourceNotFoundException.class,
 				() -> userService.getUserByUserName("Aaa"))
 				.getMessage()).isEqualTo("Error while getting user");
 		}

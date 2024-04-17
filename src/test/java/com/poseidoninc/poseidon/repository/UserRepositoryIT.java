@@ -93,7 +93,9 @@ public class UserRepositoryIT {
 			user.setPassword("apw1=Passwd");
 			user.setFullname("AAA");
 			user.setRole("USER");
+
 			Integer id = userRepository.saveAndFlush(user).getId();
+
 			User updatedUser = new User();
 			updatedUser.setId(id);
 			updatedUser.setUsername("Aaa");

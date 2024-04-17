@@ -69,7 +69,7 @@ public class UserTU {
 
         //THEN
         if (passwd != null) {
-            assertThat(passwordEncoder.matches(passwd, null)).isFalse();
+            assertThat(passwordEncoder.matches(passwd, "")).isFalse();
         }
         assertThat(constraintViolations).isNotEmpty();
         if (passwd == null) {

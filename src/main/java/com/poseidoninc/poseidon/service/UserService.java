@@ -4,11 +4,12 @@ import com.poseidoninc.poseidon.domain.User;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.web.context.request.WebRequest;
 
 public interface UserService {
-	User getUserByUserName(String userName) throws UnexpectedRollbackException;
+	User getUserByUserName(String userName) throws ResourceNotFoundException, UnexpectedRollbackException;
 	User getUserById(Integer id) throws UnexpectedRollbackException;
 	User getUserByIdWithBlankPasswd(Integer userId) throws UnexpectedRollbackException;
 	Page<User> getUsers(Pageable pageRequest) throws UnexpectedRollbackException;
