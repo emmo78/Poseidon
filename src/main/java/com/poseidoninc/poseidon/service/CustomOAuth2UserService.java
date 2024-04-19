@@ -63,7 +63,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         User user = User.builder()
                 .id(id)
                 .username(email)
-                .password(validPasswordGenerator.generatePassword())//ToDo
+                .password(validPasswordGenerator.generatePassword())
                 .fullname(Objects.requireNonNull(attributes.get("name").toString()))
                 .role("USER")
                 .build();
