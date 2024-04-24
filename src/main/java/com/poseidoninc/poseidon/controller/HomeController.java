@@ -12,8 +12,6 @@ public class HomeController {
 
     @RequestMapping({"/", "/home"})
     public String home(Principal user) {
-//        if(user instanceof UsernamePasswordAuthenticationToken)
-//        if (user instanceof OAuth2AuthenticationToken) {     }
         return "home";
     }
 
