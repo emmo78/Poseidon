@@ -10,6 +10,7 @@ import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -43,7 +44,7 @@ public class ApiUserController {
     }
 
     @PostMapping("/api/user/create")
-    public ResponseEntity<User> createUser(@RequestBody Optional<@Valid User> optionalUser, WebRequest request) throws MethodArgumentNotValidException, BadRequestException, UnexpectedRollbackException {
+    public ResponseEntity<User> createUser(@RequestBody Optional<@Valid User> optionalUser, WebRequest request) throws MethodArgumentNotValidException, BadRequestException, DataIntegrityViolationException, UnexpectedRollbackException {
         if (optionalUser.isEmpty()) {
             throw new BadRequestException("Correct request should be a json user body");
         }
@@ -60,17 +61,17 @@ public class ApiUserController {
     }
 
     @PutMapping("/api/user/update")
-    public ResponseEntity<User> updateUser(@RequestBody Optional<@Valid User> optionalUser, WebRequest request) throws MethodArgumentNotValidException, BadRequestException, UnexpectedRollbackException {
+    public ResponseEntity<User> updateUser(@RequestBody Optional<@Valid User> optionalUser, WebRequest request) throws MethodArgumentNotValidException, BadRequestException, DataIntegrityViolationException, UnexpectedRollbackException {
         if (optionalUser.isEmpty()) {
             throw new BadRequestException("Correct request should be a json user body");
         }
-        User userUpdated = userService.saveUser(optionalUser.get());  //Throws DataIntegrityViolationException, UnexpectedRollbackException
+        User userUpdated = userService.saveUser(optionalUser.get()); //Throws DataIntegrityViolationException, UnexpectedRollbackException
         log.info("{} : user = {} persisted", requestService.requestToString(request), userUpdated.toString());
         return new ResponseEntity<>(userUpdated, HttpStatus.OK);
     }
 
-    @DeleteMapping("/api/user/delete/{id}")
-    public HttpStatus deleteUserById(@PathVariable("id")  @Min(1) @Max(127) Integer id, WebRequest request) throws ConstraintViolationException, UnexpectedRollbackException {
+    @DeleteMapping("/api/user/delete/{id}") //SQL tinyint(4) = -128 to 127 so 1 to 127 for id
+    public HttpStatus deleteUserById(@PathVariable("id") @Min(1) @Max(127) Integer id, WebRequest request) throws ConstraintViolationException, UnexpectedRollbackException {
         userService.deleteUserById(id); //Throws UnexpectedRollbackException
         log.info("{} : user = {} deleted", requestService.requestToString(request), id);
         return HttpStatus.OK;
