@@ -42,17 +42,17 @@ public class ApiUserController {
         return new ResponseEntity<>(pageUser, HttpStatus.OK);
     }
 
-    @PostMapping("/api/user/validate")
-    public ResponseEntity<User> createUser(@RequestBody Optional<@Valid User> user, WebRequest request) throws MethodArgumentNotValidException, BadRequestException, UnexpectedRollbackException {
-        if (user.isEmpty()) {
+    @PostMapping("/api/user/create")
+    public ResponseEntity<User> createUser(@RequestBody Optional<@Valid User> optionalUser, WebRequest request) throws MethodArgumentNotValidException, BadRequestException, UnexpectedRollbackException {
+        if (optionalUser.isEmpty()) {
             throw new BadRequestException("Correct request should be a json user body");
         }
-        User userSaved = userService.saveUser(user.get()); //Throws DataIntegrityViolationException, UnexpectedRollbackException
+        User userSaved = userService.saveUser(optionalUser.get()); //Throws DataIntegrityViolationException, UnexpectedRollbackException
         log.info("{} : user = {} persisted", requestService.requestToString(request), userSaved.toString());
         return new ResponseEntity<>(userSaved, HttpStatus.OK);
     }
 
-    @GetMapping("/api/user/update/{id}")
+    @GetMapping("/api/user/update/{id}") //SQL tinyint(4) = -128 to 127 so 1 to 127 for id
     public ResponseEntity<User> getUserById(@PathVariable("id") @Min(1) @Max(127) Integer id, WebRequest request) throws ConstraintViolationException, UnexpectedRollbackException {
         User user = userService.getUserByIdWithBlankPasswd(id); //Throws UnexpectedRollbackException
         log.info("{} : user = {} gotten",  requestService.requestToString(request), user.toString());
@@ -60,18 +60,18 @@ public class ApiUserController {
     }
 
     @PutMapping("/api/user/update")
-    public ResponseEntity<User> updateUser(@RequestBody Optional<@Valid User> user, WebRequest request) throws MethodArgumentNotValidException, BadRequestException, UnexpectedRollbackException {
-        if (user.isEmpty()) {
+    public ResponseEntity<User> updateUser(@RequestBody Optional<@Valid User> optionalUser, WebRequest request) throws MethodArgumentNotValidException, BadRequestException, UnexpectedRollbackException {
+        if (optionalUser.isEmpty()) {
             throw new BadRequestException("Correct request should be a json user body");
         }
-        User userUpdated = userService.saveUser(user.get());  //Throws DataIntegrityViolationException, UnexpectedRollbackException
+        User userUpdated = userService.saveUser(optionalUser.get());  //Throws DataIntegrityViolationException, UnexpectedRollbackException
         log.info("{} : user = {} persisted", requestService.requestToString(request), userUpdated.toString());
         return new ResponseEntity<>(userUpdated, HttpStatus.OK);
     }
 
     @DeleteMapping("/api/user/delete/{id}")
-    public HttpStatus deleteUser(@PathVariable("id")  @Min(1) @Max(127) Integer id, WebRequest request) throws ConstraintViolationException, UnexpectedRollbackException {
-        userService.deleteUserById(id);  //Throws UnexpectedRollbackException
+    public HttpStatus deleteUserById(@PathVariable("id")  @Min(1) @Max(127) Integer id, WebRequest request) throws ConstraintViolationException, UnexpectedRollbackException {
+        userService.deleteUserById(id); //Throws UnexpectedRollbackException
         log.info("{} : user = {} deleted", requestService.requestToString(request), id);
         return HttpStatus.OK;
     }
