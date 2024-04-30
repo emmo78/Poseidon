@@ -23,6 +23,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 import java.util.Optional;
@@ -40,8 +41,9 @@ public class ApiCurveController {
     public ResponseEntity<Iterable<CurvePoint>> getCurvePoints(WebRequest request) throws UnexpectedRollbackException {
 		Pageable pageRequest = Pageable.unpaged();
         Page<CurvePoint> pageCurvePoint = curvePointService.getCurvePoints(pageRequest); //throws UnexpectedRollbackException
-        log.info("{} : curvePoints page number : {} of {}",
+        log.info("{} : {} : curvePoints page number : {} of {}",
                 requestService.requestToString(request),
+                ((ServletWebRequest) request).getHttpMethod(),
                 pageCurvePoint.getNumber()+1,
                 pageCurvePoint.getTotalPages());
         return new ResponseEntity<>(pageCurvePoint, HttpStatus.OK);
@@ -52,15 +54,15 @@ public class ApiCurveController {
 		if (optionalCurvePoint.isEmpty()) {
             throw new BadRequestException("Correct request should be a json curvePoint body");
         }
-        CurvePoint curvePointSaved = curvePointService.saveCurvePoint(optionalCurvePoint.get()); //Throws DataIntegrityViolationException, UnexpectedRollbac
-        log.info("{} : curvePoint = {} persisted", requestService.requestToString(request), curvePointSaved.toString());
+        CurvePoint curvePointSaved = curvePointService.saveCurvePoint(optionalCurvePoint.get()); //Throws DataIntegrityViolationException, UnexpectedRollbackException
+        log.info("{} : {} : curvePoint = {} persisted", requestService.requestToString(request), ((ServletWebRequest) request).getHttpMethod(), curvePointSaved.toString());
 		return new ResponseEntity<>(curvePointSaved, HttpStatus.OK);
     }
 
     @GetMapping("/api/curvePoint/update/{id}") //SQL tinyint(4) = -128 to 127 so 1 to 127 for id
     public ResponseEntity<CurvePoint> getCurvePointById(@PathVariable("id") @Min(1) @Max(127) Integer id, WebRequest request) throws ConstraintViolationException, UnexpectedRollbackException {
     	CurvePoint curvePoint = curvePointService.getCurvePointById(id);
-        log.info("{} : curvePoint = {} gotten",  requestService.requestToString(request), curvePoint.toString());
+        log.info("{} : {} : curvePoint = {} gotten",  requestService.requestToString(request), ((ServletWebRequest) request).getHttpMethod(), curvePoint.toString());
         return new ResponseEntity<>(curvePoint, HttpStatus.OK);
     }
 
@@ -70,14 +72,14 @@ public class ApiCurveController {
             throw new BadRequestException("Correct request should be a json curvePoint body");
         }
         CurvePoint curvePointUpdated = curvePointService.saveCurvePoint(optionalCurvePoint.get()); //Throws DataIntegrityViolationException, UnexpectedRollbackException
-        log.info("{} : curvePoint = {} persisted", requestService.requestToString(request), curvePointUpdated.toString());
+        log.info("{} : {} : curvePoint = {} persisted", requestService.requestToString(request), ((ServletWebRequest) request).getHttpMethod(), curvePointUpdated.toString());
         return new ResponseEntity<>(curvePointUpdated, HttpStatus.OK);
     }
 
     @DeleteMapping("/api/curvePoint/delete/{id}") //SQL tinyint(4) = -128 to 127 so 1 to 127 for id
     public HttpStatus deleteCurvePoint(@PathVariable("id") @Min(1) @Max(127) Integer id, WebRequest request) throws ConstraintViolationException, UnexpectedRollbackException {
         curvePointService.deleteCurvePointById(id);
-        log.info("{} : curvePoint = {} deleted", requestService.requestToString(request), id);
+        log.info("{} : {} : curvePoint = {} deleted", requestService.requestToString(request), ((ServletWebRequest) request).getHttpMethod(), id);
         return HttpStatus.OK;
     }
 }
