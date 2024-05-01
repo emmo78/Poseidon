@@ -1,6 +1,5 @@
 package com.poseidoninc.poseidon.controller.api;
 
-import com.poseidoninc.poseidon.domain.RuleName;
 import com.poseidoninc.poseidon.domain.Trade;
 import com.poseidoninc.poseidon.service.RequestService;
 import com.poseidoninc.poseidon.service.TradeService;
@@ -15,10 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.transaction.UnexpectedRollbackException;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -48,7 +44,7 @@ public class ApiTradeController {
         return new ResponseEntity<>(pageTrade, HttpStatus.OK);
     }
 
-    @PostMapping("/api/trade/validate")
+    @PostMapping("/api/trade/create")
     public ResponseEntity<Trade> createTrade(@RequestBody Optional<@Valid Trade> optionalTrade, WebRequest request) throws MethodArgumentNotValidException, BadRequestException, UnexpectedRollbackException {
         if (optionalTrade.isEmpty()) {
             throw new BadRequestException("Correct request should be a json Trade body");

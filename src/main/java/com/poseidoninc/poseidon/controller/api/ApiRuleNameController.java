@@ -14,10 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.transaction.UnexpectedRollbackException;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -57,14 +54,14 @@ public class ApiRuleNameController {
 		return new ResponseEntity<>(ruleNameSaved, HttpStatus.OK);
     }
 
-    @GetMapping("/api//ruleName/update/{id}") //SQL tinyint(4) = -128 to 127 so 1 to 127 for id
+    @GetMapping("/api/ruleName/update/{id}") //SQL tinyint(4) = -128 to 127 so 1 to 127 for id
     public ResponseEntity<RuleName> getRuleNameById(@PathVariable("id") @Min(1) @Max(127) Integer id, WebRequest request) throws ConstraintViolationException, UnexpectedRollbackException{
         RuleName ruleName = ruleNameService.getRuleNameById(id);
         log.info("{} : {} : ruleName = {} gotten",  requestService.requestToString(request), ((ServletWebRequest) request).getHttpMethod(), ruleName.toString());
         return new ResponseEntity<>(ruleName, HttpStatus.OK);
     }
 
-    @PutMapping("/api//ruleName/update")
+    @PutMapping("/api/ruleName/update")
     public ResponseEntity<RuleName> updateRuleName(@RequestBody Optional<@Valid  RuleName> optionalRuleName, WebRequest request) throws MethodArgumentNotValidException, BadRequestException, UnexpectedRollbackException {
         if (optionalRuleName.isEmpty()) {
             throw new BadRequestException("Correct request should be a json RuleName body");
@@ -74,7 +71,7 @@ public class ApiRuleNameController {
         return new ResponseEntity<>(ruleNameUpdated, HttpStatus.OK);
     }
 
-    @DeleteMapping("/api//ruleName/delete/{id}") //SQL tinyint(4) = -128 to 127 so 1 to 127 for id
+    @DeleteMapping("/api/ruleName/delete/{id}") //SQL tinyint(4) = -128 to 127 so 1 to 127 for id
     public HttpStatus deleteRuleNameById(@PathVariable("id") @Min(1) @Max(127) Integer id, WebRequest request) throws ConstraintViolationException, UnexpectedRollbackException {
         ruleNameService.deleteRuleNameById(id);
         log.info("{} : {} : ruleName = {} deleted", requestService.requestToString(request), ((ServletWebRequest) request).getHttpMethod(), id);
