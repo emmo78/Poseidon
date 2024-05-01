@@ -1,6 +1,5 @@
 package com.poseidoninc.poseidon.controller.api;
 
-import com.poseidoninc.poseidon.domain.BidList;
 import com.poseidoninc.poseidon.domain.Rating;
 import com.poseidoninc.poseidon.service.RatingService;
 import com.poseidoninc.poseidon.service.RequestService;
@@ -15,10 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.transaction.UnexpectedRollbackException;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -26,9 +23,10 @@ import org.springframework.web.context.request.WebRequest;
 
 import java.util.Optional;
 
-@Controller
+@RestController
 @AllArgsConstructor
 @Slf4j
+@Validated
 public class ApiRatingController {
     
 	private final RatingService ratingService;
@@ -74,7 +72,7 @@ public class ApiRatingController {
     }
 
     @DeleteMapping("/api/rating/delete/{id}") //SQL tinyint(4) = -128 to 127 so 1 to 127 for id
-    public HttpStatus deleteRatingById(@PathVariable("id") @Min(1) @Max(127) Integer id, WebRequest request) throws  ConstraintViolationException, UnexpectedRollbackException {
+    public HttpStatus deleteRatingById(@PathVariable("id") @Min(1) @Max(127) Integer id, WebRequest request) throws ConstraintViolationException, UnexpectedRollbackException {
         ratingService.deleteRatingById(id);
         log.info("{} : {} : rating = {} deleted", requestService.requestToString(request), ((ServletWebRequest) request).getHttpMethod(), id);
         return HttpStatus.OK;
