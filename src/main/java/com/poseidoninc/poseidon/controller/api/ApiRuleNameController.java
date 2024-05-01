@@ -58,9 +58,9 @@ public class ApiRuleNameController {
     }
 
     @GetMapping("/api//ruleName/update/{id}") //SQL tinyint(4) = -128 to 127 so 1 to 127 for id
-    public ResponseEntity<RuleName> getRuleNameById(@PathVariable("id")  @Min(1) @Max(127) Integer id, WebRequest request) throws ConstraintViolationException, UnexpectedRollbackException{
+    public ResponseEntity<RuleName> getRuleNameById(@PathVariable("id") @Min(1) @Max(127) Integer id, WebRequest request) throws ConstraintViolationException, UnexpectedRollbackException{
         RuleName ruleName = ruleNameService.getRuleNameById(id);
-        log.info("{} : {} : ruleName = {} gotten",  requestService.requestToString(request), ((ServletWebRequest) request), ruleName.toString());
+        log.info("{} : {} : ruleName = {} gotten",  requestService.requestToString(request), ((ServletWebRequest) request).getHttpMethod(), ruleName.toString());
         return new ResponseEntity<>(ruleName, HttpStatus.OK);
     }
 
@@ -75,7 +75,7 @@ public class ApiRuleNameController {
     }
 
     @DeleteMapping("/api//ruleName/delete/{id}") //SQL tinyint(4) = -128 to 127 so 1 to 127 for id
-    public HttpStatus deleteRuleNameById(@PathVariable("id")  @Min(1) @Max(127) Integer id, WebRequest request) throws ConstraintViolationException, UnexpectedRollbackException {
+    public HttpStatus deleteRuleNameById(@PathVariable("id") @Min(1) @Max(127) Integer id, WebRequest request) throws ConstraintViolationException, UnexpectedRollbackException {
         ruleNameService.deleteRuleNameById(id);
         log.info("{} : {} : ruleName = {} deleted", requestService.requestToString(request), ((ServletWebRequest) request).getHttpMethod(), id);
         return HttpStatus.OK;
