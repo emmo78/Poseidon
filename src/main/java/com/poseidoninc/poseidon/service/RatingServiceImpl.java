@@ -10,9 +10,6 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.request.WebRequest;
-
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor

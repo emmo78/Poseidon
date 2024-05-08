@@ -1,7 +1,6 @@
 package com.poseidoninc.poseidon.service;
 
 import com.poseidoninc.poseidon.domain.User;
-import com.poseidoninc.poseidon.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,11 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Transactional;
 
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j

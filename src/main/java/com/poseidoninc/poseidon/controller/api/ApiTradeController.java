@@ -1,6 +1,7 @@
 package com.poseidoninc.poseidon.controller.api;
 
 import com.poseidoninc.poseidon.domain.Trade;
+import com.poseidoninc.poseidon.exception.BadRequestException;
 import com.poseidoninc.poseidon.service.RequestService;
 import com.poseidoninc.poseidon.service.TradeService;
 import jakarta.validation.ConstraintViolationException;
@@ -9,7 +10,6 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;

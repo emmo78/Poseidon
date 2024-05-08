@@ -1,15 +1,11 @@
 package com.poseidoninc.poseidon.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class RequestServiceTest {
 	

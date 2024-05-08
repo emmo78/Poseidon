@@ -2,21 +2,14 @@ package com.poseidoninc.poseidon.domain;
 
 import com.poseidoninc.poseidon.annotation.ValidPassword;
 import com.poseidoninc.poseidon.annotation.ValidPasswordGroup;
+import jakarta.persistence.*;
 import jakarta.validation.GroupSequence;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 
 @Entity
 @DynamicInsert

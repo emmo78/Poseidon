@@ -1,15 +1,15 @@
 package com.poseidoninc.poseidon.controller.api;
 
 import com.poseidoninc.poseidon.domain.BidList;
+import com.poseidoninc.poseidon.exception.BadRequestException;
 import com.poseidoninc.poseidon.service.BidListService;
 import com.poseidoninc.poseidon.service.RequestService;
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.BadRequestException;
-import jakarta.validation.ConstraintViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -64,7 +64,7 @@ public class ApiBidListController {
     @PutMapping("/api/bidList/update")
     public ResponseEntity<BidList>  updateBidList(@RequestBody Optional<@Valid BidList> optionalBidList, WebRequest request) throws MethodArgumentNotValidException, BadRequestException, UnexpectedRollbackException {
         if (optionalBidList.isEmpty()) {
-            throw new BadRequestException("Correct request should be a json bidList body");
+            throw new BadRequestException("Correct request should be a json BidList body");
         }
         BidList bidListUpdated = bidListService.saveBidList(optionalBidList.get());
         log.info("{} : {} : bidList = {} persisted", requestService.requestToString(request), ((ServletWebRequest) request).getHttpMethod(), bidListUpdated.toString());

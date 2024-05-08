@@ -4,7 +4,6 @@ import com.poseidoninc.poseidon.domain.RuleName;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.UnexpectedRollbackException;
-import org.springframework.web.context.request.WebRequest;
 
 public interface RuleNameService {
 	RuleName getRuleNameById(Integer id) throws UnexpectedRollbackException;

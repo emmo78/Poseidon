@@ -1,15 +1,12 @@
 package com.poseidoninc.poseidon.controller;
 
-import org.springframework.security.access.AccessDeniedException;
+import com.poseidoninc.poseidon.service.RequestService;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
-
-import com.poseidoninc.poseidon.service.RequestService;
-
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;

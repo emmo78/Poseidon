@@ -4,7 +4,6 @@ import com.poseidoninc.poseidon.domain.Trade;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.UnexpectedRollbackException;
-import org.springframework.web.context.request.WebRequest;
 
 public interface TradeService {
 	Trade getTradeById(Integer tradeId) throws UnexpectedRollbackException;

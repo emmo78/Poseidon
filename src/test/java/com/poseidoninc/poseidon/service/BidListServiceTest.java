@@ -8,16 +8,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.transaction.UnexpectedRollbackException;
-import org.springframework.web.context.request.ServletWebRequest;
-import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -40,17 +36,17 @@ public class BidListServiceTest {
 	
 	private BidList bidList;
 
+	@AfterEach
+	public void unSetForEachTests() {
+		bidListService = null;
+		bidList = null;
+	}
+
 	@Nested
 	@Tag("getBidListByIdTests")
 	@DisplayName("Tests for getting bidList by bidListId")
 	class GetBidListByIdTests {
 		
-		@AfterEach
-		public void unSetForEachTests() {
-			bidListService = null;
-			bidList = null;
-		}
-
 		@Test
 		@Tag("BidListServiceTest")
 		@DisplayName("test getBidListById should return expected bidList")
@@ -196,12 +192,6 @@ public class BidListServiceTest {
 			pageRequest = null;
 		}
 
-		@AfterEach
-		public void unSetForEachTests() {
-			bidListService = null;
-			bidList = null;
-		}
-
 		@Test
 		@Tag("BidListServiceTest")
 		@DisplayName("test getBidLists should return bidLists")
@@ -323,12 +313,6 @@ public class BidListServiceTest {
 			bidList.setDealType("deal type");
 			bidList.setSourceListId("source list id");
 			bidList.setSide("side");
-		}
-
-		@AfterEach
-		public void unSetForEachTests() {
-			bidListService = null;
-			bidList = null;
 		}
 
 		@Test
@@ -463,12 +447,6 @@ public class BidListServiceTest {
 			bidList.setDealType("deal type");
 			bidList.setSourceListId("source list id");
 			bidList.setSide("side");
-		}
-
-		@AfterEach
-		public void unSetForEachTests() {
-			bidListService = null;
-			bidList = null;
 		}
 
 		@Test

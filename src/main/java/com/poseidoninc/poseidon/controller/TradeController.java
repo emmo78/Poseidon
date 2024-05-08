@@ -1,7 +1,6 @@
 package com.poseidoninc.poseidon.controller;
 
 import com.poseidoninc.poseidon.domain.Trade;
-import com.poseidoninc.poseidon.domain.Trade;
 import com.poseidoninc.poseidon.service.RequestService;
 import com.poseidoninc.poseidon.service.TradeService;
 import jakarta.validation.Valid;
