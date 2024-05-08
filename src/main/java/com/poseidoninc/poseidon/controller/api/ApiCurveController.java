@@ -73,7 +73,7 @@ public class ApiCurveController {
     }
 
     @DeleteMapping("/api/curvePoint/delete/{id}") //SQL tinyint(4) = -128 to 127 so 1 to 127 for id
-    public HttpStatus deleteCurvePoint(@PathVariable("id") @Min(1) @Max(127) Integer id, WebRequest request) throws ConstraintViolationException, UnexpectedRollbackException {
+    public HttpStatus deleteCurvePointById(@PathVariable("id") @Min(1) @Max(127) Integer id, WebRequest request) throws ConstraintViolationException, UnexpectedRollbackException {
         curvePointService.deleteCurvePointById(id);
         log.info("{} : {} : curvePoint = {} deleted", requestService.requestToString(request), ((ServletWebRequest) request).getHttpMethod(), id);
         return HttpStatus.OK;

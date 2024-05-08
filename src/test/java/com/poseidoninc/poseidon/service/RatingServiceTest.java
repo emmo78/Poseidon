@@ -242,18 +242,6 @@ public class RatingServiceTest {
 			//THEN
 			verify(ratingRepository).save(any(Rating.class)); //times(1) is the default and can be omitted
 			assertThat(ratingResult).extracting(
-							Rating::getId,
-							Rating::getMoodysRating,
-							Rating::getSandPRating,
-							Rating::getFitchRating,
-							Rating::getOrderNumber)
-					.containsExactly(
-							1,
-							"Moody's Rating",
-							"SandP's Rating",
-							"Fitch's Rating",
-							2);
-			assertThat(ratingResult).extracting(
 					Rating::getId,
 					Rating::getMoodysRating,
 					Rating::getSandPRating,

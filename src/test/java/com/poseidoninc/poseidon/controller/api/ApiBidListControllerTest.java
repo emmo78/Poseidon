@@ -62,7 +62,7 @@ public class ApiBidListControllerTest {
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class GetBidListsTests {
 
-        Pageable pageRequest;
+        private Pageable pageRequest;
 
         @BeforeAll
         public void setUpForAllTests() {
@@ -319,7 +319,7 @@ public class ApiBidListControllerTest {
             //THEN
             assertThat(assertThrows(BadRequestException.class,
                     () -> apiBidListController.createBidList(optionalBidList, request))
-                    .getMessage()).isEqualTo("Correct request should be a json BidList body");
+                    .getMessage()).isEqualTo("Correct request should be a json bidList body");
         }
 
         @Test
@@ -618,7 +618,7 @@ public class ApiBidListControllerTest {
             //THEN
             assertThat(assertThrows(BadRequestException.class,
                     () -> apiBidListController.updateBidList(optionalBidList, request))
-                    .getMessage()).isEqualTo("Correct request should be a json BidList body");
+                    .getMessage()).isEqualTo("Correct request should be a json bidList body");
         }
 
         @Test

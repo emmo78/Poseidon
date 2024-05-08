@@ -47,7 +47,7 @@ public class ApiRatingController {
     @PostMapping("/api/rating/create")
     public ResponseEntity<Rating> createRating(@RequestBody Optional<@Valid Rating> optionalRating, WebRequest request) throws MethodArgumentNotValidException, BadRequestException, UnexpectedRollbackException {
 		if (optionalRating.isEmpty()) {
-            throw new BadRequestException("Correct request should be a json Rating body");
+            throw new BadRequestException("Correct request should be a json rating body");
 		}
         Rating ratingSaved = ratingService.saveRating(optionalRating.get());
         log.info("{} : {} : rating = {} persisted", requestService.requestToString(request), ((ServletWebRequest) request).getHttpMethod(), ratingSaved.toString());
@@ -64,7 +64,7 @@ public class ApiRatingController {
     @PutMapping("/api/rating/update")
     public ResponseEntity<Rating> updateRating(@RequestBody Optional<@Valid Rating> optionalRating, WebRequest request) throws MethodArgumentNotValidException, BadRequestException, UnexpectedRollbackException {
         if (optionalRating.isEmpty()) {
-            throw new BadRequestException("Correct request should be a json Rating body");
+            throw new BadRequestException("Correct request should be a json rating body");
         }
         Rating ratingUpdated = ratingService.saveRating(optionalRating.get());
         log.info("{} : {} : rating = {} persisted", requestService.requestToString(request), ((ServletWebRequest) request).getHttpMethod(), ratingUpdated.toString());

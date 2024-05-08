@@ -47,7 +47,7 @@ public class ApiBidListController {
     @PostMapping("/api/bidList/create")
     public ResponseEntity<BidList>  createBidList(@RequestBody Optional<@Valid BidList> optionalBidList, WebRequest request) throws MethodArgumentNotValidException, BadRequestException, UnexpectedRollbackException {
 		if (optionalBidList.isEmpty()) {
-            throw new BadRequestException("Correct request should be a json BidList body");
+            throw new BadRequestException("Correct request should be a json bidList body");
 		}
         BidList bidListSaved = bidListService.saveBidList(optionalBidList.get());
         log.info("{} : {} : bidList = {} persisted", requestService.requestToString(request), ((ServletWebRequest) request).getHttpMethod(), bidListSaved.toString());
@@ -64,7 +64,7 @@ public class ApiBidListController {
     @PutMapping("/api/bidList/update")
     public ResponseEntity<BidList>  updateBidList(@RequestBody Optional<@Valid BidList> optionalBidList, WebRequest request) throws MethodArgumentNotValidException, BadRequestException, UnexpectedRollbackException {
         if (optionalBidList.isEmpty()) {
-            throw new BadRequestException("Correct request should be a json BidList body");
+            throw new BadRequestException("Correct request should be a json bidList body");
         }
         BidList bidListUpdated = bidListService.saveBidList(optionalBidList.get());
         log.info("{} : {} : bidList = {} persisted", requestService.requestToString(request), ((ServletWebRequest) request).getHttpMethod(), bidListUpdated.toString());
