@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -85,23 +86,24 @@ public class ApiUserControllerTest {
         public void getUsersTestShouldReturnSuccessResponseEntityWithIterableOfUser() {
 
             //GIVEN
-            List<User> expectedUsers = new ArrayList<>();
+            List<User> givenUsers = new ArrayList<>();
             user = new User();
             user.setId(1);
             user.setUsername("Aaa");
             user.setPassword("apw1=Passwd");
             user.setFullname("AAA");
             user.setRole("USER");
-            expectedUsers.add(user);
+            givenUsers.add(user);
 
             User user2 = new User();
             user2.setId(2);
             user2.setUsername("Bbb");
             user2.setPassword("bpw2=Passwd");
             user2.setFullname("BBB");
-            expectedUsers.add(user2);
+            user2.setRole("USER");
+            givenUsers.add(user2);
 
-            when(userService.getUsers(any(Pageable.class))).thenReturn(new PageImpl<User>(expectedUsers, pageRequest, 2));
+            when(userService.getUsers(any(Pageable.class))).thenReturn(new PageImpl<User>(givenUsers, pageRequest, 2).map(user -> {user.setPassword(""); return user;}));
 
             //WHEN
             ResponseEntity<Iterable<User>> responseEntity = apiUserController.getUsers(request);
@@ -110,7 +112,16 @@ public class ApiUserControllerTest {
             assertThat(responseEntity.getStatusCode().is2xxSuccessful()).isTrue();
             Iterable<User> resultUsers = responseEntity.getBody();
             assertThat(resultUsers).isNotNull();
-            assertThat(resultUsers).containsExactlyElementsOf(expectedUsers);
+            assertThat(resultUsers)
+                    .extracting(
+                            User::getId,
+                            User::getUsername,
+                            User::getPassword,
+                            User::getFullname,
+                            User::getRole)
+                    .containsExactly(
+                            tuple(1, "Aaa", "", "AAA", "USER"),
+                            tuple(2, "Bbb", "", "BBB", "USER"));
         }
 
         @Test
@@ -265,11 +276,11 @@ public class ApiUserControllerTest {
             user = new User();
             user.setId(1);
             user.setUsername("Aaa");
-            user.setPassword("apw1=Passwd");
+            user.setPassword("");
             user.setFullname("AAA");
             user.setRole("USER");
 
-            when(userService.getUserById(anyInt())).thenReturn(user);
+            when(userService.getUserByIdWithBlankPasswd(anyInt())).thenReturn(user);
 
             //WHEN
             ResponseEntity<User> responseEntity = apiUserController.getUserById(1, request);
@@ -300,7 +311,7 @@ public class ApiUserControllerTest {
         public void getUserByIdTestShouldThrowUnexpectedRollbackException() {
 
             //GIVEN
-            when(userService.getUserById(anyInt())).thenThrow(new UnexpectedRollbackException("Error while getting user"));
+            when(userService.getUserByIdWithBlankPasswd(anyInt())).thenThrow(new UnexpectedRollbackException("Error while getting user"));
             //WHEN
             //THEN
             assertThat(assertThrows(UnexpectedRollbackException.class,

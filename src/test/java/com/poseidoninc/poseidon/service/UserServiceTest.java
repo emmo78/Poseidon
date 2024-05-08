@@ -350,7 +350,6 @@ public class UserServiceTest {
 					.containsExactly(
 							tuple(1, "Aaa", "", "AAA", "USER"),
 							tuple(2, "Bbb", "", "BBB", "USER"));
-
 		}
 		
 		@Test

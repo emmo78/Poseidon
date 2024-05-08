@@ -48,7 +48,7 @@ public class ApiUserController {
     @PostMapping("/api/user/create")
     public ResponseEntity<User> createUser(@RequestBody Optional<@Valid User> optionalUser, WebRequest request) throws MethodArgumentNotValidException, BadRequestException, DataIntegrityViolationException, UnexpectedRollbackException {
         if (optionalUser.isEmpty()) {
-            throw new BadRequestException("Correct request should be a json user body");
+            throw new BadRequestException("Correct request should be a json User body");
         }
         User userSaved = userService.saveUser(optionalUser.get()); //Throws DataIntegrityViolationException, UnexpectedRollbackException
         log.info("{} : {} : user = {} persisted", requestService.requestToString(request), ((ServletWebRequest) request).getHttpMethod(), userSaved.toString());
@@ -65,7 +65,7 @@ public class ApiUserController {
     @PutMapping("/api/user/update")
     public ResponseEntity<User> updateUser(@RequestBody Optional<@Valid User> optionalUser, WebRequest request) throws MethodArgumentNotValidException, BadRequestException, DataIntegrityViolationException, UnexpectedRollbackException {
         if (optionalUser.isEmpty()) {
-            throw new BadRequestException("Correct request should be a json user body");
+            throw new BadRequestException("Correct request should be a json User body");
         }
         User userUpdated = userService.saveUser(optionalUser.get()); //Throws DataIntegrityViolationException, UnexpectedRollbackException
         log.info("{} : {} : user = {} persisted", requestService.requestToString(request), ((ServletWebRequest) request).getHttpMethod(), userUpdated.toString());
