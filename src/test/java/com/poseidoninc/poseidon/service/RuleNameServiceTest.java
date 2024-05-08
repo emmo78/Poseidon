@@ -270,8 +270,7 @@ public class RuleNameServiceTest {
 				    "Json",
 					"Template",
 					"SQL",
-					"SQL Part");		
-
+					"SQL Part");
 		}
 				
 		@Test

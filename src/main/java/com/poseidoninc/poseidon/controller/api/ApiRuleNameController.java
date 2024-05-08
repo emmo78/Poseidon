@@ -47,7 +47,7 @@ public class ApiRuleNameController {
     @PostMapping("/api/ruleName/create")
     public ResponseEntity<RuleName> createRuleName(@RequestBody Optional<@Valid  RuleName> optionalRuleName, WebRequest request) throws MethodArgumentNotValidException, BadRequestException, UnexpectedRollbackException {
         if (optionalRuleName.isEmpty()) {
-            throw new BadRequestException("Correct request should be a json RuleName body");
+            throw new BadRequestException("Correct request should be a json ruleName body");
         }
         RuleName ruleNameSaved = ruleNameService.saveRuleName(optionalRuleName.get());
         log.info("{} : {} : ruleName = {} persisted", requestService.requestToString(request), ((ServletWebRequest) request).getHttpMethod(), ruleNameSaved.toString());
@@ -64,7 +64,7 @@ public class ApiRuleNameController {
     @PutMapping("/api/ruleName/update")
     public ResponseEntity<RuleName> updateRuleName(@RequestBody Optional<@Valid  RuleName> optionalRuleName, WebRequest request) throws MethodArgumentNotValidException, BadRequestException, UnexpectedRollbackException {
         if (optionalRuleName.isEmpty()) {
-            throw new BadRequestException("Correct request should be a json RuleName body");
+            throw new BadRequestException("Correct request should be a json ruleName body");
         }
         RuleName ruleNameUpdated = ruleNameService.saveRuleName(optionalRuleName.get());
         log.info("{} : {} : ruleName = {} persisted", requestService.requestToString(request), ((ServletWebRequest) request).getHttpMethod(), ruleNameUpdated.toString());
