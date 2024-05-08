@@ -319,7 +319,7 @@ public class ApiBidListControllerTest {
             //THEN
             assertThat(assertThrows(BadRequestException.class,
                     () -> apiBidListController.createBidList(optionalBidList, request))
-                    .getMessage()).isEqualTo("Correct request should be a json bidList body");
+                    .getMessage()).isEqualTo("Correct request should be a json BidList body");
         }
 
         @Test
@@ -618,7 +618,7 @@ public class ApiBidListControllerTest {
             //THEN
             assertThat(assertThrows(BadRequestException.class,
                     () -> apiBidListController.updateBidList(optionalBidList, request))
-                    .getMessage()).isEqualTo("Correct request should be a json bidList body");
+                    .getMessage()).isEqualTo("Correct request should be a json BidList body");
         }
 
         @Test

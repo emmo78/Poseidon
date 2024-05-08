@@ -227,7 +227,7 @@ public class ApiRuleNameControllerTest {
             //THEN
             assertThat(assertThrows(BadRequestException.class,
                     () -> apiRuleNameController.createRuleName(optionalRuleName, request))
-                    .getMessage()).isEqualTo("Correct request should be a json ruleName body");
+                    .getMessage()).isEqualTo("Correct request should be a json RuleName body");
         }
 
         @Test
@@ -421,7 +421,7 @@ public class ApiRuleNameControllerTest {
             //THEN
             assertThat(assertThrows(BadRequestException.class,
                     () -> apiRuleNameController.updateRuleName(optionalRuleName, request))
-                    .getMessage()).isEqualTo("Correct request should be a json ruleName body");
+                    .getMessage()).isEqualTo("Correct request should be a json RuleName body");
         }
 
         @Test

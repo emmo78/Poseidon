@@ -223,7 +223,7 @@ public class ApiCurveControllerTest {
             //THEN
             assertThat(assertThrows(BadRequestException.class,
                     () -> apiCurveController.createCurvePoint(optionalCurvePoint, request))
-                    .getMessage()).isEqualTo("Correct request should be a json curvePoint body");
+                    .getMessage()).isEqualTo("Correct request should be a json CurvePoint body");
         }
 
         @Test
@@ -410,7 +410,7 @@ public class ApiCurveControllerTest {
             //THEN
             assertThat(assertThrows(BadRequestException.class,
                     () -> apiCurveController.updateCurvePoint(optionalCurvePoint, request))
-                    .getMessage()).isEqualTo("Correct request should be a json curvePoint body");
+                    .getMessage()).isEqualTo("Correct request should be a json CurvePoint body");
         }
 
         @Test

@@ -215,7 +215,7 @@ public class ApiRatingControllerTest {
             //THEN
             assertThat(assertThrows(BadRequestException.class,
                     () -> apiRatingController.createRating(optionalRating, request))
-                    .getMessage()).isEqualTo("Correct request should be a json rating body");
+                    .getMessage()).isEqualTo("Correct request should be a json Rating body");
         }
 
         @Test
@@ -395,7 +395,7 @@ public class ApiRatingControllerTest {
             //THEN
             assertThat(assertThrows(BadRequestException.class,
                     () -> apiRatingController.updateRating(optionalRating, request))
-                    .getMessage()).isEqualTo("Correct request should be a json rating body");
+                    .getMessage()).isEqualTo("Correct request should be a json Rating body");
         }
 
         @Test

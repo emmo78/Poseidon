@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -317,28 +318,39 @@ public class UserServiceTest {
 		public void getUsersTestShouldReturnExpectedUsers() {
 			
 			//GIVEN
-			List<User> expectedUsers = new ArrayList<>();
+			List<User> givenUsers = new ArrayList<>();
 			user = new User();
 			user.setId(1);
 			user.setUsername("Aaa");
 			user.setPassword("apw1=Passwd");
 			user.setFullname("AAA");
 			user.setRole("USER");
-			expectedUsers.add(user);
+			givenUsers.add(user);
 
 			User user2 = new User();			
 			user2.setId(2);
 			user2.setUsername("Bbb");
 			user2.setPassword("bpw2=Passwd");
 			user2.setFullname("BBB");
-			expectedUsers.add(user2);
-			when(userRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<User>(expectedUsers, pageRequest, 2));
+			user2.setRole("USER");
+			givenUsers.add(user2);
+			when(userRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<User>(givenUsers, pageRequest, 2));
 			
 			//WHEN
 			Page<User> resultedUsers = userService.getUsers(pageRequest);
 			
 			//THEN
-			assertThat(resultedUsers).containsExactlyElementsOf(expectedUsers);
+			assertThat(resultedUsers)
+					.extracting(
+							User::getId,
+							User::getUsername,
+							User::getPassword,
+							User::getFullname,
+							User::getRole)
+					.containsExactly(
+							tuple(1, "Aaa", "", "AAA", "USER"),
+							tuple(2, "Bbb", "", "BBB", "USER"));
+
 		}
 		
 		@Test

@@ -314,7 +314,7 @@ public class ApiTradeControllerTest {
             //THEN
             assertThat(assertThrows(BadRequestException.class,
                     () -> apiTradeController.createTrade(optionalTrade, request))
-                    .getMessage()).isEqualTo("Correct request should be a json trade body");
+                    .getMessage()).isEqualTo("Correct request should be a json Trade body");
         }
 
         @Test
@@ -606,7 +606,7 @@ public class ApiTradeControllerTest {
             //THEN
             assertThat(assertThrows(BadRequestException.class,
                     () -> apiTradeController.updateTrade(optionalTrade, request))
-                    .getMessage()).isEqualTo("Correct request should be a json trade body");
+                    .getMessage()).isEqualTo("Correct request should be a json Trade body");
         }
 
         @Test

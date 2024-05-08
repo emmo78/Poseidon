@@ -48,7 +48,7 @@ public class ApiCurveController {
     @PostMapping("/api/curvePoint/create")
     public ResponseEntity<CurvePoint> createCurvePoint(@RequestBody Optional<@Valid CurvePoint> optionalCurvePoint, WebRequest request) throws MethodArgumentNotValidException, BadRequestException, DataIntegrityViolationException, UnexpectedRollbackException {
 		if (optionalCurvePoint.isEmpty()) {
-            throw new BadRequestException("Correct request should be a json curvePoint body");
+            throw new BadRequestException("Correct request should be a json CurvePoint body");
         }
         CurvePoint curvePointSaved = curvePointService.saveCurvePoint(optionalCurvePoint.get()); //Throws DataIntegrityViolationException, UnexpectedRollbackException
         log.info("{} : {} : curvePoint = {} persisted", requestService.requestToString(request), ((ServletWebRequest) request).getHttpMethod(), curvePointSaved.toString());
@@ -65,7 +65,7 @@ public class ApiCurveController {
     @PutMapping("/api/curvePoint/update")
     public ResponseEntity<CurvePoint> updateCurvePoint(@RequestBody Optional<@Valid CurvePoint> optionalCurvePoint, WebRequest request) throws MethodArgumentNotValidException, BadRequestException, DataIntegrityViolationException, UnexpectedRollbackException {
         if (optionalCurvePoint.isEmpty()) {
-            throw new BadRequestException("Correct request should be a json curvePoint body");
+            throw new BadRequestException("Correct request should be a json CurvePoint body");
         }
         CurvePoint curvePointUpdated = curvePointService.saveCurvePoint(optionalCurvePoint.get()); //Throws DataIntegrityViolationException, UnexpectedRollbackException
         log.info("{} : {} : curvePoint = {} persisted", requestService.requestToString(request), ((ServletWebRequest) request).getHttpMethod(), curvePointUpdated.toString());
