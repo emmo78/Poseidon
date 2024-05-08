@@ -47,7 +47,7 @@ public class ApiTradeController {
     @PostMapping("/api/trade/create")
     public ResponseEntity<Trade> createTrade(@RequestBody Optional<@Valid Trade> optionalTrade, WebRequest request) throws MethodArgumentNotValidException, BadRequestException, UnexpectedRollbackException {
         if (optionalTrade.isEmpty()) {
-            throw new BadRequestException("Correct request should be a json Trade body");
+            throw new BadRequestException("Correct request should be a json trade body");
         }
         Trade tradeSaved = tradeService.saveTrade(optionalTrade.get());
         log.info("{} : {} : trade = {} persisted", requestService.requestToString(request), ((ServletWebRequest) request).getHttpMethod(), tradeSaved.toString());
@@ -64,7 +64,7 @@ public class ApiTradeController {
     @PutMapping("/api/trade/update")
     public ResponseEntity<Trade> updateTrade(@RequestBody Optional<@Valid Trade> optionalTrade, WebRequest request) throws MethodArgumentNotValidException, BadRequestException, UnexpectedRollbackException {
         if (optionalTrade.isEmpty()) {
-            throw new BadRequestException("Correct request should be a json Trade body");
+            throw new BadRequestException("Correct request should be a json trade body");
         }
         Trade tradeUpdated = tradeService.saveTrade(optionalTrade.get());
         log.info("{} : {} : trade = {} persisted", requestService.requestToString(request), ((ServletWebRequest) request).getHttpMethod(), tradeUpdated.toString());
