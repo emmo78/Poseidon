@@ -25,4 +25,10 @@ public class ApiError {
         this.status = status;
         this.message = ex.getMessage();
     }
+
+    public ApiError(HttpStatus status, String message) {
+        this();
+        this.status = status;
+        this.message = message;
+    }
 }

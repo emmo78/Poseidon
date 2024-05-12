@@ -35,7 +35,7 @@ public class ControllerExceptionHandler {
 				requestService.requestToString(request),
 				((ServletWebRequest) request).getHttpMethod(),
 				e.getMessage());
-		model.addAttribute("errorMessage", "Internal Error");
+		model.addAttribute("errorMessage", "Internal Server Error");
 		return "error";
 	}
 }
