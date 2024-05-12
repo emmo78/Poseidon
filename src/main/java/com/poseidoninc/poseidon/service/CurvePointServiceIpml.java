@@ -1,21 +1,16 @@
 package com.poseidoninc.poseidon.service;
 
+import com.poseidoninc.poseidon.domain.CurvePoint;
+import com.poseidoninc.poseidon.repository.CurvePointRepository;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.request.WebRequest;
-
-import com.poseidoninc.poseidon.domain.CurvePoint;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import com.poseidoninc.poseidon.repository.CurvePointRepository;
-
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
 @AllArgsConstructor

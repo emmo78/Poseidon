@@ -45,8 +45,8 @@ public class ApiControllerExceptionHandler {
 	}
 
 	@ExceptionHandler(ConstraintViolationException.class)
-	public ResponseEntity<ApiError> constraintViolationException(MethodArgumentNotValidException manvex, WebRequest request) {
-		ApiError error = new ApiError(HttpStatus.BAD_REQUEST, manvex);
+	public ResponseEntity<ApiError> constraintViolationException(ConstraintViolationException cve, WebRequest request) {
+		ApiError error = new ApiError(HttpStatus.BAD_REQUEST, cve);
 		log.error("{} : {} : {}",
 				requestService.requestToString(request),
 				((ServletWebRequest) request).getHttpMethod(),
@@ -77,11 +77,11 @@ public class ApiControllerExceptionHandler {
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ApiError> unexpectedException(Exception e, WebRequest request) {
-		ApiError error = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, e);
 		log.error("{} : {} : {}",
 				requestService.requestToString(request),
 				((ServletWebRequest) request).getHttpMethod(),
-				error.getMessage());
+				e.getMessage());
+		ApiError error = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error");
 		return new ResponseEntity<>(error, error.getStatus());
 	}
 }

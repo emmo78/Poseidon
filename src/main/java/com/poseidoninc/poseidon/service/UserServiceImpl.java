@@ -68,7 +68,7 @@ public class UserServiceImpl implements UserService {
 		Page<User> pageUser;
 		try {
 			//throws NullPointerException if pageRequest is null
-			pageUser = userRepository.findAll(pageRequest);
+			pageUser = userRepository.findAll(pageRequest).map(user -> {user.setPassword(""); return user;});
 		} catch(Exception e) {
 			log.error("Error while getting Users : {} ", e.toString());
 			throw new UnexpectedRollbackException("Error while getting Users");

@@ -1,6 +1,7 @@
 package com.poseidoninc.poseidon.controller.api;
 
 import com.poseidoninc.poseidon.domain.User;
+import com.poseidoninc.poseidon.exception.BadRequestException;
 import com.poseidoninc.poseidon.service.RequestService;
 import com.poseidoninc.poseidon.service.UserService;
 import jakarta.validation.ConstraintViolationException;
@@ -9,7 +10,6 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.BadRequestException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -48,7 +48,7 @@ public class ApiUserController {
     @PostMapping("/api/user/create")
     public ResponseEntity<User> createUser(@RequestBody Optional<@Valid User> optionalUser, WebRequest request) throws MethodArgumentNotValidException, BadRequestException, DataIntegrityViolationException, UnexpectedRollbackException {
         if (optionalUser.isEmpty()) {
-            throw new BadRequestException("Correct request should be a json user body");
+            throw new BadRequestException("Correct request should be a json User body");
         }
         User userSaved = userService.saveUser(optionalUser.get()); //Throws DataIntegrityViolationException, UnexpectedRollbackException
         log.info("{} : {} : user = {} persisted", requestService.requestToString(request), ((ServletWebRequest) request).getHttpMethod(), userSaved.toString());
@@ -65,7 +65,7 @@ public class ApiUserController {
     @PutMapping("/api/user/update")
     public ResponseEntity<User> updateUser(@RequestBody Optional<@Valid User> optionalUser, WebRequest request) throws MethodArgumentNotValidException, BadRequestException, DataIntegrityViolationException, UnexpectedRollbackException {
         if (optionalUser.isEmpty()) {
-            throw new BadRequestException("Correct request should be a json user body");
+            throw new BadRequestException("Correct request should be a json User body");
         }
         User userUpdated = userService.saveUser(optionalUser.get()); //Throws DataIntegrityViolationException, UnexpectedRollbackException
         log.info("{} : {} : user = {} persisted", requestService.requestToString(request), ((ServletWebRequest) request).getHttpMethod(), userUpdated.toString());

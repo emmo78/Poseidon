@@ -1,6 +1,7 @@
 package com.poseidoninc.poseidon.controller.api;
 
 import com.poseidoninc.poseidon.domain.CurvePoint;
+import com.poseidoninc.poseidon.exception.BadRequestException;
 import com.poseidoninc.poseidon.service.CurvePointService;
 import com.poseidoninc.poseidon.service.RequestService;
 import jakarta.validation.ConstraintViolationException;
@@ -9,7 +10,6 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.BadRequestException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -48,7 +48,7 @@ public class ApiCurveController {
     @PostMapping("/api/curvePoint/create")
     public ResponseEntity<CurvePoint> createCurvePoint(@RequestBody Optional<@Valid CurvePoint> optionalCurvePoint, WebRequest request) throws MethodArgumentNotValidException, BadRequestException, DataIntegrityViolationException, UnexpectedRollbackException {
 		if (optionalCurvePoint.isEmpty()) {
-            throw new BadRequestException("Correct request should be a json curvePoint body");
+            throw new BadRequestException("Correct request should be a json CurvePoint body");
         }
         CurvePoint curvePointSaved = curvePointService.saveCurvePoint(optionalCurvePoint.get()); //Throws DataIntegrityViolationException, UnexpectedRollbackException
         log.info("{} : {} : curvePoint = {} persisted", requestService.requestToString(request), ((ServletWebRequest) request).getHttpMethod(), curvePointSaved.toString());
@@ -65,7 +65,7 @@ public class ApiCurveController {
     @PutMapping("/api/curvePoint/update")
     public ResponseEntity<CurvePoint> updateCurvePoint(@RequestBody Optional<@Valid CurvePoint> optionalCurvePoint, WebRequest request) throws MethodArgumentNotValidException, BadRequestException, DataIntegrityViolationException, UnexpectedRollbackException {
         if (optionalCurvePoint.isEmpty()) {
-            throw new BadRequestException("Correct request should be a json curvePoint body");
+            throw new BadRequestException("Correct request should be a json CurvePoint body");
         }
         CurvePoint curvePointUpdated = curvePointService.saveCurvePoint(optionalCurvePoint.get()); //Throws DataIntegrityViolationException, UnexpectedRollbackException
         log.info("{} : {} : curvePoint = {} persisted", requestService.requestToString(request), ((ServletWebRequest) request).getHttpMethod(), curvePointUpdated.toString());
@@ -73,7 +73,7 @@ public class ApiCurveController {
     }
 
     @DeleteMapping("/api/curvePoint/delete/{id}") //SQL tinyint(4) = -128 to 127 so 1 to 127 for id
-    public HttpStatus deleteCurvePoint(@PathVariable("id") @Min(1) @Max(127) Integer id, WebRequest request) throws ConstraintViolationException, UnexpectedRollbackException {
+    public HttpStatus deleteCurvePointById(@PathVariable("id") @Min(1) @Max(127) Integer id, WebRequest request) throws ConstraintViolationException, UnexpectedRollbackException {
         curvePointService.deleteCurvePointById(id);
         log.info("{} : {} : curvePoint = {} deleted", requestService.requestToString(request), ((ServletWebRequest) request).getHttpMethod(), id);
         return HttpStatus.OK;

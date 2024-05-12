@@ -24,10 +24,13 @@ public class ControllerExceptionHandlerTest {
 
 	@InjectMocks
 	private ControllerExceptionHandler controllerExceptionHandler;
+
 	@Mock
 	private Model model;
+
 	@Spy
 	private final RequestService requestService = new RequestServiceImpl();
+
 	private MockHttpServletRequest requestMock;
 	private WebRequest request;
 	private ArgumentCaptor<String> stringArgumentCaptor;
@@ -85,7 +88,7 @@ public class ControllerExceptionHandlerTest {
 		//THEN
 		verify(model).addAttribute(stringArgumentCaptor.capture(), stringArgumentCaptor.capture());
 		assertThat(stringArgumentCaptor.getAllValues())
-				.containsExactly("errorMessage", "Internal Error");
+				.containsExactly("errorMessage", "Internal Server Error");
 		assertThat(html).isEqualTo("error");
 	}
 }
