@@ -1,11 +1,13 @@
 package com.poseidoninc.poseidon.controller;
 
+import com.poseidoninc.poseidon.domain.BidList;
 import com.poseidoninc.poseidon.domain.CurvePoint;
 import com.poseidoninc.poseidon.service.CurvePointService;
 import com.poseidoninc.poseidon.service.RequestService;
 import com.poseidoninc.poseidon.service.RequestServiceImpl;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -20,15 +22,21 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
+/**
+ * unit test class for the CurveController.
+ * @author olivier morel
+ */
 @ExtendWith(MockitoExtension.class)
 public class CurveControllerTest {
 
@@ -82,12 +90,36 @@ public class CurveControllerTest {
 		public void homeTestShouldReturnStringCurvePointList() {
 
 			//GIVEN
-			when(curvePointService.getCurvePoints(any(Pageable.class))).thenReturn(new PageImpl<CurvePoint>(new ArrayList<>()));
+			List<CurvePoint> expectedCurvePoints = new ArrayList<>();
+			CurvePoint curvePoint = new CurvePoint();
+			curvePoint.setId(1);
+			curvePoint.setCurveId(2);
+			curvePoint.setAsOfDate(LocalDateTime.parse("21/01/2023 10:20:30", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			curvePoint.setTerm(3.0);
+			curvePoint.setValue(4.0);
+			curvePoint.setCreationDate(LocalDateTime.parse("22/01/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			expectedCurvePoints.add(curvePoint);
+
+			CurvePoint curvePoint2 = new CurvePoint();
+			curvePoint2.setId(2);
+			curvePoint2.setCurveId(3);
+			curvePoint2.setAsOfDate(LocalDateTime.parse("23/01/2023 10:20:30", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			curvePoint2.setTerm(4.0);
+			curvePoint2.setValue(5.0);
+			curvePoint2.setCreationDate(LocalDateTime.parse("24/01/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			expectedCurvePoints.add(curvePoint2);
+
+			ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+			ArgumentCaptor<Iterable<CurvePoint>> iterableArgumentCaptor = ArgumentCaptor.forClass(Iterable.class);
+			when(curvePointService.getCurvePoints(any(Pageable.class))).thenReturn(new PageImpl<CurvePoint>(expectedCurvePoints));
 
 			//WHEN
 			String html = curveController.home(model, request);
 
 			//THEN
+			verify(model).addAttribute(stringArgumentCaptor.capture(), iterableArgumentCaptor.capture()); //times(1) is used by default
+			assertThat(stringArgumentCaptor.getValue()).isEqualTo("curvePoints");
+			assertThat(iterableArgumentCaptor.getValue()).containsExactlyElementsOf(expectedCurvePoints);
 			assertThat(html).isEqualTo("curvePoint/list");
 		}
 
@@ -235,12 +267,23 @@ public class CurveControllerTest {
 
 			//GIVEN
 			CurvePoint curvePoint = new CurvePoint();
+			curvePoint.setId(1);
+			curvePoint.setCurveId(2);
+			curvePoint.setAsOfDate(LocalDateTime.parse("21/01/2023 10:20:30", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			curvePoint.setTerm(3.0);
+			curvePoint.setValue(4.0);
+			curvePoint.setCreationDate(LocalDateTime.parse("22/01/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+			ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+			ArgumentCaptor<CurvePoint> curvePointArgumentCaptor = ArgumentCaptor.forClass(CurvePoint.class);
 			when(curvePointService.getCurvePointById(anyInt())).thenReturn(curvePoint);
 
 			//WHEN
 			String html = curveController.showUpdateForm(1, model, request);
 
 			//THEN
+			verify(model).addAttribute(stringArgumentCaptor.capture(), curvePointArgumentCaptor.capture()); //times(1) is used by default
+			assertThat(stringArgumentCaptor.getValue()).isEqualTo("curvePoint");
+			assertThat(curvePointArgumentCaptor.getValue()).isEqualTo(curvePoint);
 			assertThat(html).isEqualTo("curvePoint/update");
 		}
 

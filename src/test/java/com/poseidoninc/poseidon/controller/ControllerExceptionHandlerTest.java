@@ -18,6 +18,10 @@ import org.springframework.web.context.request.WebRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
+/**
+ * unit test class for the ControllerExceptionHandler.
+ * @author olivier morel
+ */
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ControllerExceptionHandlerTest {
@@ -70,7 +74,7 @@ public class ControllerExceptionHandlerTest {
 		//WHEN
 		String html = controllerExceptionHandler.unexpectedRollbackException(ure, request, model);
 		//THEN
-		verify(model).addAttribute(stringArgumentCaptor.capture(), stringArgumentCaptor.capture());
+		verify(model).addAttribute(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()); //times(1) is used by default
 		assertThat(stringArgumentCaptor.getAllValues())
 				.containsExactly("errorMessage", "Error while...");
 		assertThat(html).isEqualTo("error");

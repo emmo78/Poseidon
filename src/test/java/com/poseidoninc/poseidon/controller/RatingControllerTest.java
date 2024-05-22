@@ -1,11 +1,13 @@
 package com.poseidoninc.poseidon.controller;
 
+import com.poseidoninc.poseidon.domain.BidList;
 import com.poseidoninc.poseidon.domain.Rating;
 import com.poseidoninc.poseidon.service.RatingService;
 import com.poseidoninc.poseidon.service.RequestService;
 import com.poseidoninc.poseidon.service.RequestServiceImpl;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -20,14 +22,18 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
+/**
+ * unit test class for the RatingController.
+ * @author olivier morel
+ */
 @ExtendWith(MockitoExtension.class)
 public class RatingControllerTest {
 	
@@ -80,12 +86,34 @@ public class RatingControllerTest {
 		public void homeTestShouldReturnStringRatingList() {
 
 			//GIVEN
-			when(ratingService.getRatings(any(Pageable.class))).thenReturn(new PageImpl<Rating>(new ArrayList<>()));
+			List<Rating> expectedRatings = new ArrayList<>();
+			Rating rating = new Rating();
+			rating.setId(1);
+			rating.setMoodysRating("Moody's Rating");
+			rating.setSandPRating("SandP's Rating");
+			rating.setFitchRating("Fitch's Rating");
+			rating.setOrderNumber(2);
+			expectedRatings.add(rating);
+
+			Rating rating2 = new Rating();
+			rating2.setId(2);
+			rating2.setMoodysRating("Moody's Rating2");
+			rating2.setSandPRating("SandP's Rating2");
+			rating2.setFitchRating("Fitch's Rating2");
+			rating2.setOrderNumber(3);
+			expectedRatings.add(rating2);
+
+			ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+			ArgumentCaptor<Iterable<Rating>> iterableArgumentCaptor = ArgumentCaptor.forClass(Iterable.class);
+			when(ratingService.getRatings(any(Pageable.class))).thenReturn(new PageImpl<Rating>(expectedRatings));
 
 			//WHEN
 			String html = ratingController.home(model, request);
 
 			//THEN
+			verify(model).addAttribute(stringArgumentCaptor.capture(), iterableArgumentCaptor.capture()); //times(1) is used by default
+			assertThat(stringArgumentCaptor.getValue()).isEqualTo("ratings");
+			assertThat(iterableArgumentCaptor.getValue()).containsExactlyElementsOf(expectedRatings);
 			assertThat(html).isEqualTo("rating/list");
 		}
 
@@ -216,12 +244,22 @@ public class RatingControllerTest {
 
 			//GIVEN
 			Rating rating = new Rating();
+			rating.setId(1);
+			rating.setMoodysRating("Moody's Rating");
+			rating.setSandPRating("SandP's Rating");
+			rating.setFitchRating("Fitch's Rating");
+			rating.setOrderNumber(2);
+			ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+			ArgumentCaptor<Rating> ratingArgumentCaptor = ArgumentCaptor.forClass(Rating.class);
 			when(ratingService.getRatingById(anyInt())).thenReturn(rating);
 
 			//WHEN
 			String html = ratingController.showUpdateForm(1, model, request);
 
 			//THEN
+			verify(model).addAttribute(stringArgumentCaptor.capture(), ratingArgumentCaptor.capture()); //times(1) is used by default
+			assertThat(stringArgumentCaptor.getValue()).isEqualTo("rating");
+			assertThat(ratingArgumentCaptor.getValue()).isEqualTo(rating);
 			assertThat(html).isEqualTo("rating/update");
 		}
 		@Test

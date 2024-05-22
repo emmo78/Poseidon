@@ -16,6 +16,10 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * unit test class to test constraint for the User Entity.
+ * @author olivier morel
+ */
 @TestInstance(Lifecycle.PER_CLASS)
 public class UserTU {
 

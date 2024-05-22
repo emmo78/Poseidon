@@ -14,6 +14,10 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * unit test class to test constraint for the CurvePoint Entity.
+ * @author olivier morel
+ */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CurvePointTU {
 

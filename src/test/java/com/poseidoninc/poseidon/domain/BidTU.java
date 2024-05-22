@@ -14,6 +14,10 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * unit test class to test constraint for the Bid Entity.
+ * @author olivier morel
+ */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class BidTU {
 
@@ -54,7 +58,7 @@ public class BidTU {
             "account, -1.0, Bidqantity must be a positive decimal number"},
             nullValues = {"null"})
     @Tag("BidListRepositoryIT")
-    @DisplayName("save test with incorrect password should throw a ConstraintViolationException")
+    @DisplayName("save test with incorrect value should throw a ConstraintViolationException")
     public void saveTestShouldThrowAConstraintViolationException(String account, Double bidQuantity, String errorMsg) {
 
         //GIVEN

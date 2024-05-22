@@ -2,9 +2,9 @@ package com.poseidoninc.poseidon.controller.api;
 
 import com.poseidoninc.poseidon.domain.User;
 import com.poseidoninc.poseidon.exception.BadRequestException;
-import com.poseidoninc.poseidon.service.UserService;
 import com.poseidoninc.poseidon.service.RequestService;
 import com.poseidoninc.poseidon.service.RequestServiceImpl;
+import com.poseidoninc.poseidon.service.UserService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -27,11 +27,15 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
+/**
+ * unit test class for the ApiUserController.
+ * @author olivier morel
+ */
 @ExtendWith(MockitoExtension.class)
 public class ApiUserControllerTest {
 

@@ -12,9 +12,13 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * integration test class for BidListRepository
+ * @author olivier morel
+ */
 @SpringBootTest
 @ActiveProfiles("mytest")
-public class BidListServiceIT {
+public class BidListRepositoryIT {
 
 	@Autowired
 	private BidListRepository bidListRepository;

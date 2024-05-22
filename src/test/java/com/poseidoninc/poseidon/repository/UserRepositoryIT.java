@@ -17,6 +17,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+/**
+ * integration test class to test unique constraint for userRepository
+ * and test thrown exception
+ * @author olivier morel
+ */
 @SpringBootTest
 @ActiveProfiles("mytest")
 public class UserRepositoryIT {
@@ -241,29 +246,16 @@ public class UserRepositoryIT {
 	}
 
 	@Test
-	@Tag("UserReositoyIT")
-	@DisplayName("delete null should throw an InvalidDataAccessApiUsageException")
-	public void deleteNullShouldThrowAnInvalidDataAccessApiUsageException() {
-		//GIVEN
-		User user = null;
-		//WHEN
-		//THEN
-		assertThat(assertThrows(InvalidDataAccessApiUsageException.class, () -> userRepository.delete(user)).getMessage())
-				.contains("Entity must not be null");
-	}
-
-	@Test
 	@Tag("UserRepositoryIT")
 	@DisplayName("delete test null should throw InvalidDataAccessApiUsageException")
 	public void deleteTestNull() {
 
 		//GIVEN
-		user=null;
+		user = null;
 		//WHEN
 		//THEN
 		assertThat(assertThrows(InvalidDataAccessApiUsageException.class, () -> userRepository.delete(user)).getMessage())
 				.isEqualTo("Entity must not be null");
 
 	}
-
 }

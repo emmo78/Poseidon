@@ -7,6 +7,10 @@ import org.springframework.web.context.request.WebRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * unit test class for the RequestService.
+ * @author olivier morel
+ */
 public class RequestServiceTest {
 	
 	private RequestService requestService;
