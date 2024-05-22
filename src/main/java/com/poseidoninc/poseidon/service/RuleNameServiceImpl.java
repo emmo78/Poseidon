@@ -11,6 +11,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Implementation class for RuleNameService
+ *
+ * @see RuleNameService
+ *
+ * @author olivier morel
+ */
 @Service
 @AllArgsConstructor
 @Slf4j
@@ -51,6 +58,11 @@ public class RuleNameServiceImpl implements RuleNameService {
 	public RuleName saveRuleName(RuleName ruleName) throws UnexpectedRollbackException {
 		RuleName ruleNameSaved;
 		try {
+			/*
+			 * No need to test blank or null fields for update because constraint validation on each field
+			 * @DynamicUpdate, Hibernate generates an UPDATE SQL statement that sets only columns that have changed
+			 * Throws InvalidDataAccessApiUsageException | OptimisticLockingFailureException
+			 */
 			ruleNameSaved = ruleNameRepository.save(ruleName);
 		} catch(Exception e) {
 			log.error("Error while saving ruleName = {} : {} ", ruleName.toString(), e.toString());
@@ -63,7 +75,9 @@ public class RuleNameServiceImpl implements RuleNameService {
 	@Transactional(rollbackFor = UnexpectedRollbackException.class)
 	public void deleteRuleNameById(Integer id) throws UnexpectedRollbackException {
 		try {
-			ruleNameRepository.delete(getRuleNameById(id)); //getRuleNameById throws UnexpectedRollbackException
+			/* getRuleNameById throws UnexpectedRollbackException
+			 * Throws InvalidDataAccessApiUsageException | OptimisticLockingFailureException */
+			ruleNameRepository.delete(getRuleNameById(id));
 		} catch(Exception e) {
 			log.error("Error while deleting ruleName = {} : {} ", id, e.toString());
 			throw new UnexpectedRollbackException("Error while deleting ruleName");

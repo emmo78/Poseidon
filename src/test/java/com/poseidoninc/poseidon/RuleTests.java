@@ -13,6 +13,9 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * provided test for RuleRepository
+ */
 @SpringBootTest
 @ActiveProfiles("mytest")
 public class RuleTests {

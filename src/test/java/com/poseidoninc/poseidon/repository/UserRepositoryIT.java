@@ -17,6 +17,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+/**
+ * integration test class to test unique constraint for userRepository
+ * and test thrown exception
+ * @author olivier morel
+ */
 @SpringBootTest
 @ActiveProfiles("mytest")
 public class UserRepositoryIT {
@@ -137,6 +142,19 @@ public class UserRepositoryIT {
 					() -> userRepository.saveAndFlush(userTest))
 					.getMessage()).contains(("Unique index or primary key violation"));
 		}
+
+		@Test
+		@Tag("UserRepositoryIT")
+		@DisplayName("save test null should throw InvalidDataAccessApiUsageException")
+		public void saveTestNull() {
+
+			//GIVEN
+			//WHEN
+			//THEN
+			assertThat(assertThrows(InvalidDataAccessApiUsageException.class, () -> userRepository.save(null)).getMessage())
+					.isEqualTo("Entity must not be null");
+
+		}
 	}
 
 	@Nested
@@ -145,7 +163,7 @@ public class UserRepositoryIT {
 	@TestInstance(Lifecycle.PER_CLASS)
 	class FindByUserNameTests {
 
-		@ParameterizedTest(name = "{0} should throw a DataIntegrityViolationException")
+		@ParameterizedTest(name = "{0} should return the user by his name")
 		@ValueSource(strings = {"Aaa", "aAa", "aaA", "aAA", "AaA", "AAa", "AAA", "aaa"})
 		@Tag("UserRepositoryIT")
 		@DisplayName("find by Username should return the user by Username case insensitive")
@@ -228,14 +246,16 @@ public class UserRepositoryIT {
 	}
 
 	@Test
-	@Tag("UserReositoyIT")
-	@DisplayName("delete null should throw an InvalidDataAccessApiUsageException")
-	public void deleteNullShouldThrowAnInvalidDataAccessApiUsageException() {
+	@Tag("UserRepositoryIT")
+	@DisplayName("delete test null should throw InvalidDataAccessApiUsageException")
+	public void deleteTestNull() {
+
 		//GIVEN
-		User user = null;
+		user = null;
 		//WHEN
 		//THEN
 		assertThat(assertThrows(InvalidDataAccessApiUsageException.class, () -> userRepository.delete(user)).getMessage())
-				.contains("Entity must not be null");
+				.isEqualTo("Entity must not be null");
+
 	}
 }

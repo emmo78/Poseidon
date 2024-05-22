@@ -5,6 +5,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.UnexpectedRollbackException;
 
+/**
+ * Service for BidList
+ *
+ * @author olivier morel
+ */
 public interface BidListService {
 	BidList getBidListById(Integer bidListId) throws UnexpectedRollbackException;
 	Page<BidList> getBidLists(Pageable pageRequest) throws UnexpectedRollbackException;

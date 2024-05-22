@@ -1,11 +1,13 @@
 package com.poseidoninc.poseidon.controller;
 
+import com.poseidoninc.poseidon.domain.Rating;
 import com.poseidoninc.poseidon.domain.RuleName;
 import com.poseidoninc.poseidon.service.RequestService;
 import com.poseidoninc.poseidon.service.RequestServiceImpl;
 import com.poseidoninc.poseidon.service.RuleNameService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -20,14 +22,18 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
+/**
+ * unit test class for the RuleNameController.
+ * @author olivier morel
+ */
 @ExtendWith(MockitoExtension.class)
 public class RuleNameControllerTest {
 
@@ -82,12 +88,38 @@ public class RuleNameControllerTest {
         public void homeTestShouldReturnStringRuleNameList() {
 
             //GIVEN
-            when(ruleNameService.getRuleNames(any(Pageable.class))).thenReturn(new PageImpl<RuleName>(new ArrayList<>()));
+            List<RuleName> expectedRuleNames = new ArrayList<>();
+            RuleName ruleName = new RuleName();
+            ruleName.setId(1);
+            ruleName.setName("Rule Name");
+            ruleName.setDescription("Rule Description");
+            ruleName.setJson("Json");
+            ruleName.setTemplate("Template");
+            ruleName.setSqlStr("SQL");
+            ruleName.setSqlPart("SQL Part");
+            expectedRuleNames.add(ruleName);
+
+            RuleName ruleName2 = new RuleName();
+            ruleName2.setId(2);
+            ruleName2.setName("Rule Name2");
+            ruleName2.setDescription("Rule Description2");
+            ruleName2.setJson("Json2");
+            ruleName2.setTemplate("Template2");
+            ruleName2.setSqlStr("SQL2");
+            ruleName2.setSqlPart("SQL Part2");
+            expectedRuleNames.add(ruleName2);
+
+            ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+            ArgumentCaptor<Iterable<RuleName>> iterableArgumentCaptor = ArgumentCaptor.forClass(Iterable.class);
+            when(ruleNameService.getRuleNames(any(Pageable.class))).thenReturn(new PageImpl<RuleName>(expectedRuleNames));
 
             //WHEN
             String html = ruleNameController.home(model, request);
 
             //THEN
+            verify(model).addAttribute(stringArgumentCaptor.capture(), iterableArgumentCaptor.capture()); //times(1) is used by default
+            assertThat(stringArgumentCaptor.getValue()).isEqualTo("ruleNames");
+            assertThat(iterableArgumentCaptor.getValue()).containsExactlyElementsOf(expectedRuleNames);
             assertThat(html).isEqualTo("ruleName/list");
         }
 
@@ -219,12 +251,24 @@ public class RuleNameControllerTest {
 
             //GIVEN
             RuleName ruleName = new RuleName();
+            ruleName.setId(1);
+            ruleName.setName("Rule Name");
+            ruleName.setDescription("Rule Description");
+            ruleName.setJson("Json");
+            ruleName.setTemplate("Template");
+            ruleName.setSqlStr("SQL");
+            ruleName.setSqlPart("SQL Part");
+            ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+            ArgumentCaptor<RuleName> ruleNameArgumentCaptor = ArgumentCaptor.forClass(RuleName.class);
             when(ruleNameService.getRuleNameById(anyInt())).thenReturn(ruleName);
 
             //WHEN
             String html = ruleNameController.showUpdateForm(1, model, request);
 
             //THEN
+            verify(model).addAttribute(stringArgumentCaptor.capture(), ruleNameArgumentCaptor.capture()); //times(1) is used by default
+            assertThat(stringArgumentCaptor.getValue()).isEqualTo("ruleName");
+            assertThat(ruleNameArgumentCaptor.getValue()).isEqualTo(ruleName);
             assertThat(html).isEqualTo("ruleName/update");
         }
 

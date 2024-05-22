@@ -15,6 +15,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+/**
+ * Implementation class for UserService
+ *
+ * @see UserService
+ *
+ * @author olivier morel
+ */
 @Service
 @AllArgsConstructor
 @Slf4j
@@ -67,7 +74,7 @@ public class UserServiceImpl implements UserService {
 	public Page<User> getUsers(Pageable pageRequest) throws UnexpectedRollbackException {
 		Page<User> pageUser;
 		try {
-			//throws NullPointerException if pageRequest is null
+			//Throws NullPointerException if pageRequest is null
 			pageUser = userRepository.findAll(pageRequest).map(user -> {user.setPassword(""); return user;});
 		} catch(Exception e) {
 			log.error("Error while getting Users : {} ", e.toString());
@@ -82,7 +89,12 @@ public class UserServiceImpl implements UserService {
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
 		User userSaved;
 		try {
-			//No need to test blank or null fields for update because constraint validation on each field
+			/*
+			* No need to test blank or null fields for update because constraint validation on each field
+			* @DynamicUpdate, Hibernate generates an UPDATE SQL statement that sets only columns that have changed
+			* @Column(name = "username", unique = true) Throws DataIntegrityViolationException
+			* Throws InvalidDataAccessApiUsageException | OptimisticLockingFailureException
+			*/
 			userSaved = userRepository.save(user);
 		} catch(DataIntegrityViolationException dive) {
 			log.error("Error while saving user = {} : {} ", user.toString(), dive.toString());
@@ -98,7 +110,9 @@ public class UserServiceImpl implements UserService {
 	@Transactional(rollbackFor = {UnexpectedRollbackException.class})
 	public void deleteUserById(Integer id) throws UnexpectedRollbackException {
 		try {
-			userRepository.delete(getUserById(id)); //getUserById throws  UnexpectedRollbackException
+			/* getUserById throws  UnexpectedRollbackException
+			 * Throws InvalidDataAccessApiUsageException | OptimisticLockingFailureException */
+			userRepository.delete(getUserById(id));
 		} catch(Exception e) {
 			log.error("Error while deleting user = {} : {} ", id, e.toString());
 			throw new UnexpectedRollbackException("Error while deleting user");

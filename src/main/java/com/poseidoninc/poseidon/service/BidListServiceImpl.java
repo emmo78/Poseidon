@@ -11,6 +11,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Implementation class for BidListService
+ *
+ * @see BidListService
+ *
+ * @author olivier morel
+ */
 @Service
 @AllArgsConstructor
 @Slf4j
@@ -51,6 +58,11 @@ public class BidListServiceImpl implements BidListService {
 	public BidList saveBidList(BidList bidList) throws UnexpectedRollbackException {
 		BidList bidListSaved;
 		try {
+			/*
+			 * No need to test blank or null fields for update because constraint validation on each field
+			 * @DynamicUpdate, Hibernate generates an UPDATE SQL statement that sets only columns that have changed
+			 * Throws InvalidDataAccessApiUsageException | OptimisticLockingFailureException
+			 */
 			bidListSaved = bidListRepository.save(bidList);
 		} catch(Exception e) {
 			log.error("Error while saving bidList = {} : {} ", bidList.toString(), e.toString());
@@ -63,7 +75,9 @@ public class BidListServiceImpl implements BidListService {
 	@Transactional(rollbackFor = UnexpectedRollbackException.class)
 	public void deleteBidListById(Integer bidListId) throws UnexpectedRollbackException {
 		try {
-			bidListRepository.delete(getBidListById(bidListId)); //getBidListById throws UnexpectedRollbackException
+			/* getBidListById throws UnexpectedRollbackException
+			 * Throws InvalidDataAccessApiUsageException | OptimisticLockingFailureException */
+			bidListRepository.delete(getBidListById(bidListId));
 		} catch(Exception e) {
 			log.error("Error while deleting bidList = {} : {} ", bidListId, e.toString());
 			throw new UnexpectedRollbackException("Error while deleting bidList");

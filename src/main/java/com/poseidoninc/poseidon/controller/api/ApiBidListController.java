@@ -23,10 +23,15 @@ import org.springframework.web.context.request.WebRequest;
 
 import java.util.Optional;
 
+/**
+ * ApiBidListController class represents the API endpoints (CRUD) for managing Bid List.
+ *
+ * @author olivier morel
+ */
 @RestController
 @AllArgsConstructor
 @Slf4j
-@Validated
+@Validated //for constraints on PathVariable
 public class ApiBidListController {
 	
 	private final BidListService bidListService;

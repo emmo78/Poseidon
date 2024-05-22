@@ -12,6 +12,11 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Customize the loading of the OidcUser.
+ *
+ * @@author olivier morel
+ */
 @Service
 @AllArgsConstructor
 @Slf4j
@@ -22,21 +27,14 @@ public class CustomOidcUserService implements OAuth2UserService<OidcUserRequest,
     private final OidcUserService oidcUserService = new OidcUserService();
 
     @Override
+    //@Transactional(rollbackFor = {UnexpectedRollbackException.class, DataIntegrityViolationException.class})
     public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
 
         OidcUser oidcUser = (OidcUser) oidcUserService.loadUser(userRequest);
         Map<String, Object> attributes = new HashMap<>(oidcUser.getAttributes());
         attributes = oidcUser.getAttributes();
         attributes.forEach((name, value) -> log.info("name : {} - value : {}", name, value!=null?value.toString():"null"));
-
-        /*String email = (String) attributes.get("email");
-
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found: " + email));
-
-        attributes.put("custom:role", user.getRole());
-
-        return new DefaultOidcUser(Collections.singleton(new SimpleGrantedAuthority(user.getRole())), oidcUser.getIdToken(), oidcUser.getUserInfo(), "custom:role");
-         */
+        //TODO create a new user or update one see CustomOauth2Service
         return oidcUser;
     }
 }

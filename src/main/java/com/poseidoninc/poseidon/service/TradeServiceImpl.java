@@ -11,6 +11,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Implementation class for TradeService
+ *
+ * @see TradeService
+ *
+ * @author olivier morel
+ */
 @Service
 @AllArgsConstructor
 @Slf4j
@@ -51,6 +58,11 @@ public class TradeServiceImpl implements TradeService {
 	public Trade saveTrade(Trade trade) throws UnexpectedRollbackException {
 		Trade tradeSaved;
 		try {
+			/*
+			* No need to test blank or null fields for update because constraint validation on each field
+			* @DynamicUpdate, Hibernate generates an UPDATE SQL statement that sets only columns that have changed
+			* Throws InvalidDataAccessApiUsageException | OptimisticLockingFailureException
+			*/
 			tradeSaved = tradeRepository.save(trade);
 		} catch(Exception e) {
 			log.error("Error while saving trade = {} : {} ", trade.toString(), e.toString());
@@ -63,7 +75,9 @@ public class TradeServiceImpl implements TradeService {
 	@Transactional(rollbackFor = UnexpectedRollbackException.class)
 	public void deleteTradeById(Integer tradeId) throws UnexpectedRollbackException {
 		try {
-			tradeRepository.delete(getTradeById(tradeId)); //getTradeById throws UnexpectedRollbackException
+			/* getTradeById throws UnexpectedRollbackException
+			 * Throws InvalidDataAccessApiUsageException | OptimisticLockingFailureException */
+			tradeRepository.delete(getTradeById(tradeId));
 		} catch(Exception e) {
 			log.error("Error while deleting trade = {} : {} ", tradeId, e.toString());
 			throw new UnexpectedRollbackException("Error while deleting trade");

@@ -5,6 +5,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.UnexpectedRollbackException;
 
+/**
+ * Service for Rating
+ *
+ * @author olivier morel
+ */
 public interface RatingService {
 	Rating getRatingById(Integer id) throws UnexpectedRollbackException;
 	Page<Rating> getRatings(Pageable pageRequest) throws UnexpectedRollbackException;

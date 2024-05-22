@@ -26,6 +26,10 @@ public class CurvePoint {
 	@ToString.Include
 	Integer id;
 
+	/**
+	 * The curveId variable has @Column annotation with the unique parameter set to true, indicating that the username must be unique in the table.
+	 * Throw a DataIntegrityViolationException.
+	 */
 	@Column(name = "CurveId", unique = true)
 	@NotNull(message = "must not be null")
 	@Min(value = 1, message = "CurveId min is 1")

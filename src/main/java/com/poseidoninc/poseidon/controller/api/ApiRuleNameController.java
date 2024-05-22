@@ -23,10 +23,15 @@ import org.springframework.web.context.request.WebRequest;
 
 import java.util.Optional;
 
+/**
+ * ApiRuleNameController class represents the API endpoints (CRUD) for managing RuleName.
+ *
+ * @author olivier morel
+ */
 @RestController
 @AllArgsConstructor
 @Slf4j
-@Validated
+@Validated //for constraints on PathVariable
 public class ApiRuleNameController {
 	
 	private final RuleNameService ruleNameService;

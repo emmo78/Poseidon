@@ -10,13 +10,16 @@ import java.util.List;
 
 
 /**
- * The ValidPasswordValidator class is an implementation of the ConstraintValidator interface that validates a password
- * based on specified rules.
+ * validate a password
+ * use passay PasswordValidator specified rules
+ * @see ValidPassword
+ *
+ * @author olivier morel
  */
 public class ValidPasswordValidator implements ConstraintValidator<ValidPassword, String> {
 
     /**
-     * Determines whether a given password is valid based on specified rules.
+     * test given password is valid, based on specified rules.
      *
      * @param password The password to validate.
      * @param context  The constraint validator context.
@@ -27,7 +30,7 @@ public class ValidPasswordValidator implements ConstraintValidator<ValidPassword
         PasswordValidator passwordValidator = new PasswordValidator(Arrays.asList(
                 // at least 8 characters, max 13
                 // need spring.jpa.properties.jakarta.persistence.validation.mode=none in application.properties
-                // because once encoded length will be >  13 and will throw violation on persistence
+                // because once encoded length will be > 13 and will throw violation on persistence
                 new LengthRule(8, 13),
                 // at least one upper-case character
                 new CharacterRule(EnglishCharacterData.UpperCase, 1),

@@ -6,6 +6,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.security.Principal;
 
+/**
+ * HomeController class handles HTTP requests related to home management.
+ *
+ * @author olivier morel
+ */
 @Controller
 @Slf4j
 public class HomeController {

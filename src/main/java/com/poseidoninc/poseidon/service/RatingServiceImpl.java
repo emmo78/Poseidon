@@ -11,6 +11,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Implementation class for RatingService
+ *
+ * @see RatingService
+ *
+ * @author olivier morel
+ */
 @Service
 @AllArgsConstructor
 @Slf4j
@@ -51,6 +58,11 @@ public class RatingServiceImpl implements RatingService {
 	public Rating saveRating(Rating rating) throws UnexpectedRollbackException {
 		Rating ratingSaved;
 		try {
+			/*
+			 * No need to test blank or null fields for update because constraint validation on each field
+			 * @DynamicUpdate, Hibernate generates an UPDATE SQL statement that sets only columns that have changed
+			 * Throws InvalidDataAccessApiUsageException | OptimisticLockingFailureException
+			 */
 			ratingSaved = ratingRepository.save(rating);
 		} catch(Exception e) {
 			log.error("Error while saving rating = {} : {} ", rating.toString(), e.toString());
@@ -63,7 +75,9 @@ public class RatingServiceImpl implements RatingService {
 	@Transactional(rollbackFor = UnexpectedRollbackException.class)
 	public void deleteRatingById(Integer id) throws UnexpectedRollbackException {
 		try {
-			ratingRepository.delete(getRatingById(id)); //getRatingById throws UnexpectedRollbackException
+			/* getRatingById throws UnexpectedRollbackException
+			 * Throws InvalidDataAccessApiUsageException | OptimisticLockingFailureException */
+			ratingRepository.delete(getRatingById(id));
 		} catch(Exception e) {
 			log.error("Error while deleting rating = {} : {} ", id, e.toString());
 			throw new UnexpectedRollbackException("Error while deleting rating");

@@ -6,6 +6,12 @@ import org.springframework.stereotype.Component;
 import java.security.SecureRandom;
 import java.util.List;
 
+/**
+ * Generates a valid password. Uses SecureRandom and Passay PasswordGenerator.
+ * @see ValidPasswordValidator
+ *
+ * @author olivier morel
+ */
 @Component
 public class ValidPasswordGenerator {
 

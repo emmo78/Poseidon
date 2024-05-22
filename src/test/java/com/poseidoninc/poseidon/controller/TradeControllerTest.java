@@ -1,11 +1,13 @@
 package com.poseidoninc.poseidon.controller;
 
+import com.poseidoninc.poseidon.domain.RuleName;
 import com.poseidoninc.poseidon.domain.Trade;
 import com.poseidoninc.poseidon.service.RequestService;
 import com.poseidoninc.poseidon.service.RequestServiceImpl;
 import com.poseidoninc.poseidon.service.TradeService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -19,15 +21,21 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
+/**
+ * unit test class for the TradeController.
+ * @author olivier morel
+ */
 @ExtendWith(MockitoExtension.class)
 public class TradeControllerTest {
 
@@ -82,12 +90,67 @@ public class TradeControllerTest {
         public void homeTestShouldReturnStringTradeList() {
 
             //GIVEN
-            when(tradeService.getTrades(any(Pageable.class))).thenReturn(new PageImpl<Trade>(new ArrayList<>()));
+            List<Trade> expectedTrades = new ArrayList<>();
+            Trade trade = new Trade();
+            trade.setTradeId(1);
+            trade.setAccount("account");
+            trade.setType("type");
+            trade.setBuyQuantity(3.0);
+            trade.setSellQuantity(1.0);
+            trade.setBuyPrice(4.0);
+            trade.setSellPrice(5.0);
+            trade.setTradeDate(LocalDateTime.parse("21/01/2023 10:20:30", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+            trade.setSecurity("security");
+            trade.setStatus("status");
+            trade.setTrader("trader");
+            trade.setBenchmark("benchmark");
+            trade.setBook("book");
+            trade.setCreationName("creation name");
+            trade.setCreationDate(LocalDateTime.parse("22/01/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+            trade.setRevisionName("revisionName");
+            trade.setRevisionDate(LocalDateTime.parse("23/01/2023 13:23:33", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+            trade.setDealName("deal name");
+            trade.setDealType("deal type");
+            trade.setSourceListId("source list id");
+            trade.setSide("side");
+            expectedTrades.add(trade);
+
+            Trade trade2 = new Trade();
+            trade2 = new Trade();
+            trade2.setTradeId(2);
+            trade2.setAccount("account2");
+            trade2.setType("type2");
+            trade2.setBuyQuantity(3.2);
+            trade2.setSellQuantity(1.2);
+            trade2.setBuyPrice(4.2);
+            trade2.setSellPrice(5.2);
+            trade2.setTradeDate(LocalDateTime.parse("21/02/2023 10:20:30", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+            trade2.setSecurity("security2");
+            trade2.setStatus("status2");
+            trade2.setTrader("trader2");
+            trade2.setBenchmark("benchmark2");
+            trade2.setBook("book2");
+            trade2.setCreationName("creation name2");
+            trade2.setCreationDate(LocalDateTime.parse("22/02/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+            trade2.setRevisionName("revisionName2");
+            trade2.setRevisionDate(LocalDateTime.parse("23/02/2023 13:23:33", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+            trade2.setDealName("deal name2");
+            trade2.setDealType("deal type2");
+            trade2.setSourceListId("source list id2");
+            trade2.setSide("side2");
+            expectedTrades.add(trade2);
+
+            ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+            ArgumentCaptor<Iterable<Trade>> iterableArgumentCaptor = ArgumentCaptor.forClass(Iterable.class);
+            when(tradeService.getTrades(any(Pageable.class))).thenReturn(new PageImpl<Trade>(expectedTrades));
 
             //WHEN
             String html = tradeController.home(model, request);
 
             //THEN
+            verify(model).addAttribute(stringArgumentCaptor.capture(), iterableArgumentCaptor.capture()); //times(1) is used by default
+            assertThat(stringArgumentCaptor.getValue()).isEqualTo("trades");
+            assertThat(iterableArgumentCaptor.getValue()).containsExactlyElementsOf(expectedTrades);
             assertThat(html).isEqualTo("trade/list");
         }
 
@@ -220,6 +283,29 @@ public class TradeControllerTest {
 
             //GIVEN
             Trade trade = new Trade();
+            trade.setTradeId(1);
+            trade.setAccount("account");
+            trade.setType("type");
+            trade.setBuyQuantity(3.0);
+            trade.setSellQuantity(1.0);
+            trade.setBuyPrice(4.0);
+            trade.setSellPrice(5.0);
+            trade.setTradeDate(LocalDateTime.parse("21/01/2023 10:20:30", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+            trade.setSecurity("security");
+            trade.setStatus("status");
+            trade.setTrader("trader");
+            trade.setBenchmark("benchmark");
+            trade.setBook("book");
+            trade.setCreationName("creation name");
+            trade.setCreationDate(LocalDateTime.parse("22/01/2023 12:22:32", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+            trade.setRevisionName("revisionName");
+            trade.setRevisionDate(LocalDateTime.parse("23/01/2023 13:23:33", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")));
+            trade.setDealName("deal name");
+            trade.setDealType("deal type");
+            trade.setSourceListId("source list id");
+            trade.setSide("side");
+            ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+            ArgumentCaptor<Trade> tradeArgumentCaptor = ArgumentCaptor.forClass(Trade.class);
             when(tradeService.getTradeById(anyInt())).thenReturn(trade);
 
 
@@ -227,6 +313,9 @@ public class TradeControllerTest {
             String html = tradeController.showUpdateForm(1, model, request);
 
             //THEN
+            verify(model).addAttribute(stringArgumentCaptor.capture(), tradeArgumentCaptor.capture()); //times(1) is used by default
+            assertThat(stringArgumentCaptor.getValue()).isEqualTo("trade");
+            assertThat(tradeArgumentCaptor.getValue()).isEqualTo(trade);
             assertThat(html).isEqualTo("trade/update");
         }
 

@@ -14,6 +14,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+/**
+ * unit test class for the ValidPasswordValidator
+ * @author olivier morel
+ */
 @ExtendWith(MockitoExtension.class)
 public class ValidPasswordValidatorTest {
 

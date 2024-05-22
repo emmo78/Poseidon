@@ -26,6 +26,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+/**
+ * unit test class for the BidListService.
+ * @author olivier morel
+ */
 @ExtendWith(MockitoExtension.class)
 public class BidListServiceTest {
 	@InjectMocks

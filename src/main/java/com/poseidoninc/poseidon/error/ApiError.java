@@ -7,6 +7,13 @@ import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 
+/**
+ * ApiError class represents error response returned by the API.
+ * Used to encapsulate details about the error such as the HTTP status code, timestamp, and error message.
+ *
+ * @author olivier morel
+ */
+
 @Getter
 @Setter
 public class ApiError {

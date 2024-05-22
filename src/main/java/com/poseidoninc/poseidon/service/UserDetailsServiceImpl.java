@@ -14,6 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * provides the user details for authentication and authorization (Username Password Authentication)
+ *
+ * @author olivier MOREL
+ */
 @Service
 @Slf4j
 @AllArgsConstructor

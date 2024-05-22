@@ -5,6 +5,7 @@ import com.poseidoninc.poseidon.validator.ValidPasswordGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -18,6 +19,8 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.UnexpectedRollbackException;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Collection;
@@ -25,6 +28,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Customize the loading of the OAuth2User
+ */
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -37,6 +43,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final ValidPasswordGenerator validPasswordGenerator;
 
     @Override
+    @Transactional(rollbackFor = {UnexpectedRollbackException.class, DataIntegrityViolationException.class})
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
         Map<String, Object> attributes = oAuth2User.getAttributes();
@@ -53,15 +60,18 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 entity,
                 PARAMETERIZED_RESPONSE_TYPE);
         String email = Objects.requireNonNull(response.getBody()).stream().filter(map -> map.get("primary").equals("true")).map(map -> map.get("email")).toList().get(0);
-        Integer id = null;
+        //get user if exists
+        User user = null;
         try {
-            id=userService.getUserByUserName(email).getId();
-            log.info("user id = {} exists", id);
+            user = userService.getUserByUserName(email);
+            log.info("user = {} exists", user.toString());
         } catch (ResourceNotFoundException rnfe) {
-            log.info("user not exist");
+            log.info("user does not exist");
         }
-        User user = User.builder()
-                .id(id)
+        //update user if exists or save new one
+        //for update : @DynamicUpdate, Hibernate generates an UPDATE SQL statement that sets only columns that have changed
+        user = User.builder()
+                .id(user!=null?user.getId():null)
                 .username(email)
                 .password(validPasswordGenerator.generatePassword())
                 .fullname(Objects.requireNonNull(attributes.get("name").toString()))

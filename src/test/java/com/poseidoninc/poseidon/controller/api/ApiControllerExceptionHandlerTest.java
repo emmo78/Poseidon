@@ -20,10 +20,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.transaction.UnexpectedRollbackException;
-import org.springframework.validation.BindException;
 import org.springframework.validation.DirectFieldBindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
@@ -34,6 +32,10 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * unit test class for the ApiControllerExceptionHandler.
+ * @author olivier morel
+ */
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ApiControllerExceptionHandlerTest {
@@ -78,13 +80,12 @@ public class ApiControllerExceptionHandlerTest {
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
-        // index of the parameter you want to validate
+        // index of the parameter @RequestBody Optional<@Valid User> optionalUser
         MethodParameter methodParameter = new MethodParameter(method, 0);
 
-        // The object that was validated (could be any object, using String here for demonstration)
+        // user to be validated
         Object user = User.class;
         DirectFieldBindingResult bindingResult = new DirectFieldBindingResult(user, "User");
-        // Add your custom errors. The third parameter is the default message.
         bindingResult.addError(new FieldError("User", "password",  "Password is mandatory"));
 
         MethodArgumentNotValidException manve =  new MethodArgumentNotValidException(methodParameter, bindingResult);
@@ -103,12 +104,12 @@ public class ApiControllerExceptionHandlerTest {
     public void badRequestExceptionTest() {
 
         //GIVEN
-        BadRequestException bre = new BadRequestException("Error while...");
+        BadRequestException bre = new BadRequestException("Correct request should be a json Entity body");
         //WHEN
         ResponseEntity<ApiError> responseEntity = apiControllerExceptionHandler.badRequestException(bre, request);
         //THEN
         assertThat(responseEntity.getStatusCode().isSameCodeAs(HttpStatus.BAD_REQUEST)).isTrue();
-        assertThat(responseEntity.getBody().getMessage()).isEqualTo("Error while...");
+        assertThat(responseEntity.getBody().getMessage()).isEqualTo("Correct request should be a json Entity body");
     }
 
     @Test
@@ -117,6 +118,7 @@ public class ApiControllerExceptionHandlerTest {
     public void constraintViolationExceptionTest() {
 
         //GIVEN
+        // Class ConstraintViolationImpl is nested
         ConstraintViolationException cve = new ConstraintViolationException(Set.of(new ConstraintViolationImpl("Constraint violation")));
         //WHEN
         ResponseEntity<ApiError> responseEntity = apiControllerExceptionHandler.constraintViolationException(cve, request);
@@ -129,7 +131,7 @@ public class ApiControllerExceptionHandlerTest {
 			.map( cv -> cv == null ? "null" : cv.getPropertyPath() + ": " + cv.getMessage() )
 			.collect( Collectors.joining( ", " ) );
 
-		cv == null -> "null"+": "+"Constraint violation"
+		given : cv == null -> so expected  "null"+": "+"Constraint violation"
          */
         assertThat(responseEntity.getBody().getMessage()).isEqualTo("null: Constraint violation");
     }
@@ -178,6 +180,7 @@ public class ApiControllerExceptionHandlerTest {
         assertThat(responseEntity.getBody().getMessage()).isEqualTo("Internal Server Error");
     }
 
+    //Needed in constraintViolationExceptionTest()
     class ConstraintViolationImpl implements ConstraintViolation<Object> {
 
         private String message;
@@ -239,12 +242,6 @@ public class ApiControllerExceptionHandlerTest {
         @Override
         public <U> U unwrap(Class<U> aClass) {
             return null;
-        }
-    }
-
-    class MyClass {
-        void myMethod(String param1, int param2) {
-            // some logic here
         }
     }
 }

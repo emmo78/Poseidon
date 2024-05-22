@@ -11,6 +11,19 @@ import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+/**
+ * User entity
+ * GroupSequence annotation is useful to control
+ * the order in which constraints are evaluated,
+ * to test NotNull annotation (User.class) before
+ * ValidPassword annotation (ValidPasswordGroup.class)
+ * to avoid NullPointerException
+ *
+ * @see ValidPassword
+ * @see ValidPasswordGroup
+ *
+ * @author olivier morel
+ */
 @Entity
 @DynamicInsert
 @DynamicUpdate
@@ -28,8 +41,12 @@ public class User {
 	@Column(name = "Id")
     @ToString.Include
     private Integer id;
-    
-	@Column(name = "username", unique = true)
+
+    /**
+     * The username variable has @Column annotation with the unique parameter set to true, indicating that the username must be unique in the table.
+     * Throw a DataIntegrityViolationException.
+     */
+    @Column(name = "username", unique = true)
     @NotBlank(message = "Username is mandatory")
 	@Size(max = 125, message = "Username must be maximum of 125 characters")
     @ToString.Include

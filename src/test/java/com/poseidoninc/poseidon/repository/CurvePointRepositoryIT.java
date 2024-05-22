@@ -15,6 +15,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+/**
+ * integration test class to test unique constraint for CurvePointRepository
+ * @author olivier morel
+ */
 @SpringBootTest
 @ActiveProfiles("mytest")
 public class CurvePointRepositoryIT {

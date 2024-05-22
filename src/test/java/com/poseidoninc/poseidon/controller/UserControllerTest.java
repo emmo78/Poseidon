@@ -6,6 +6,7 @@ import com.poseidoninc.poseidon.service.RequestServiceImpl;
 import com.poseidoninc.poseidon.service.UserService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -21,14 +22,19 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
+/**
+ * unit test class for the UserController.
+ * @author olivier morel
+ */
 @ExtendWith(MockitoExtension.class)
 public class UserControllerTest {
 
@@ -82,12 +88,43 @@ public class UserControllerTest {
 		public void homeTestTestShouldReturnStringUserList() {
 
 			//GIVEN
-			when(userService.getUsers(any(Pageable.class))).thenReturn(new PageImpl<User>(new ArrayList<>()));
+			List<User> givenUsers = new ArrayList<>();
+			User user = new User();
+			user.setId(1);
+			user.setUsername("Aaa");
+			user.setPassword("apw1=Passwd");
+			user.setFullname("AAA");
+			user.setRole("USER");
+			givenUsers.add(user);
+
+			User user2 = new User();
+			user2.setId(2);
+			user2.setUsername("Bbb");
+			user2.setPassword("bpw2=Passwd");
+			user2.setFullname("BBB");
+			user2.setRole("USER");
+			givenUsers.add(user2);
+
+			ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+			ArgumentCaptor<Iterable<User>> iterableArgumentCaptor = ArgumentCaptor.forClass(Iterable.class);
+			when(userService.getUsers(any(Pageable.class))).thenReturn(new PageImpl<User>(givenUsers).map(u -> {u.setPassword(""); return u;}));
 
 			//WHEN
 			String html = userController.home(model, request);
 
 			//THEN
+			verify(model).addAttribute(stringArgumentCaptor.capture(), iterableArgumentCaptor.capture()); //times(1) is used by default
+			assertThat(stringArgumentCaptor.getValue()).isEqualTo("users");
+			assertThat(iterableArgumentCaptor.getValue())
+					.extracting(
+							User::getId,
+							User::getUsername,
+							User::getPassword,
+							User::getFullname,
+							User::getRole)
+					.containsExactly(
+							tuple(1, "Aaa", "", "AAA", "USER"),
+							tuple(2, "Bbb", "", "BBB", "USER"));
 			assertThat(html).isEqualTo("user/list");
 		}
 
@@ -235,12 +272,33 @@ public class UserControllerTest {
 
 			//GIVEN
 			User user = new User();
-			when(userService.getUserByIdWithBlankPasswd(anyInt())).thenReturn(user);
+			user.setId(1);
+			user.setUsername("Aaa");
+			user.setPassword("apw1=Passwd");
+			user.setFullname("AAA");
+			user.setRole("USER");
+			ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+			ArgumentCaptor<User> userArgumentCaptor = ArgumentCaptor.forClass(User.class);
+			when(userService.getUserByIdWithBlankPasswd(anyInt())).thenReturn(user.builder().id(1).username("Aaa").password("").fullname("AAA").role("USER").build());
 
 			//WHEN
 			String html = userController.showUpdateForm(1, model, request);
 
 			//THEN
+			verify(model).addAttribute(stringArgumentCaptor.capture(), userArgumentCaptor.capture()); //times(1) is used by default
+			assertThat(stringArgumentCaptor.getValue()).isEqualTo("user");
+			assertThat(userArgumentCaptor.getValue()).extracting(
+							User::getId,
+							User::getUsername,
+							User::getPassword,
+							User::getFullname,
+							User::getRole)
+					.containsExactly(
+							1,
+							"Aaa",
+							"",
+							"AAA",
+							"USER");	;
 			assertThat(html).isEqualTo("user/update");
 		}
 

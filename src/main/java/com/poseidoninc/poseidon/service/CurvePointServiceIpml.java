@@ -12,6 +12,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Implementation class for CurvePointService
+ *
+ * @see CurvePointService
+ *
+ * @author olivier morel
+ */
 @Service
 @AllArgsConstructor
 @Slf4j
@@ -52,7 +59,12 @@ public class CurvePointServiceIpml implements CurvePointService {
 	public CurvePoint saveCurvePoint(CurvePoint curvePoint) throws DataIntegrityViolationException, UnexpectedRollbackException {
 		CurvePoint curvePointSaved;
 		try {
-			//No need to test blank or null fields for update because constraint validation on each field
+			/*
+			 * No need to test blank or null fields for update because constraint validation on each field
+			 * @DynamicUpdate, Hibernate generates an UPDATE SQL statement that sets only columns that have changed
+			 * @Column(name = "curveId", unique = true) Throws DataIntegrityViolationException
+			 * Throws InvalidDataAccessApiUsageException | OptimisticLockingFailureException
+			 */
 			curvePointSaved = curvePointRepository.save(curvePoint);
 		} catch(DataIntegrityViolationException dive) {
 			log.error("Error while saving curvePoint = {} : {} ", curvePoint.toString(), dive.toString());
@@ -68,7 +80,9 @@ public class CurvePointServiceIpml implements CurvePointService {
 	@Transactional(rollbackFor = UnexpectedRollbackException.class)
 	public void deleteCurvePointById(Integer id) throws UnexpectedRollbackException {
 		try {
-			curvePointRepository.delete(getCurvePointById(id)); //getCurvePointById throws UnexpectedRollbackException
+			/* getCurvePointById throws UnexpectedRollbackException
+			 * Throws InvalidDataAccessApiUsageException | OptimisticLockingFailureException */
+			curvePointRepository.delete(getCurvePointById(id));
 		} catch(Exception e) {
 			log.error("Error while deleting curvePoint = {} : {} ", id, e.toString());
 			throw new UnexpectedRollbackException("Error while deleting curvePoint");
