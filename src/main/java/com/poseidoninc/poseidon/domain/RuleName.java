@@ -8,6 +8,11 @@ import lombok.ToString;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+/**
+ * RuleName Entity
+ *
+ * @author olivier morel
+ */
 @Entity
 @DynamicInsert
 @DynamicUpdate

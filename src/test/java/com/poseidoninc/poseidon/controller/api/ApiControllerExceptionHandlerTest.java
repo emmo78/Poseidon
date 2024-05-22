@@ -103,12 +103,12 @@ public class ApiControllerExceptionHandlerTest {
     public void badRequestExceptionTest() {
 
         //GIVEN
-        BadRequestException bre = new BadRequestException("Error while...");
+        BadRequestException bre = new BadRequestException("Correct request should be a json Entity body");
         //WHEN
         ResponseEntity<ApiError> responseEntity = apiControllerExceptionHandler.badRequestException(bre, request);
         //THEN
         assertThat(responseEntity.getStatusCode().isSameCodeAs(HttpStatus.BAD_REQUEST)).isTrue();
-        assertThat(responseEntity.getBody().getMessage()).isEqualTo("Error while...");
+        assertThat(responseEntity.getBody().getMessage()).isEqualTo("Correct request should be a json Entity body");
     }
 
     @Test

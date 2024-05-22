@@ -7,6 +7,11 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+/**
+ * main entry point for the application.
+ *
+ * @author olivier morel
+ */
 @SpringBootApplication
 @PropertySource({"file:./db.properties", "file:./OAuth2.properties"})
 public class Application {

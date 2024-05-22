@@ -19,6 +19,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.context.request.WebRequest;
 
+/**
+ * CurveController class handles HTTP requests related to Curve Point management.
+ *
+ * @author olivier morel
+ */
 @Controller
 @AllArgsConstructor
 @Slf4j

@@ -3,12 +3,21 @@ package com.poseidoninc.poseidon.service;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.WebRequest;
 
+/**
+ * Implementation class for RequestService
+ *
+ * @see RequestService
+ *
+ * @author olivier morel
+ */
 @Service
 public class RequestServiceImpl implements RequestService {
 
 	@Override
 	public String requestToString(WebRequest request) {
+		//uri in StringBuffer
 		StringBuffer parameters = new StringBuffer(request.getDescription(false)+"?"); 
+		//p = parameter key of values v = String[]
 		request.getParameterMap().forEach((p,v) -> {
 			if (!p.equals("password")) {
 				parameters.append(p + "=");

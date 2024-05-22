@@ -17,6 +17,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.context.request.WebRequest;
 
+/**
+ * BidListController class handles HTTP requests related to Bid List management.
+ *
+ * @author olivier morel
+ */
 @Controller
 @AllArgsConstructor
 @Slf4j

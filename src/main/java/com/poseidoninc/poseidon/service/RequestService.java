@@ -3,7 +3,7 @@ package com.poseidoninc.poseidon.service;
 import org.springframework.web.context.request.WebRequest;
 
 /**
- * Single responsibility for request treatment
+ * web request treatment
  * 
  * @author Olivier MOREL
  *

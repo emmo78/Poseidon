@@ -17,6 +17,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.context.request.WebRequest;
 
+/**
+ * TradeController class handles HTTP requests related to Trade management.
+ *
+ * @author olivier morel
+ */
 @Controller
 @AllArgsConstructor
 @Slf4j

@@ -15,6 +15,11 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
+/**
+ * BidList Entity
+ *
+ * @author olivier morel
+ */
 @Entity
 @DynamicInsert
 @DynamicUpdate

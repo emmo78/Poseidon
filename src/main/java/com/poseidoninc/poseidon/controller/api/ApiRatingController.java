@@ -23,10 +23,15 @@ import org.springframework.web.context.request.WebRequest;
 
 import java.util.Optional;
 
+/**
+ * ApiRatingController class represents the API endpoints (CRUD) for managing Rating.
+ *
+ * @author olivier morel
+ */
 @RestController
 @AllArgsConstructor
 @Slf4j
-@Validated
+@Validated //for constraints on PathVariable
 public class ApiRatingController {
     
 	private final RatingService ratingService;
