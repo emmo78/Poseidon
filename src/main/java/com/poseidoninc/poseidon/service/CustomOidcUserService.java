@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * Customize the loading of the OidcUser.
  *
- * @@author olivier morel
+ * @author olivier morel
  */
 @Service
 @AllArgsConstructor

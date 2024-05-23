@@ -18,8 +18,10 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
- * integration test class to test unique constraint for userRepository
+ * integration test class to test unique constraint for userRepository,
+ * also test JPA Named Query findByUsername
  * and test thrown exception
+ * nominal cases and for corner cases
  * @author olivier morel
  */
 @SpringBootTest
