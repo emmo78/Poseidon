@@ -32,8 +32,8 @@ import java.util.Objects;
  * Customize the loading of the OAuth2User
  */
 @Service
-@Slf4j
 @RequiredArgsConstructor
+@Slf4j
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final ParameterizedTypeReference<List<Map<String, String>>> PARAMETERIZED_RESPONSE_TYPE = new ParameterizedTypeReference<>() {};
@@ -43,7 +43,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final ValidPasswordGenerator validPasswordGenerator;
 
     @Override
-    @Transactional(rollbackFor = {UnexpectedRollbackException.class, DataIntegrityViolationException.class})
+    //@Transactional(rollbackFor = {UnexpectedRollbackException.class, DataIntegrityViolationException.class})
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
         Map<String, Object> attributes = oAuth2User.getAttributes();
