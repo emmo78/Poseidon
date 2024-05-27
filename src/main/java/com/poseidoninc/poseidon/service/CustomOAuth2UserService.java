@@ -30,6 +30,8 @@ import java.util.Objects;
 
 /**
  * Customize the loading of the OAuth2User
+ *
+ * @author olivier morel
  */
 @Service
 @RequiredArgsConstructor
