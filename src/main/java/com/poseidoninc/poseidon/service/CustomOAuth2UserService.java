@@ -44,6 +44,15 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final ValidPasswordGenerator validPasswordGenerator;
 
+    /**
+     * Get the OAuth access token and use it to get users' email and name attributes.
+     * Then persist as new user or update it in database.
+     * Return the user (OAuth2User extends AuthenticatedPrincipal)
+     *
+     * @param userRequest
+     * @return OidcUser : principal
+     * @throws OAuth2AuthenticationException
+     */
     @Override
     //@Transactional(rollbackFor = {UnexpectedRollbackException.class, DataIntegrityViolationException.class})
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {

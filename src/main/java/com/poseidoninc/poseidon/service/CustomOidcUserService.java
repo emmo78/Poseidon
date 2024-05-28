@@ -34,6 +34,15 @@ public class CustomOidcUserService implements OAuth2UserService<OidcUserRequest,
 
     private final ValidPasswordGenerator validPasswordGenerator;
 
+    /**
+     * Get the Oidc token and use it to get users' email and name attributes.
+     * Then persist as new user or update it in database.
+     * Return the user (OidcUser extends OAuth2User, AuthenticatedPrincipal)
+     *
+     * @param userRequest
+     * @return OAuth2User : principal
+     * @throws OAuth2AuthenticationException
+     */
     @Override
     //@Transactional(rollbackFor = {UnexpectedRollbackException.class, DataIntegrityViolationException.class})
     public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {

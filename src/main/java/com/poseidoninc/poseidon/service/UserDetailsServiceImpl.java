@@ -26,6 +26,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserService userService;
 
+    /**
+     * Get the username to try to get users' name, role and password from database
+     * Return the user (UserDetails extends AuthenticatedPrincipal)
+     * @param userName
+     * @return user : principal
+     * @throws UnexpectedRollbackException
+     */
     @Override
     @Transactional(readOnly = true, rollbackFor = UnexpectedRollbackException.class)
     public UserDetails loadUserByUsername(String userName) throws UnexpectedRollbackException {
