@@ -19,9 +19,4 @@ public class HomeController {
     public String home(Principal user) {
         return "home";
     }
-
-    @RequestMapping("/admin/home")
-    public String adminHome() {
-        return "redirect:/bidList/list";
-    }
 }
