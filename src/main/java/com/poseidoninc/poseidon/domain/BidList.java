@@ -73,7 +73,6 @@ public class BidList {
 	String benchmark;
 
 	@Column(name = "bidListDate")
-	@DateTimeFormat
 	@JsonFormat(shape = JsonFormat.Shape.STRING)
 	LocalDateTime bidListDate;
 
@@ -102,7 +101,6 @@ public class BidList {
 	String creationName;
 
 	@Column(name = "creationDate")
-	@DateTimeFormat
 	@JsonFormat(shape = JsonFormat.Shape.STRING)
 	LocalDateTime creationDate;
 
@@ -111,7 +109,6 @@ public class BidList {
 	String revisionName;
 
 	@Column(name = "revisionDate")
-	@DateTimeFormat
 	@JsonFormat(shape = JsonFormat.Shape.STRING)
 	LocalDateTime revisionDate;
 
