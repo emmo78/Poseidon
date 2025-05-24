@@ -69,6 +69,7 @@ public class Trade {
 	Double sellPrice;
 
 	@Column(name = "tradeDate")
+	@DateTimeFormat
 	@JsonFormat(shape = JsonFormat.Shape.STRING)
 	LocalDateTime tradeDate;
 
@@ -97,6 +98,7 @@ public class Trade {
 	String creationName;
 
 	@Column(name = "creationDate")
+	@DateTimeFormat
 	@JsonFormat(shape = JsonFormat.Shape.STRING)
 	LocalDateTime creationDate;
 
@@ -105,6 +107,7 @@ public class Trade {
 	String revisionName;
 
 	@Column(name = "revisionDate")
+	@DateTimeFormat
 	@JsonFormat(shape = JsonFormat.Shape.STRING)
 	LocalDateTime revisionDate;
 

@@ -38,6 +38,7 @@ public class CurvePoint {
 	Integer curveId;
 
 	@Column(name = "asOfDate")
+	@DateTimeFormat
 	@JsonFormat(shape = JsonFormat.Shape.STRING)
 	LocalDateTime asOfDate;
 
@@ -54,6 +55,7 @@ public class CurvePoint {
 	Double value;
 
 	@Column(name = "creationDate")
+	@DateTimeFormat
 	@JsonFormat(shape = JsonFormat.Shape.STRING)
 	LocalDateTime creationDate;
 }
